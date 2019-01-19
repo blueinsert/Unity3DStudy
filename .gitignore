@@ -2,7 +2,6 @@ Temp
 Library
 obj
 Packages
-ProjectSettings
 *.sln
 *.csproj
 *.vs
