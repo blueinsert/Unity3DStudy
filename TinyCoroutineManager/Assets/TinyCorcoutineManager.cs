@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -56,6 +57,94 @@ namespace bluebean.utils
         public override bool IsPassed()
         {
             return m_frames <= 0;
+        }
+    }
+
+    public class WaitUntil : YieldInstruction
+    {
+        private System.Func<bool> m_funcChecker;
+
+        public WaitUntil(System.Func<bool> checker)
+        {
+            m_funcChecker = checker;
+        }
+
+        public override bool IsPassed()
+        {
+            return m_funcChecker();
+        }
+    }
+
+    public class WaitWhile : YieldInstruction
+    {
+        private System.Func<bool> m_funcChecker;
+
+        public WaitWhile(System.Func<bool> checker)
+        {
+            m_funcChecker = checker;
+        }
+
+        public override bool IsPassed()
+        {
+            return !m_funcChecker();
+        }
+    }
+
+    public class WaitAll : YieldInstruction
+    {
+        private List<Func<bool>> m_funcCheckers;
+        private bool m_result = false;
+
+        public WaitAll(List<Func<bool>> checkers)
+        {
+            m_funcCheckers = checkers;
+        }
+
+        public override bool IsPassed()
+        {
+            return m_result;
+        }
+
+        public override void Update()
+        {
+            foreach(var checker in m_funcCheckers)
+            {
+                if (checker == null || !checker())
+                {
+                    m_result = false;
+                    return;
+                }
+            }
+            m_result = true;
+        }
+    }
+
+    public class WaitAny : YieldInstruction
+    {
+        private List<Func<bool>> m_funcCheckers;
+        private bool m_result = false;
+
+        public WaitAny(List<Func<bool>> checkers)
+        {
+            m_funcCheckers = checkers;
+        }
+
+        public override bool IsPassed()
+        {
+            return m_result;
+        }
+
+        public override void Update()
+        {
+            foreach (var checker in m_funcCheckers)
+            {
+                if (checker != null && checker())
+                {
+                    m_result = true;
+                    return;
+                }
+            }
+            m_result = false;
         }
     }
 
