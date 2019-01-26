@@ -33,7 +33,7 @@ public class Test : MonoBehaviour {
         print(Time.frameCount);
         yield return new WaitForNextFrame();
         print(Time.frameCount);
-        yield return new Break();
+        yield break;
     }
 
     IEnumerator Child()
@@ -54,7 +54,7 @@ public class Test : MonoBehaviour {
         print("in child'child, " + Time.frameCount);
         yield return new WaitForNextFrame();
         print("in child'child, 提前退出, " + Time.frameCount);
-        yield return new Break();
+        yield break;
         print("others be skipped");
     }
 

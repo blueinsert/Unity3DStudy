@@ -15,11 +15,6 @@ namespace bluebean.utils
 
     }
 
-    public class Break : YieldInstruction
-    {
-
-    }
-
     public class WaitForSeconds : YieldInstruction
     {
         private float m_duration;
@@ -40,7 +35,7 @@ namespace bluebean.utils
         }
     }
 
-    public class WaitForFrames: YieldInstruction
+    public class WaitForFrames : YieldInstruction
     {
         private int m_frames;
 
@@ -107,7 +102,7 @@ namespace bluebean.utils
 
         public override void Update()
         {
-            foreach(var checker in m_funcCheckers)
+            foreach (var checker in m_funcCheckers)
             {
                 if (checker == null || !checker())
                 {
@@ -158,7 +153,7 @@ namespace bluebean.utils
             var first = corcoutines.First;
             var node = first;
             while (node != null)
-            { 
+            {
                 if (!MoveNext(node.Value))
                 {
                     deadCorcoutines.Add(node.Value);
@@ -177,25 +172,20 @@ namespace bluebean.utils
 
         private bool MoveNext(IEnumerator corcoutine)
         {
-            var current = corcoutine.Current; 
+            var current = corcoutine.Current;
             if (current is IEnumerator && MoveNext(corcoutine.Current as IEnumerator)) //优先执行子协程
             {
                 return true;
-            }else if(current is YieldInstruction)
+            }
+            else if (current is YieldInstruction)
             {
-                if(current is Break)
+                var yieldInstruction = current as YieldInstruction;
+                yieldInstruction.Update();
+                if (yieldInstruction.IsPassed())
                 {
-                    return false;
-                }else
-                {
-                    var yieldInstruction = current as YieldInstruction;
-                    yieldInstruction.Update();
-                    if (yieldInstruction.IsPassed())
-                    {
-                        return corcoutine.MoveNext();
-                    }
-                    return true;
-                }  
+                    return corcoutine.MoveNext();
+                }
+                return true;
             }
             else
             {
