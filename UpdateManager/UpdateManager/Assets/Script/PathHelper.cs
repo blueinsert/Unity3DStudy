@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class PathHelper
 {
+    public static string GetPathRelativeToProject(string fullPath)
+    { 
+        return "Assets/" + GetPathRelativeToAsset(fullPath);
+    }
+
     public static string GetPathRelativeToAsset(string fullPath)
     {
         var res = fullPath.Replace("\\", "/").Replace(Application.dataPath + "/", "");

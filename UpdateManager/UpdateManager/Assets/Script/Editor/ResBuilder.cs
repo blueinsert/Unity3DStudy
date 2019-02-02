@@ -1,8 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
-using System.IO;
+using System.Security.Cryptography;
 
 public class ResBuilder 
 {
@@ -51,11 +54,13 @@ public class ResBuilder
         return true;
     }
 
-    [MenuItem("Build/SetAssetBundleName")]
+    [MenuItem("Build/Step/1.SetAssetBundleName")]
     public static void SetAssetBundleName()
     {
         string resourcePath = Application.dataPath + "/" + "Resources";
         DirectoryInfo dirInfo = new DirectoryInfo(resourcePath);
+        //清理所有打包标签
+        SetAssetBundleName(dirInfo, string.Empty);
         //收集打包的文件夹
         List<DirectoryInfo> assetBundleDirs = new List<DirectoryInfo>();
         CollectAssetBundleFolder(dirInfo, assetBundleDirs);
@@ -69,16 +74,103 @@ public class ResBuilder
             SetAssetBundleName(dir, PathHelper.GetAssetBundleName(dir.FullName));
         }
         AssetDatabase.SaveAssets();
-        Debug.Log("SetAssetBundleName done");
+        Debug.Log("1.SetAssetBundleName done");
    }
 
-    [MenuItem("Build/GenerateResourceInfo")]
+    [MenuItem("Build/Step/2.GenerateResourceInfo")]
     public static void GenerateResourceInfo()
     {
-        var assetBundles = AssetDatabase.GetAllAssetBundleNames();
-        foreach(var assetBundleName in assetBundles)
+        //旧的ResourceInfo文件
+        var resourceInfoPath = PathHelper.GetPathRelativeToProject(Application.dataPath + "/Resources/ResourcesInfo.asset");
+        var resourceInfos = AssetDatabase.LoadAssetAtPath<ResourceInfo>(resourceInfoPath);
+        if(resourceInfos == null)
         {
-            Debug.Log(assetBundleName);
+            resourceInfos = ScriptableObject.CreateInstance<ResourceInfo>();
+            AssetDatabase.CreateAsset(resourceInfos, resourceInfoPath);
         }
+        //中间数据
+        var bundleDataDic = new Dictionary<string, BundleData>();
+        foreach(var bundleData in resourceInfos.resources)
+        {
+            bundleDataDic[bundleData.bundleName] = bundleData;
+        }
+
+        var assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+        //是否有assetBundle被删除
+        List<BundleData> removedBundleData = new List<BundleData>();
+        foreach(var bundleData in bundleDataDic.Values)
+        {
+            if (!assetBundleNames.Contains(bundleData.bundleName)){
+                removedBundleData.Add(bundleData);
+            }
+        }
+        foreach(var removeItem in removedBundleData)
+        {
+            bundleDataDic.Remove(removeItem.bundleName);
+        }
+        foreach (var assetBundleName in assetBundleNames)
+        {
+            BundleData bundleData;
+            //新增的assetBundle
+            if(!bundleDataDic.TryGetValue(assetBundleName, out bundleData))
+            {
+                bundleData = new BundleData();
+                bundleData.bundleName = assetBundleName;
+                bundleDataDic.Add(assetBundleName, bundleData);
+            }
+            var assets = AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName);
+            bundleData.allAssets = new List<string>(assets);
+        }
+        resourceInfos.resources = new List<BundleData>(bundleDataDic.Values);
+        EditorUtility.SetDirty(resourceInfos);
+        AssetDatabase.SaveAssets();
+        Debug.Log("2.GenerateResourceInfo done");
+    }
+
+    [MenuItem("Build/Step/3.GenerateAssetBundles")]
+    public static void GenerateAssetBundles()
+    {
+        DirectoryInfo dir = new DirectoryInfo(Application.streamingAssetsPath);
+        if (!dir.Exists)
+        {
+            dir.Create();
+        }
+        BuildPipeline.BuildAssetBundles(Application.streamingAssetsPath, BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
+        Debug.Log("3.GenerateAssetBundles done");
+    }
+
+    private static string GetFileHash(string path)
+    {
+        var hash = SHA1.Create();
+        var stream = new FileStream(path, FileMode.Open);
+        byte[] hashBytes = hash.ComputeHash(stream);
+        stream.Close();
+        return BitConverter.ToString(hashBytes).Replace("-", "");
+    }
+
+    [MenuItem("Build/Step/4.CalcAssetBundlesHashCode")]
+    public static void CalcAssetBundlesHashCode()
+    {
+        var resourceInfoPath = PathHelper.GetPathRelativeToProject(Application.dataPath + "/Resources/ResourcesInfo.asset");
+        var resourceInfos = AssetDatabase.LoadAssetAtPath<ResourceInfo>(resourceInfoPath);
+        foreach(var bundleData in resourceInfos.resources)
+        {
+            var fileHash = GetFileHash(Application.streamingAssetsPath + "/" + bundleData.bundleName);
+            bundleData.hashCode = fileHash;
+        }
+        EditorUtility.SetDirty(resourceInfos);
+        AssetDatabase.SaveAssets();
+        //复制一份ResourceInfo到StreamAsset文件夹
+        File.Copy(Application.dataPath + "/Resources/ResourcesInfo.asset",  Application.streamingAssetsPath + "/ResourcesInfo.asset", true);
+        Debug.Log("4.CalcAssetBundlesHashCode done");
+    }
+
+    [MenuItem("Build/BuildAllStep")]
+    public static void BuildAllStep()
+    {
+        SetAssetBundleName();
+        GenerateResourceInfo();
+        GenerateAssetBundles();
+        CalcAssetBundlesHashCode();
     }
 }
