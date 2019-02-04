@@ -8,7 +8,7 @@ public class BundleData
     public string bundleName;
     public int version;
     public string hashCode;
-    public int size;
+    public long size;//byte
     public List<string> allAssets = new List<string>();
     
 }

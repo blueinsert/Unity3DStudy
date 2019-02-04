@@ -14,20 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resources:
   - bundleName: bg_blue_blue1990_ab
-    version: 0
+    version: 1
+    hashCode: CAE0206D64CEFC2FDBA808E9BFA861F87990A2B4
+    size: 1156
     allAssets:
     - Assets/Resources/BG/Blue/Blue1990_ab/test.txt
-    hashCode: CAE0206D64CEFC2FDBA808E9BFA861F87990A2B4
   - bundleName: char_ab
-    version: 0
+    version: 1
+    hashCode: BD615F66D0F007DFB2FDFD83F062C5F1358F08FA
+    size: 43845
     allAssets:
     - Assets/Resources/char_ab/moun.png
     - Assets/Resources/char_ab/New Material.mat
     - Assets/Resources/char_ab/NewSurfaceShader.shader
     - Assets/Resources/char_ab/Script/test.txt
-    hashCode: BD615F66D0F007DFB2FDFD83F062C5F1358F08FA
   - bundleName: scene_ab
-    version: 0
+    version: 1
+    hashCode: 261632C46106ADA14C86676CFEFA8ACCAFBF6AC8
+    size: 1137
     allAssets:
     - Assets/Resources/scene_ab/scene.txt
-    hashCode: 261632C46106ADA14C86676CFEFA8ACCAFBF6AC8

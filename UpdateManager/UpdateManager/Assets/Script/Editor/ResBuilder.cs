@@ -148,21 +148,33 @@ public class ResBuilder
         return BitConverter.ToString(hashBytes).Replace("-", "");
     }
 
-    [MenuItem("Build/Step/4.CalcAssetBundlesHashCode")]
-    public static void CalcAssetBundlesHashCode()
+    public static long GetFileSize(string path)
+    {
+        FileInfo fileInfo = new FileInfo(path);
+        return fileInfo.Length;
+    }
+
+    [MenuItem("Build/Step/4.CalcAssetBundlesInfo")]
+    public static void CalcAssetBundlesInfo()
     {
         var resourceInfoPath = PathHelper.GetPathRelativeToProject(Application.dataPath + "/Resources/ResourcesInfo.asset");
         var resourceInfos = AssetDatabase.LoadAssetAtPath<ResourceInfo>(resourceInfoPath);
         foreach(var bundleData in resourceInfos.resources)
         {
+            var oldHash = bundleData.hashCode;
             var fileHash = GetFileHash(Application.streamingAssetsPath + "/" + bundleData.bundleName);
+            if (fileHash != oldHash)
+            {
+                bundleData.version++;
+            }
             bundleData.hashCode = fileHash;
+            bundleData.size = GetFileSize(Application.streamingAssetsPath + "/" + bundleData.bundleName);
         }
         EditorUtility.SetDirty(resourceInfos);
         AssetDatabase.SaveAssets();
         //复制一份ResourceInfo到StreamAsset文件夹
         File.Copy(Application.dataPath + "/Resources/ResourcesInfo.asset",  Application.streamingAssetsPath + "/ResourcesInfo.asset", true);
-        Debug.Log("4.CalcAssetBundlesHashCode done");
+        Debug.Log("4.CalcAssetBundlesInfo done");
     }
 
     [MenuItem("Build/BuildAllStep")]
@@ -171,6 +183,6 @@ public class ResBuilder
         SetAssetBundleName();
         GenerateResourceInfo();
         GenerateAssetBundles();
-        CalcAssetBundlesHashCode();
+        CalcAssetBundlesInfo();
     }
 }
