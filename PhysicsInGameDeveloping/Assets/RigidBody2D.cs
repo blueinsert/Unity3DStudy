@@ -6,31 +6,33 @@ namespace bluebean
 {
     public class RigidBody2D
     {
-        float m_mass;
-        float m_inertia;//转动惯量
-        float m_inertiaInverse;//1/inertia
-        Vector3 m_position; //global coordinates
-        Vector3 m_velocity; //global coordinates
-        Vector3 m_velocityLocal; //local coordinates
-        Vector3 m_angularVelocityLocal; //角速度，本地坐标系, 单位：rad/s
+        public float m_mass;
+        public float m_inertia;//转动惯量
+        public float m_inertiaInverse;//1/inertia
+        public Vector3 m_position; //global coordinates
+        public Vector3 m_velocity; //global coordinates
+        public Vector3 m_velocityLocal; //local coordinates
+        public Vector3 m_angularVelocityLocal; //角速度，本地坐标系, 单位：rad/s
         float m_speed;
-        float m_orientation; //朝向，绕z轴旋转的角度，单位：deg
+        public float m_orientation; //朝向，绕z轴旋转的角度，单位：deg
         Vector3 m_forces; //受力和
         Vector3 m_moment; //力矩和
         float m_thrustForce; //主推力大小
         Vector3 m_lThrustLocal, m_rThrustLocal;//侧向推力
         //几何大小
-        float m_width;
-        float m_length;
-        float m_height;
+        public float m_width;
+        public float m_length;
+        public float m_height;
         Vector3 m_dragCenterLocal; //阻力受力点
         Vector3 m_thrustCenterLocal;//推力受力点
         Vector3 m_leftThrustCenterLocal; //左侧推力受力点
         Vector3 m_rightThrustCenterLocal; //右侧推力受力点
         float m_projectedArea; //在与运动方向垂直平面的投影面积，计算阻力用
 
-        Vector3[] m_vertexListLocal;
-        Vector3[] m_vertexListGlobal;
+        public Vector3[] m_vertexListLocal;
+        public Vector3[] m_vertexListGlobal;
+
+        public Vector3 m_collisionPoint;
 
         const float THRUSTFORCE = 5.0f;//初始时的推力大小
         const float MAXTHRUST = 10.0f; //最大主推力
@@ -83,6 +85,35 @@ namespace bluebean
             {
                 m_vertexListGlobal[i] = new Vector3();
             }
+        }
+
+        public void CopyTo(RigidBody2D target)
+        {
+            target.m_mass = this.m_mass;
+            target.m_inertia = this.m_inertia;
+            target.m_inertiaInverse = this.m_inertiaInverse;
+            target.m_position = this.m_position;
+            target.m_width = this.m_width;
+            target.m_length = this.m_length;
+            target.m_height = this.m_height;
+            target.m_orientation = this.m_orientation;
+
+            target.m_dragCenterLocal = this.m_dragCenterLocal; 
+
+            target.m_thrustCenterLocal = this.m_thrustCenterLocal;
+
+            target.m_leftThrustCenterLocal = this.m_leftThrustCenterLocal;
+
+            target.m_rightThrustCenterLocal = this.m_rightThrustCenterLocal;
+
+            target.m_projectedArea = this.m_projectedArea;
+            target.m_thrustForce = this.m_thrustForce;
+
+            for (int i = 0; i < 5; i++)
+            {
+                target.m_vertexListLocal[i] = this.m_vertexListLocal[i];
+            }
+           
         }
 
         void CalcLoads() {
