@@ -42,7 +42,7 @@ namespace bluebean
         const float LINEARDRAGCOEFFICIENT = 1.25f; //阻力系数
 
         public RigidBody2D() {
-            m_mass = 100;
+            m_mass = 50;
             m_inertia = 500;
             m_inertiaInverse = 1 / m_inertia;
             m_position.x = 0; m_position.y = 0;
@@ -113,6 +113,12 @@ namespace bluebean
             {
                 target.m_vertexListLocal[i] = this.m_vertexListLocal[i];
             }
+            for (int i = 0; i < 5; i++)
+            {
+                target.m_vertexListGlobal[i] = this.m_vertexListGlobal[i];
+            }
+            target.m_lThrustLocal = this.m_lThrustLocal;
+            target.m_rThrustLocal = this.m_rThrustLocal;
            
         }
 
@@ -172,6 +178,13 @@ namespace bluebean
 
             m_speed = m_velocity.magnitude;
             m_velocityLocal = PhysicsWorld.VRotate2D(-m_orientation, m_velocity);
+            ///*
+            for (int i = 0; i < 5; i++)
+            {
+                m_vertexListGlobal[i] = PhysicsWorld.VRotate2D(m_orientation, m_vertexListLocal[i]);
+                m_vertexListGlobal[i] = m_vertexListGlobal[i] + m_position;
+            }
+            //*/
         }
 
         public void SetThrusters(bool l, bool r) {
@@ -194,11 +207,13 @@ namespace bluebean
 
         public void Draw(Color color)
         {
-            for(int i = 0; i < 5; i++)
+            /*
+            for (int i = 0; i < 5; i++)
             {
                 m_vertexListGlobal[i] = PhysicsWorld.VRotate2D(m_orientation, m_vertexListLocal[i]);
                 m_vertexListGlobal[i] = m_vertexListGlobal[i] + m_position;
             }
+            */
             Debug.DrawLine(m_vertexListGlobal[0], m_vertexListGlobal[1], color, Time.deltaTime);
             Debug.DrawLine(m_vertexListGlobal[1], m_vertexListGlobal[2], color, Time.deltaTime);
             Debug.DrawLine(m_vertexListGlobal[2], m_vertexListGlobal[3], color, Time.deltaTime);
