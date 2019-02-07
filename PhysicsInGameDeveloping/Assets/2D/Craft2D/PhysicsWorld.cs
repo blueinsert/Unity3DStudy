@@ -16,8 +16,8 @@ namespace bluebean
         public CollisionResultType m_type;
         public Vector3 m_collisionNormal;
         public Vector3 m_relativeVelocity;
-        public RigidBody2D m_body1;
-        public RigidBody2D m_body2;
+        public RigidBody2DCraft m_body1;
+        public RigidBody2DCraft m_body2;
     }
 
     public class PhysicsWorld
@@ -27,10 +27,10 @@ namespace bluebean
         const float COLLISIONTOLERANCE = 0.01f;
 
         int m_frameCount = 0;
-        RigidBody2D m_craft;
-        RigidBody2D m_craft2;
-        RigidBody2D m_craft1Copy;
-        RigidBody2D m_craft2Copy;
+        RigidBody2DCraft m_craft;
+        RigidBody2DCraft m_craft2;
+        RigidBody2DCraft m_craft1Copy;
+        RigidBody2DCraft m_craft2Copy;
         CollisionResult collisionResult = new CollisionResult();
         Vector3 m_collisionNormal;
         Vector3 m_relativeVelocity;
@@ -39,12 +39,12 @@ namespace bluebean
 
         public void Initialize()
         {
-            m_craft = new RigidBody2D();
-            m_craft2 = new RigidBody2D();
+            m_craft = new RigidBody2DCraft();
+            m_craft2 = new RigidBody2DCraft();
             m_craft2.m_orientation = -90;
             m_craft2.m_position = new Vector3(-30, 30);
-            m_craft1Copy = new RigidBody2D();
-            m_craft2Copy = new RigidBody2D();
+            m_craft1Copy = new RigidBody2DCraft();
+            m_craft2Copy = new RigidBody2DCraft();
         }
 
         public void UpdateSimulation(float dt)
@@ -114,7 +114,7 @@ namespace bluebean
             m_frameCount++;
         }
 
-        CollisionResultType CheckForCollision(RigidBody2D body1, RigidBody2D body2, CollisionResult collisionResult)
+        CollisionResultType CheckForCollision(RigidBody2DCraft body1, RigidBody2DCraft body2, CollisionResult collisionResult)
         {
             bool haveNodeNode = false;
             bool haveNodeEdge = false;
@@ -229,18 +229,18 @@ namespace bluebean
             return result;
         }
 
-        void ApplyImpulse(RigidBody2D body1, RigidBody2D body2)
+        void ApplyImpulse(RigidBody2DCraft body1, RigidBody2DCraft body2)
         {
             float j = -(1 + fcr) * Vector3.Dot(m_relativeVelocity, m_collisionNormal) /
                 (
                 1 / body1.m_mass + 1 / body2.m_mass +
-                Vector3.Dot(m_collisionNormal, Vector3.Cross(Vector3.Cross(body1.m_collisionPoint, m_collisionNormal) / body1.m_inertia, body1.m_collisionPoint)) +
-                Vector3.Dot(m_collisionNormal, Vector3.Cross(Vector3.Cross(body2.m_collisionPoint, m_collisionNormal) / body2.m_inertia, body2.m_collisionPoint))
+                Vector3.Dot(m_collisionNormal, Vector3.Cross(Vector3.Cross(body1.m_collisionPoint, m_collisionNormal), body1.m_collisionPoint)) / body1.m_inertia +
+                Vector3.Dot(m_collisionNormal, Vector3.Cross(Vector3.Cross(body2.m_collisionPoint, m_collisionNormal), body2.m_collisionPoint)) / body2.m_inertia
                 );
             body1.m_velocity += (j * m_collisionNormal) / body1.m_mass;
             body1.m_angularVelocityLocal += Vector3.Cross(body1.m_collisionPoint, j * m_collisionNormal) / body1.m_inertia;
-            body2.m_velocity += (j * m_collisionNormal) / body2.m_mass;
-            body2.m_angularVelocityLocal -= Vector3.Cross(body2.m_collisionPoint, j * m_collisionNormal) / body2.m_inertia;
+            body2.m_velocity += (-j * m_collisionNormal) / body2.m_mass;
+            body2.m_angularVelocityLocal += Vector3.Cross(body2.m_collisionPoint, -j * m_collisionNormal) / body2.m_inertia;
         }
 
         public static bool ArePointsEqual(Vector3 p1, Vector3 p2)
@@ -257,7 +257,7 @@ namespace bluebean
             }
         }
 
-        void DrawCraft(RigidBody2D craft, Color color)
+        void DrawCraft(RigidBody2DCraft craft, Color color)
         {
             craft.Draw(color);
         }

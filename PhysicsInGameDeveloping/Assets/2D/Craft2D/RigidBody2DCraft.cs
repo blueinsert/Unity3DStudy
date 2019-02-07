@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace bluebean
 {
-    public class RigidBody2D
+    public class RigidBody2DCraft
     {
         public float m_mass;
         public float m_inertia;//转动惯量
@@ -41,7 +41,7 @@ namespace bluebean
         const float STEERINGFORCE = 3f;//侧向推力大小
         const float LINEARDRAGCOEFFICIENT = 1.25f; //阻力系数
 
-        public RigidBody2D() {
+        public RigidBody2DCraft() {
             m_mass = 50;
             m_inertia = 500;
             m_inertiaInverse = 1 / m_inertia;
@@ -87,7 +87,7 @@ namespace bluebean
             }
         }
 
-        public void CopyTo(RigidBody2D target)
+        public void CopyTo(RigidBody2DCraft target)
         {
             target.m_mass = this.m_mass;
             target.m_inertia = this.m_inertia;
