@@ -17,5 +17,11 @@ namespace bluebean
         public float m_k;
         public float m_d;
         public float m_initialLength;
+
+        public SpringEP()
+        {
+            m_end1 = new EndPoint();
+            m_end2 = new EndPoint();
+        }
     }
 }
