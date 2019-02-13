@@ -10,6 +10,9 @@ namespace bluebean
         private float m_w;
         public float length { get { return m_l; } }
         public float width { get { return m_w; } }
+        public Vector3 position { get { return m_owner.rigidBody.m_position; } }
+        public Vector3 velocity { get { return m_owner.rigidBody.m_velocity; } }
+        public Vector3 angularVelocityLocal { get { return m_owner.rigidBody.m_angularVelocityLocal; } }
         private Vector3[] m_pointsLocal;
         private Vector3[] m_points;
         public Vector3[] pointsLocal { get { return m_pointsLocal; } }

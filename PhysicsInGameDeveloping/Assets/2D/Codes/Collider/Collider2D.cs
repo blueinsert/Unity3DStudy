@@ -1,11 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Vector3 = UnityEngine.Vector3;
 
 namespace bluebean
 {
+    public class CollisionPointInfo
+    {
+        public Vector3 m_point;
+        public Vector3 m_relativeVelocity;
+        public Vector3 m_collisionNormal;
+    }
+
     public abstract class Collider2D
     {
         protected LogicGameObject2D m_owner;
+
+        //public List<CollisionPointInfo> m_collisionPoints;
 
         public Collider2D(LogicGameObject2D go)
         {
