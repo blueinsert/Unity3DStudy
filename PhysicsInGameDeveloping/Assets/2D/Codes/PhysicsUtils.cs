@@ -106,7 +106,7 @@ namespace bluebean
             {
                 return CollideTest(collider1 as Box2DCollider, collider2 as Box2DCollider, out collisionPointInfos);
             }
-            return null;
+            return CollisionResultType.Separate;
         }
 
         public static CollisionResultType CollideTest(Box2DCollider collider1, Box2DCollider collider2, out List<CollisionPointInfo> collisionPointInfos)

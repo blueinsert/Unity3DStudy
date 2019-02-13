@@ -25,17 +25,19 @@ namespace bluebean
         {
             var collisionNormal = collisionPointInfo.m_collisionNormal;
             var relativeVelocity = collisionPointInfo.m_relativeVelocity;
-            var collisionPoint = collisionPointInfo.m_point;
+            var collisionPoint1Local = collisionPointInfo.m_point - obj1.position;
+            var collisionPoint2Local = collisionPointInfo.m_point - obj2.position;
+
             float j = -(1 + 0.5f) * Vector3.Dot(relativeVelocity, collisionNormal) /
                 (
                 1 / obj1.mass + 1 / obj2.mass +
-                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint, collisionNormal), collisionPoint)) / obj1.inertia +
-                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint, collisionNormal), collisionPoint)) / obj2.inertia
+                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint1Local, collisionNormal), collisionPoint1Local)) / obj1.inertia +
+                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint2Local, collisionNormal), collisionPoint2Local)) / obj2.inertia
                 );
             obj1.rigidBody.m_velocity += (j * collisionNormal) / obj1.mass;
-            obj1.rigidBody.m_angularVelocityLocal += Vector3.Cross(body1.m_collisionPoint, j * m_collisionNormal) / body1.m_inertia;
-            body2.m_velocity += (-j * m_collisionNormal) / body2.m_mass;
-            body2.m_angularVelocityLocal += Vector3.Cross(body2.m_collisionPoint, -j * m_collisionNormal) / body2.m_inertia;
+            obj1.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint1Local, j * collisionNormal) / obj1.inertia;
+            obj2.rigidBody.m_velocity += (-j * collisionNormal) / obj2.mass;
+            obj2.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint2Local, -j * collisionNormal) / obj2.inertia;
         }
 
         public void Update(float deltaTime)

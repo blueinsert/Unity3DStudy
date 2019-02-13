@@ -4,22 +4,7 @@ using UnityEngine;
 
 namespace bluebean
 {
-    public enum CollisionResultType
-    {
-        Collision,
-        Penetrating,
-        Separate,
-    }
-
-    public class CollisionResult
-    {
-        public CollisionResultType m_type;
-        public Vector3 m_collisionNormal;
-        public Vector3 m_relativeVelocity;
-        public RigidBody2DCraft m_body1;
-        public RigidBody2DCraft m_body2;
-    }
-
+   
     public class PhysicsWorld
     {
         const float LINEARDRAGCOEFFICIENT = 0.25f;
@@ -31,7 +16,6 @@ namespace bluebean
         RigidBody2DCraft m_craft2;
         RigidBody2DCraft m_craft1Copy;
         RigidBody2DCraft m_craft2Copy;
-        CollisionResult collisionResult = new CollisionResult();
         Vector3 m_collisionNormal;
         Vector3 m_relativeVelocity;
         float fcr = COEFFICIENTOFRESTITUTION;
@@ -79,7 +63,7 @@ namespace bluebean
                 m_craft2.CopyTo(m_craft2Copy);
                 m_craft1Copy.UpdateBodyEuler(deltaTime);
                 m_craft2Copy.UpdateBodyEuler(deltaTime);
-                collisionResultType = CheckForCollision(m_craft1Copy, m_craft2Copy, collisionResult);
+                collisionResultType = CheckForCollision(m_craft1Copy, m_craft2Copy);
                 if (collisionResultType == CollisionResultType.Collision)
                 {
                     Debug.Log("ApplyImpulse");
@@ -114,12 +98,11 @@ namespace bluebean
             m_frameCount++;
         }
 
-        CollisionResultType CheckForCollision(RigidBody2DCraft body1, RigidBody2DCraft body2, CollisionResult collisionResult)
+        CollisionResultType CheckForCollision(RigidBody2DCraft body1, RigidBody2DCraft body2)
         {
             bool haveNodeNode = false;
             bool haveNodeEdge = false;
             bool interpenetrating = false;
-            collisionResult.m_type = CollisionResultType.Separate;
             //检查是否点与点之间发生碰撞
             for (int i = 0; i < 5 && !haveNodeNode; i++)
             {
