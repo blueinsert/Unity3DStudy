@@ -73,6 +73,8 @@ namespace bluebean
 
         public void UpdateBodyEuler(float dt)
         {
+            if (this.m_mass == 0)
+                return;
             Vector3 a = new Vector3();
             Vector3 dv = new Vector3();
             Vector3 ds = new Vector3();

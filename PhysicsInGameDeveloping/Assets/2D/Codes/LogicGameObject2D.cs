@@ -19,11 +19,14 @@ namespace bluebean
         public float orientation { get { return m_rigidBody.m_orientation; } }
         public float inertia { get { return m_rigidBody.m_inertia; } }
 
-        public LogicGameObject2D(Collider2D collider)
+        public LogicGameObject2D(Collider2D collider, Vector3 position, float orientation = 0, float? mass = null)
         {
             m_collider = collider;
             m_collider.SetGameObject(this);
             m_rigidBody = new RigidBody2D();
+            m_rigidBody.m_position = position;
+            m_rigidBody.m_orientation = orientation;
+            m_rigidBody.m_mass = (float)(mass == null ? 1 : mass);
         }
 
         public void UpdatePhysics(float deltaTime)

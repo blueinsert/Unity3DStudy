@@ -13,7 +13,7 @@ namespace bluebean
         Separate,
     }
 
-    public class PhysicsUtils
+    public class PhysicsUtils2D
     {
         const float COLLISIONTOLERANCE = 0.01f;
         const float ctol = COLLISIONTOLERANCE;
@@ -27,8 +27,14 @@ namespace bluebean
             return normal;
         }
 
-        //轴分离相交检测算法
-        public static bool AxisSeparateIntersectionTest(Vector3[] C1Points, Vector3[] C2Points)
+        private static Vector3 GetLineNormalVector(Vector3 p1, Vector3 p2)
+        {
+            return GetPlaneNormalVector(p1, p2, p1 + new Vector3(0,0,1));
+        }
+
+
+        //轴分离相交检测算法，长方体
+        public static bool AxisSeparateIntersectionTest3D(Vector3[] C1Points, Vector3[] C2Points)
         {
             Vector3[] normalVectors = new Vector3[6];
             normalVectors[0] = GetPlaneNormalVector(C1Points[0], C1Points[3], C1Points[2]);
@@ -41,6 +47,62 @@ namespace bluebean
 
             bool isIntersect = true;
             for (int i = 0; i < 6; i++)
+            {
+                Vector3 normal = normalVectors[i];
+                //
+                float c1Max = float.MinValue;
+                float c1Min = float.MaxValue;
+                foreach (var v in C1Points)
+                {
+                    float projectValue = Vector3.Dot(v, normal);
+                    if (projectValue > c1Max)
+                    {
+                        c1Max = projectValue;
+                    }
+                    if (projectValue < c1Min)
+                    {
+                        c1Min = projectValue;
+                    }
+                }
+                //
+                float c2Max = float.MinValue;
+                float c2Min = float.MaxValue;
+                foreach (var v in C2Points)
+                {
+                    float projectValue = Vector3.Dot(v, normal);
+                    if (projectValue > c2Max)
+                    {
+                        c2Max = projectValue;
+                    }
+                    if (projectValue < c2Min)
+                    {
+                        c2Min = projectValue;
+                    }
+                }
+                //
+                if (c2Min > c1Max || c1Min > c2Max)
+                {
+                    isIntersect = false;
+                    //Debug.Log("c1Min:" + c1Min + " c1Max" + c1Max + " c2Min:" + c2Min + " c2Max" + c2Max);
+                    break;
+                }
+
+            }//for six separate axis
+            return isIntersect;
+        }
+
+        //轴分离相交检测算法，长方形
+        public static bool AxisSeparateIntersectionTest2D(Vector3[] C1Points, Vector3[] C2Points)
+        {
+            Vector3[] normalVectors = new Vector3[4];
+            normalVectors[0] = GetLineNormalVector(C1Points[0], C1Points[1]);
+            normalVectors[1] = GetLineNormalVector(C1Points[1], C1Points[2]);
+
+            normalVectors[2] = GetLineNormalVector(C2Points[0], C2Points[1]);
+            normalVectors[3] = GetLineNormalVector(C2Points[1], C2Points[2]);
+
+            bool isIntersect = true;
+            for (int i = 0; i < 4; i++)
             {
                 Vector3 normal = normalVectors[i];
                 //
@@ -118,7 +180,7 @@ namespace bluebean
                 var p2 = collider2.position;
                 float dist = (p1 - p2).magnitude;
                 var r1 = Math.Sqrt(collider1.width * collider1.width + collider1.length * collider1.length) / 2;
-                var r2 = Math.Sqrt(collider1.width * collider1.width + collider1.length * collider1.length) / 2;
+                var r2 = Math.Sqrt(collider2.width * collider2.width + collider2.length * collider2.length) / 2;
                 if (dist > r1 + r2)
                     return CollisionResultType.Separate;
             }
@@ -243,10 +305,10 @@ namespace bluebean
             {
                 return CollisionResultType.Collision;
             }
-            if (AxisSeparateIntersectionTest(collider1.points, collider2.points))
+            if (AxisSeparateIntersectionTest2D(collider1.points, collider2.points))
             {
                 return CollisionResultType.Penetrating;
-            }
+             }
             return CollisionResultType.Separate;
         }
 

@@ -58,10 +58,17 @@ namespace bluebean
                     for (int j = i + 1; j < m_objs.Count; j++)
                     {
                         List<CollisionPointInfo> collisionPointInfos;
-                        var result = PhysicsUtils.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionPointInfos);
-                        if(result == CollisionResultType.Collision)
+                        var result = PhysicsUtils2D.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionPointInfos);
+                        UnityEngine.Debug.Log(result);
+                        if (result == CollisionResultType.Collision)
                         {
-
+                            if (collisionPointInfos.Count != 0)
+                            {
+                                foreach(var collisionPointInfo in collisionPointInfos)
+                                {
+                                    ApplyImpulse(m_objs[i], m_objs[j], collisionPointInfo);
+                                }
+                            }
                         }
                     }
                 }

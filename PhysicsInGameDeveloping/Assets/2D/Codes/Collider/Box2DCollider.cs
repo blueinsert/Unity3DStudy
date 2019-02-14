@@ -13,14 +13,16 @@ namespace bluebean
         public Vector3 position { get { return m_owner.rigidBody.m_position; } }
         public Vector3 velocity { get { return m_owner.rigidBody.m_velocity; } }
         public Vector3 angularVelocityLocal { get { return m_owner.rigidBody.m_angularVelocityLocal; } }
+
         private Vector3[] m_pointsLocal;
-        private Vector3[] m_points;
         public Vector3[] pointsLocal { get { return m_pointsLocal; } }
+
+        private Vector3[] m_points;
         public Vector3[] points {
             get {
                 for(int i = 0; i< m_pointsLocal.Length; i++)
                 {
-                    m_pointsLocal[i] = m_points[i].Rotate(m_owner.orientation) + m_owner.position;
+                    m_points[i] = m_pointsLocal[i].Rotate(m_owner.orientation) + m_owner.position;
                 }
                 return m_points;
             }
@@ -44,7 +46,7 @@ namespace bluebean
 
         public override void DebugDraw(UnityEngine.Color color, float deltaTime)
         {
-            var points = this.m_points;
+            var points = this.points;
             for(int i = 0; i < 4; i++)
             {
                 if(i == 0)
@@ -53,7 +55,7 @@ namespace bluebean
                 }
                 else
                 {
-                    UnityEngine.Debug.DrawLine(points[i+1], points[i], color, deltaTime);
+                    UnityEngine.Debug.DrawLine(points[i], points[i-1], color, deltaTime);
                 }
             }
         }
