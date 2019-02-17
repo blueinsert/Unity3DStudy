@@ -154,22 +154,16 @@ namespace bluebean
                     }
                 }
                 //
-                if (c2Min > c1Max || c1Min > c2Max)
+                if (c2Min >= c1Max || c1Min >= c2Max)
                 {
                     isIntersect = false;
                     //Debug.Log("c1Min:" + c1Min + " c1Max" + c1Max + " c2Min:" + c2Min + " c2Max" + c2Max);
-                    break;
                 }
                 else
                 {
-                    float penetratingDist = 0;
-                    if(c1Max > c2Min)
-                    {
-                        penetratingDist = c1Max - c2Min;
-                    }else
-                    {
-                        penetratingDist = c2Max - c1Min;
-                    }
+                    float min = Math.Min(c1Min, c2Min);
+                    float max = Math.Max(c1Max, c2Max);
+                    float penetratingDist = (c1Max-c1Min)+(c2Max-c2Min)-(max-min);
                     if(penetratingDist < minPenetratingDist)
                     {
                         minPenetratingDist = penetratingDist;
@@ -361,7 +355,7 @@ namespace bluebean
                 float dist = (p1 - p2).magnitude;
                 var r1 = Math.Sqrt(collider1.width * collider1.width + collider1.length * collider1.length) / 2;
                 var r2 = Math.Sqrt(collider2.width * collider2.width + collider2.length * collider2.length) / 2;
-                if (dist > r1 + r2)
+                if (dist >= r1 + r2)
                 {
                     collisionResult.m_type = CollisionResultType.Separate;
                     return;
@@ -371,14 +365,41 @@ namespace bluebean
             if (AxisSeparateIntersectionTest2D(collider1.points, collider2.points, out recoverVector))
             {
                 collisionResult.m_type = CollisionResultType.Penetrating;
-                if(Vector3.Dot(recoverVector, collider1.velocity) > 0)
+                if(Vector3.Dot(collider1.velocity, collider2.velocity) < 0)
                 {
-                    collisionResult.m_recoverVector = -recoverVector;
+                    if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
+                    {
+                        collisionResult.m_recoverVector = -recoverVector;
+                    }
+                    else
+                    {
+                        collisionResult.m_recoverVector = recoverVector;
+                    }
                 }
                 else
                 {
-                    collisionResult.m_recoverVector = recoverVector;
-                }
+                    if(collider1.velocity.magnitude > collider2.velocity.magnitude)
+                    {
+                        if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
+                        {
+                            collisionResult.m_recoverVector = -recoverVector;
+                        }
+                        else
+                        {
+                            collisionResult.m_recoverVector = recoverVector;
+                        }
+                    }else
+                    {
+                        if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
+                        {
+                            collisionResult.m_recoverVector = recoverVector;
+                        }
+                        else
+                        {
+                            collisionResult.m_recoverVector = -recoverVector;
+                        }
+                    }
+                }   
             }
             else
             {

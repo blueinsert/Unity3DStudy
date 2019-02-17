@@ -43,40 +43,70 @@ namespace bluebean
 
         public void Update(float deltaTime)
         {
-            if(m_objsForAdd.Count != 0)
+            if (m_objsForAdd.Count != 0)
             {
                 m_objs.AddRange(m_objsForAdd);
                 m_objsForAdd.Clear();
             }
-            foreach(var obj in m_objs)
+            foreach (var obj in m_objs)
             {
                 obj.rigidBody.UpdateBodyEuler(deltaTime);
             }
             if (m_objs.Count > 1)
             {
-                for (int i = 0; i < m_objs.Count; i++)
+                //避免彼此相互穿越
+                int maxIterNum = 10;
+                int iterNum = 0;
+                bool tryNext = true;
+                Dictionary<LogicGameObject2D, LogicGameObject2D> collisionPairs = new Dictionary<LogicGameObject2D, LogicGameObject2D>();
+                while (iterNum < maxIterNum && tryNext)
                 {
-                    for (int j = i + 1; j < m_objs.Count; j++)
+                    for (int i = 0; i < m_objs.Count; i++)
                     {
-                        CollisionResult collisionResult;
-                        PhysicsUtils2D.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionResult);
-                        if (collisionResult != null && (collisionResult.m_type == CollisionResultType.Collision || collisionResult.m_type == CollisionResultType.Penetrating))
+                        tryNext = false;
+                        for (int j = i + 1; j < m_objs.Count; j++)
                         {
-                            m_objs[i].rigidBody.m_position += collisionResult.m_recoverVector * (m_objs[i].rigidBody.m_speed / (m_objs[i].rigidBody.m_speed + m_objs[j].rigidBody.m_speed));
-                            m_objs[j].rigidBody.m_position += -collisionResult.m_recoverVector * (m_objs[j].rigidBody.m_speed / (m_objs[i].rigidBody.m_speed + m_objs[j].rigidBody.m_speed));
-                            PhysicsUtils2D.GetCollisionPointInfo(m_objs[i].collider, m_objs[j].collider, out collisionResult.m_pointInfos);
-                            if (collisionResult.m_pointInfos.Count != 0)
+                            CollisionResult collisionResult;
+                            PhysicsUtils2D.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionResult);
+                            if (collisionResult != null && (collisionResult.m_type == CollisionResultType.Collision || collisionResult.m_type == CollisionResultType.Penetrating))
                             {
-                                foreach(var collisionPointInfo in collisionResult.m_pointInfos)
-                                {
-                                    ApplyImpulse(m_objs[i], m_objs[j], collisionPointInfo);
-                                }
+                                // m_objs[i].rigidBody.m_position += collisionResult.m_recoverVector;
+                                //var rv = m_objs[i].rigidBody.m_velocity - m_objs[j].rigidBody.m_velocity;
+                                var recoverDir = collisionResult.m_recoverVector.normalized;
+                                var recoverDist = collisionResult.m_recoverVector.magnitude;
+
+                                var rv1 = Vector3.Dot(recoverDir, m_objs[i].rigidBody.m_velocity);
+                                var rv2 = Vector3.Dot(-recoverDir, m_objs[j].rigidBody.m_velocity);
+                                //UnityEngine.Debug.Assert(rv1 + rv2 < 0, "rv1 + rv2 >= 0");
+                                var s1 = m_objs[i].rigidBody.m_speed;
+                                var s2 = m_objs[j].rigidBody.m_speed;
+                                //m_objs[i].rigidBody.m_position += collisionResult.m_recoverVector * (rv1 / (rv1 + rv2));
+                                //m_objs[j].rigidBody.m_position += -collisionResult.m_recoverVector * (rv2 / (rv1 + rv2));
+                                m_objs[i].rigidBody.m_position += collisionResult.m_recoverVector * (s1 / (s1 + s2));
+                                m_objs[j].rigidBody.m_position += -collisionResult.m_recoverVector * (s2 / (s1 + s2));
+                                tryNext = true;
+                                collisionPairs[m_objs[i]] = m_objs[j];
+                                //计算碰撞点，应用碰撞冲量
+
                             }
                         }
                     }
+                    iterNum++;
+                }//while
+                foreach (var collisionPair in collisionPairs)
+                {
+                    List<CollisionPointInfo> collisionPointInfos = new List<CollisionPointInfo>();
+                    PhysicsUtils2D.GetCollisionPointInfo(collisionPair.Key.collider, collisionPair.Value.collider, out collisionPointInfos);
+                    if (collisionPointInfos.Count != 0)
+                    {
+                        foreach (var collisionPointInfo in collisionPointInfos)
+                        {
+                            ApplyImpulse(collisionPair.Key, collisionPair.Value, collisionPointInfo);
+                        }
+                    }
                 }
+                UnityEngine.Debug.Log("iterNum:" + iterNum);
             }
-           
             DebugDraw(deltaTime);
         }
     }
