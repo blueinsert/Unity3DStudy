@@ -4,12 +4,7 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace bluebean
 {
-    public class CollisionPointInfo
-    {
-        public Vector3 m_point;
-        public Vector3 m_relativeVelocity;
-        public Vector3 m_collisionNormal;
-    }
+   
 
     public abstract class Collider2D
     {

@@ -6,11 +6,25 @@ using bluebean;
 
 namespace bluebean
 {
+    public class CollisionPointInfo
+    {
+        public Vector3 m_point;
+        public Vector3 m_relativeVelocity;
+        public Vector3 m_collisionNormal;
+    }
+
     public enum CollisionResultType
     {
         Collision,
         Penetrating,
         Separate,
+    }
+
+    public class CollisionResult
+    {
+        public CollisionResultType m_type = CollisionResultType.Separate;
+        public List<CollisionPointInfo> m_pointInfos = new List<CollisionPointInfo>();
+        public Vector3 m_recoverVector;
     }
 
     public class PhysicsUtils2D
@@ -92,8 +106,10 @@ namespace bluebean
         }
 
         //轴分离相交检测算法，长方形
-        public static bool AxisSeparateIntersectionTest2D(Vector3[] C1Points, Vector3[] C2Points)
+        public static bool AxisSeparateIntersectionTest2D(Vector3[] C1Points, Vector3[] C2Points, out Vector3 recoverVector)
         {
+            recoverVector = Vector3.zero;
+
             Vector3[] normalVectors = new Vector3[4];
             normalVectors[0] = GetLineNormalVector(C1Points[0], C1Points[1]);
             normalVectors[1] = GetLineNormalVector(C1Points[1], C1Points[2]);
@@ -101,6 +117,8 @@ namespace bluebean
             normalVectors[2] = GetLineNormalVector(C2Points[0], C2Points[1]);
             normalVectors[3] = GetLineNormalVector(C2Points[1], C2Points[2]);
 
+            Vector3 minPenetratingSeparateAxis = Vector3.zero;
+            float minPenetratingDist = float.MaxValue;
             bool isIntersect = true;
             for (int i = 0; i < 4; i++)
             {
@@ -142,8 +160,28 @@ namespace bluebean
                     //Debug.Log("c1Min:" + c1Min + " c1Max" + c1Max + " c2Min:" + c2Min + " c2Max" + c2Max);
                     break;
                 }
+                else
+                {
+                    float penetratingDist = 0;
+                    if(c1Max > c2Min)
+                    {
+                        penetratingDist = c1Max - c2Min;
+                    }else
+                    {
+                        penetratingDist = c2Max - c1Min;
+                    }
+                    if(penetratingDist < minPenetratingDist)
+                    {
+                        minPenetratingDist = penetratingDist;
+                        minPenetratingSeparateAxis = normal;
+                    }
+                }
 
             }//for six separate axis
+            if (isIntersect)
+            {
+                recoverVector = minPenetratingSeparateAxis * minPenetratingDist;
+            }
             return isIntersect;
         }
 
@@ -161,17 +199,17 @@ namespace bluebean
             }
         }
 
-        public static CollisionResultType CollideTest(Collider2D collider1, Collider2D collider2, out List<CollisionPointInfo> collisionPointInfos)
+        public static void CollideTest(Collider2D collider1, Collider2D collider2, out CollisionResult collisionResult)
         {
-            collisionPointInfos = null;
+            collisionResult = null;
             if (collider1 is Box2DCollider && collider2 is Box2DCollider)
             {
-                return CollideTest(collider1 as Box2DCollider, collider2 as Box2DCollider, out collisionPointInfos);
+                CollideTest(collider1 as Box2DCollider, collider2 as Box2DCollider, out collisionResult);
             }
-            return CollisionResultType.Separate;
         }
 
-        public static CollisionResultType CollideTest(Box2DCollider collider1, Box2DCollider collider2, out List<CollisionPointInfo> collisionPointInfos)
+        /*
+        public static CollisionResultType CollideTest2(Box2DCollider collider1, Box2DCollider collider2, out List<CollisionPointInfo> collisionPointInfos)
         {
             collisionPointInfos = new List<CollisionPointInfo>();
             //检测外接包围圆是否分离
@@ -310,6 +348,215 @@ namespace bluebean
                 return CollisionResultType.Penetrating;
              }
             return CollisionResultType.Separate;
+        }
+        */
+
+        public static void CollideTest(Box2DCollider collider1, Box2DCollider collider2, out CollisionResult collisionResult)
+        {
+            collisionResult = new CollisionResult();
+            //检测外接包围圆是否分离
+            {
+                var p1 = collider1.position;
+                var p2 = collider2.position;
+                float dist = (p1 - p2).magnitude;
+                var r1 = Math.Sqrt(collider1.width * collider1.width + collider1.length * collider1.length) / 2;
+                var r2 = Math.Sqrt(collider2.width * collider2.width + collider2.length * collider2.length) / 2;
+                if (dist > r1 + r2)
+                {
+                    collisionResult.m_type = CollisionResultType.Separate;
+                    return;
+                }       
+            }
+            Vector3 recoverVector;
+            if (AxisSeparateIntersectionTest2D(collider1.points, collider2.points, out recoverVector))
+            {
+                collisionResult.m_type = CollisionResultType.Penetrating;
+                if(Vector3.Dot(recoverVector, collider1.velocity) > 0)
+                {
+                    collisionResult.m_recoverVector = -recoverVector;
+                }
+                else
+                {
+                    collisionResult.m_recoverVector = recoverVector;
+                }
+            }
+            else
+            {
+                collisionResult.m_type = CollisionResultType.Separate;
+            } 
+        }
+
+        public static void GetCollisionPointInfo(Collider2D collider1, Collider2D collider2, out List<CollisionPointInfo> collisionPointInfos)
+        {
+            collisionPointInfos = null;
+            if (collider1 is Box2DCollider)
+            {
+                if(collider2 is Box2DCollider)
+                {
+                    GetCollisionPointInfo(collider1 as Box2DCollider, collider2 as Box2DCollider, out collisionPointInfos);
+                }
+            }
+        }
+
+        public static void GetCollisionPointInfo(Box2DCollider collider1, Box2DCollider collider2, out List<CollisionPointInfo> collisionPointInfos)
+        {
+            collisionPointInfos = new List<CollisionPointInfo>();
+            foreach (var point1 in collider1.points)
+            {
+                foreach (var point2 in collider2.points)
+                {
+                    if (ArePointsEqual(point1, point2))
+                    {
+                        Vector3 collisionNormal = (collider1.position - collider2.position).normalized;
+                        Vector3 v1 = collider1.velocity + Vector3.Cross(collider1.angularVelocityLocal, point1 - collider1.position);
+                        Vector3 v2 = collider2.velocity + Vector3.Cross(collider2.angularVelocityLocal, point2 - collider2.position);
+                        Vector3 relativeVelocity = v1 - v2;
+                        float vrn = Vector3.Dot(relativeVelocity, collisionNormal);
+                        //两点相互靠近
+                        if (vrn < 0)
+                        {
+                            CollisionPointInfo collisionPointInfo = new CollisionPointInfo();
+                            collisionPointInfo.m_collisionNormal = collisionNormal;
+                            collisionPointInfo.m_point = (point1 + point2) / 2;
+                            collisionPointInfo.m_relativeVelocity = relativeVelocity;
+                            collisionPointInfos.Add(collisionPointInfo);
+                        }
+                    }
+                }
+            }
+            //点与边之间检测相交
+            foreach (var point1 in collider1.points)
+            {
+                for (int i = 0; i < collider2.points.Length; i++)
+                {
+                    Vector3 edge;
+                    if (i == 0)
+                    {
+                        edge = collider2.points[0] - collider2.points[collider2.points.Length - 1];
+                    }
+                    else
+                    {
+                        edge = collider2.points[i] - collider2.points[i - 1];
+                    }
+                    Vector3 u = edge.normalized;
+                    Vector3 p = point1 - collider2.points[i];
+                    float proj = Vector3.Dot(p, -u);
+                    float dist = Vector3.Cross(p, u).magnitude;
+                    //点距离边很近
+                    if (proj > 0 && proj <= edge.magnitude && dist <= ctol)
+                    {
+                        Vector3 collisionNormal = Vector3.Cross(new Vector3(0, 0, 1), u).normalized;
+                        Vector3 v1 = collider1.velocity + Vector3.Cross(collider1.angularVelocityLocal, point1 - collider1.position);
+                        Vector3 v2 = collider2.velocity + Vector3.Cross(collider2.angularVelocityLocal, point1 - collider2.position);
+                        Vector3 relativeVelocity = v1 - v2;
+                        float vrn = Vector3.Dot(relativeVelocity, collisionNormal);
+                        if (vrn < 0)
+                        {
+                            CollisionPointInfo collisionPointInfo = new CollisionPointInfo();
+                            collisionPointInfo.m_collisionNormal = collisionNormal;
+                            collisionPointInfo.m_point = (point1 + point1) / 2;
+                            collisionPointInfo.m_relativeVelocity = relativeVelocity;
+                            collisionPointInfos.Add(collisionPointInfo);
+                        }
+                    }
+                }
+            }
+            foreach (var point2 in collider2.points)
+            {
+                for (int i = 0; i < collider1.points.Length; i++)
+                {
+                    Vector3 edge;
+                    if (i == 0)
+                    {
+                        edge = collider1.points[0] - collider1.points[collider2.points.Length - 1];
+                    }
+                    else
+                    {
+                        edge = collider1.points[i] - collider1.points[i - 1];
+                    }
+                    Vector3 u = edge.normalized;
+                    Vector3 p = point2 - collider1.points[i];
+                    float proj = Vector3.Dot(p, -u);
+                    float dist = Vector3.Cross(p, u).magnitude;
+                    //点距离边很近
+                    if (proj > 0 && proj <= edge.magnitude && dist <= ctol)
+                    {
+                        Vector3 collisionNormal = Vector3.Cross(new Vector3(0, 0, 1), u);
+                        Vector3 v1 = collider1.velocity + Vector3.Cross(collider1.angularVelocityLocal, point2 - collider1.position);
+                        Vector3 v2 = collider2.velocity + Vector3.Cross(collider2.angularVelocityLocal, point2 - collider2.position);
+                        Vector3 relativeVelocity = v2 - v1;
+                        float vrn = Vector3.Dot(relativeVelocity, collisionNormal);
+                        if (vrn < 0)
+                        {
+                            CollisionPointInfo collisionPointInfo = new CollisionPointInfo();
+                            collisionPointInfo.m_collisionNormal = -collisionNormal;
+                            collisionPointInfo.m_point = (point2 + point2) / 2;
+                            collisionPointInfo.m_relativeVelocity = -relativeVelocity;
+                            collisionPointInfos.Add(collisionPointInfo);
+                        }
+                    }
+                }
+            }
+            //去除重复的碰撞点
+            if (collisionPointInfos.Count > 1)
+            {
+                List<CollisionPointInfo> removedCollisionPointInfo = new List<CollisionPointInfo>();
+                for (int i = 0; i < collisionPointInfos.Count; i++)
+                {
+                    for (int j = i + 1; j < collisionPointInfos.Count; j++)
+                    {
+                        if (ArePointsEqual(collisionPointInfos[i].m_point, collisionPointInfos[j].m_point))
+                        {
+                            removedCollisionPointInfo.Add(collisionPointInfos[i]);
+                        }
+                    }
+                }
+                foreach (var removeItem in removedCollisionPointInfo)
+                {
+                    collisionPointInfos.Remove(removeItem);
+                }
+            }
+            //合并碰撞点 
+            if (collisionPointInfos.Count > 1)
+            {
+                Dictionary<Vector3, List<CollisionPointInfo>> keyValuePairs = new Dictionary<Vector3, List<CollisionPointInfo>>();
+                foreach(var collisionPointInfo in collisionPointInfos)
+                {
+                    if (!keyValuePairs.ContainsKey(collisionPointInfo.m_collisionNormal))
+                    {
+                        keyValuePairs.Add(collisionPointInfo.m_collisionNormal, new List<CollisionPointInfo>());
+                    }
+                    keyValuePairs[collisionPointInfo.m_collisionNormal].Add(collisionPointInfo);
+                }
+                Dictionary<Vector3, CollisionPointInfo> dicPointInfos = new Dictionary<Vector3, CollisionPointInfo>();
+                foreach(var pair in keyValuePairs)
+                {
+                    dicPointInfos.Add(pair.Key, GetAverageCollisionPointInfo(pair.Value));
+                }
+                collisionPointInfos.Clear();
+                foreach(var pointInfo in dicPointInfos.Values)
+                {
+                    collisionPointInfos.Add(pointInfo);
+                }
+            }               
+        }
+
+        private static CollisionPointInfo GetAverageCollisionPointInfo(List<CollisionPointInfo> points)
+        {
+            CollisionPointInfo result = new CollisionPointInfo();
+            Vector3 point = Vector3.zero;
+            Vector3 relativeVelocity = Vector3.zero;
+            Vector3 normal = Vector3.zero;
+            foreach (var pointInfo in points)
+            {
+                point += pointInfo.m_point;
+                relativeVelocity += pointInfo.m_relativeVelocity;
+                normal += pointInfo.m_collisionNormal;
+            }
+            result.m_point = point / points.Count;
+            result.m_collisionNormal += normal / points.Count;
+            result.m_relativeVelocity += relativeVelocity / points.Count;
+            return result;
         }
 
         public static bool SegmentIntersectionTest(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, ref Vector3 point)

@@ -14,8 +14,36 @@ namespace bluebean
     {
         Vector3 _G = new Vector3(0, -9.8f, 0);
         public float m_mass;
+        public float massInverse
+        {
+            get
+            {
+                if (m_mass <= 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1 / m_mass;
+                }
+            }
+        }
         public float m_inertia;//转动惯量
-        public float m_inertiaInverse;//1/inertia
+
+        public float inertiaInverse
+        {
+            get
+            {
+                if (m_inertia <= 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1 / m_inertia;
+                }
+            }
+        }
         public Vector3 m_position; //global coordinates
         public Vector3 m_velocity; //global coordinates
         public Vector3 m_velocityLocal; //local coordinates
@@ -30,7 +58,6 @@ namespace bluebean
         {
             m_mass = 1;
             m_inertia = 10;
-            m_inertiaInverse = 1 / m_inertia;
             m_position.x = 0; m_position.y = 0;
             m_orientation = 0;
             m_externForces = new Dictionary<int, ForceDesc>();
@@ -38,7 +65,7 @@ namespace bluebean
 
         public void ClearExternForces()
         {
-            foreach(var force in m_externForces)
+            foreach (var force in m_externForces)
             {
                 force.Value.m_force = Vector3.zero;
             }
@@ -47,7 +74,7 @@ namespace bluebean
         public void SetForce(int id, Vector3 force, Vector3 pointLocal)
         {
             ForceDesc forceDesc;
-            if(!m_externForces.TryGetValue(id, out forceDesc))
+            if (!m_externForces.TryGetValue(id, out forceDesc))
             {
                 forceDesc = new ForceDesc();
                 forceDesc.id = id;
@@ -62,7 +89,7 @@ namespace bluebean
             Vector3 sumForce = Vector3.zero;
             Vector3 sumMoment = Vector3.zero;
             sumForce += m_mass * _G;
-            foreach(var forceDesc in m_externForces)
+            foreach (var forceDesc in m_externForces)
             {
                 sumForce += forceDesc.Value.m_force;
                 sumMoment += Vector3.Cross(forceDesc.Value.m_pointLocal.Rotate(m_orientation), forceDesc.Value.m_force);

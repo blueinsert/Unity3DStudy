@@ -21,6 +21,7 @@ namespace bluebean
                 obj.collider.DebugDraw(UnityEngine.Color.blue, deltaTime);
             }
         }
+
         void ApplyImpulse(LogicGameObject2D obj1, LogicGameObject2D obj2, CollisionPointInfo collisionPointInfo)
         {
             var collisionNormal = collisionPointInfo.m_collisionNormal;
@@ -30,14 +31,14 @@ namespace bluebean
 
             float j = -(1 + 0.5f) * Vector3.Dot(relativeVelocity, collisionNormal) /
                 (
-                1 / obj1.mass + 1 / obj2.mass +
-                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint1Local, collisionNormal), collisionPoint1Local)) / obj1.inertia +
-                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint2Local, collisionNormal), collisionPoint2Local)) / obj2.inertia
+                obj1.massInverse + obj2.massInverse +
+                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint1Local, collisionNormal), collisionPoint1Local)) * obj1.inertiaVerse +
+                Vector3.Dot(collisionNormal, Vector3.Cross(Vector3.Cross(collisionPoint2Local, collisionNormal), collisionPoint2Local)) * obj2.inertiaVerse
                 );
-            obj1.rigidBody.m_velocity += (j * collisionNormal) / obj1.mass;
-            obj1.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint1Local, j * collisionNormal) / obj1.inertia;
-            obj2.rigidBody.m_velocity += (-j * collisionNormal) / obj2.mass;
-            obj2.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint2Local, -j * collisionNormal) / obj2.inertia;
+            obj1.rigidBody.m_velocity += (j * collisionNormal) * obj1.massInverse;
+            obj1.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint1Local, j * collisionNormal) * obj1.inertiaVerse;
+            obj2.rigidBody.m_velocity += (-j * collisionNormal) * obj2.massInverse;
+            obj2.rigidBody.m_angularVelocityLocal += Vector3.Cross(collisionPoint2Local, -j * collisionNormal) * obj2.inertiaVerse;
         }
 
         public void Update(float deltaTime)
@@ -57,14 +58,16 @@ namespace bluebean
                 {
                     for (int j = i + 1; j < m_objs.Count; j++)
                     {
-                        List<CollisionPointInfo> collisionPointInfos;
-                        var result = PhysicsUtils2D.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionPointInfos);
-                        UnityEngine.Debug.Log(result);
-                        if (result == CollisionResultType.Collision)
+                        CollisionResult collisionResult;
+                        PhysicsUtils2D.CollideTest(m_objs[i].collider, m_objs[j].collider, out collisionResult);
+                        if (collisionResult != null && (collisionResult.m_type == CollisionResultType.Collision || collisionResult.m_type == CollisionResultType.Penetrating))
                         {
-                            if (collisionPointInfos.Count != 0)
+                            m_objs[i].rigidBody.m_position += collisionResult.m_recoverVector * (m_objs[i].rigidBody.m_speed / (m_objs[i].rigidBody.m_speed + m_objs[j].rigidBody.m_speed));
+                            m_objs[j].rigidBody.m_position += -collisionResult.m_recoverVector * (m_objs[j].rigidBody.m_speed / (m_objs[i].rigidBody.m_speed + m_objs[j].rigidBody.m_speed));
+                            PhysicsUtils2D.GetCollisionPointInfo(m_objs[i].collider, m_objs[j].collider, out collisionResult.m_pointInfos);
+                            if (collisionResult.m_pointInfos.Count != 0)
                             {
-                                foreach(var collisionPointInfo in collisionPointInfos)
+                                foreach(var collisionPointInfo in collisionResult.m_pointInfos)
                                 {
                                     ApplyImpulse(m_objs[i], m_objs[j], collisionPointInfo);
                                 }
