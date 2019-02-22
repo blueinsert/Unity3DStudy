@@ -9,7 +9,6 @@ namespace bluebean {
         public GameObject rootMap;
         public GameObject rootNode;
         public GameObject rootEdge;
-        public GameObject rootPlatform;
 
         public EditorNode AddNode(int id, Vector3 position) {
             var go = new GameObject("node_" + id.ToString());

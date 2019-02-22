@@ -365,41 +365,14 @@ namespace bluebean
             if (AxisSeparateIntersectionTest2D(collider1.points, collider2.points, out recoverVector))
             {
                 collisionResult.m_type = CollisionResultType.Penetrating;
-                if(Vector3.Dot(collider1.velocity, collider2.velocity) < 0)
+                if (Vector3.Dot(recoverVector, collider1.position - collider2.position) > 0)
                 {
-                    if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
-                    {
-                        collisionResult.m_recoverVector = -recoverVector;
-                    }
-                    else
-                    {
-                        collisionResult.m_recoverVector = recoverVector;
-                    }
+                    collisionResult.m_recoverVector = recoverVector;
                 }
                 else
                 {
-                    if(collider1.velocity.magnitude > collider2.velocity.magnitude)
-                    {
-                        if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
-                        {
-                            collisionResult.m_recoverVector = -recoverVector;
-                        }
-                        else
-                        {
-                            collisionResult.m_recoverVector = recoverVector;
-                        }
-                    }else
-                    {
-                        if (Vector3.Dot(recoverVector, collider1.velocity) > 0)
-                        {
-                            collisionResult.m_recoverVector = recoverVector;
-                        }
-                        else
-                        {
-                            collisionResult.m_recoverVector = -recoverVector;
-                        }
-                    }
-                }   
+                    collisionResult.m_recoverVector = -recoverVector;
+                }
             }
             else
             {

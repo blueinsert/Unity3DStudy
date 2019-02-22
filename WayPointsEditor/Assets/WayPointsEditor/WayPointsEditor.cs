@@ -12,12 +12,10 @@ namespace bluebean {
         AddEdge,
     }
 
-    [ExecuteInEditMode]
     public class WayPointsEditor : MonoBehaviour {
         public GameObject rootMap;
         public GameObject rootNode;
         public GameObject rootEdge;
-        public GameObject rootPlatform;
 
         private WayPointsEditorModule m_module;
         private WayPointsEditorView m_view;
@@ -35,7 +33,6 @@ namespace bluebean {
             m_view.rootMap = this.rootMap;
             m_view.rootNode = this.rootNode;
             m_view.rootEdge = this.rootEdge;
-            m_view.rootPlatform = this.rootPlatform;
             this.m_module = new WayPointsEditorModule(m_view);
         }
 
@@ -234,7 +231,12 @@ namespace bluebean {
 
         void OnGUI() {
             GUILayout.BeginHorizontal();
-           
+            GUILayout.Label("1: Ctrl + LeftMouseButton to add a point\n" +
+                 "2:Press RightMouseButton on a point and drag to create edge\n" +
+                 "  2.1:move mouse cursor to another point to create edge between the two points\n" +
+                 "  2.2:or click LeftMouseButton to create a point and auto create edge\n" +
+                 "3: Mouse Wheel to zoon the viewPort\n" +
+                 "4: Press and Drag MidMouseButton to move the viewPort\n");
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
            
