@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace bluebean
@@ -28,25 +29,29 @@ namespace bluebean
         public override void OnInspectorGUI()
         {
             EditTarget.Update();
-
             DrawDefaultInspector();
             EditorGUILayout.Separator();
-            if(m_editMode == WayPointsComponentEditMode.None)
+            //如果对象是prefab，或者在层次树中选中了多个物体，将不能点击编辑
+            using (new EditorGUI.DisabledScope(base.targets.Length > 1 || EditorUtility.IsPersistent(this.target)))
             {
-                if (GUILayout.Button("Edit"))
+                if (m_editMode == WayPointsComponentEditMode.None)
                 {
-                    BeginEdit();
+                    if (GUILayout.Button("Edit"))
+                    {
+                        BeginEdit();
+                    }
                 }
-            }else if (m_editMode == WayPointsComponentEditMode.Editing)
-            {
-                if (GUILayout.Button("EndEdit"))
+                else if (m_editMode == WayPointsComponentEditMode.Editing)
                 {
-                    EndEdit();
+                    if (GUILayout.Button("EndEdit"))
+                    {
+                        EndEdit();
+                    }
                 }
-            }
-            if (GUILayout.Button("Clear"))
-            {
-                Clear();
+                if (GUILayout.Button("Clear"))
+                {
+                    Clear();
+                }
             }
             EditTarget.ApplyModifiedProperties();
         }
