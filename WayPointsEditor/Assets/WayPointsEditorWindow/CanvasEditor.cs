@@ -30,65 +30,37 @@ namespace bluebean
         private void OnDrawDebugInfos()
         {
             GUILayout.BeginArea(debugAreaRect);
-
+            GUILayout.Label("MousePosition:" + Event.current.mousePosition);
             GUILayout.Label("ScreenWidth:" + Screen.width);
             GUILayout.Label("ScreenHeight:" + Screen.height);
+            GUILayout.Label("CanvasOffset:" + string.Format("[{0},{1}]", m_canvasOffset.x, m_canvasOffset.y));
+            GUILayout.Label("CanvasScale:" + m_canvasScale);
             GUILayout.EndArea();
         }
 
-        void DrawGrid()
-        {
-            GL.PushMatrix();
-            GL.Begin(GL.LINES);
-            Vector2 originInCanvas = LocalToCanvas(Vector2.zero, new Rect(0, 0, 500, 500), m_canvasOffset, canvasScale);
 
-            this.DrawGridLines(new Rect(0, 0, 500, 500), 100, m_canvasOffset, canvasScale, new Color(0f, 0f, 0f, 0.28f));
-            this.DrawGridLines(new Rect(0, 0, 500, 500), 10, m_canvasOffset, canvasScale, new Color(0f, 0f, 0f, 0.18f));
-            GL.End();
+        protected virtual void OnDraw()
+        {
+            GLHelper.DrawGrid(50, new Rect(-100, -100, 200, 200));
+            GLHelper.DrawCircle(new Vector2(0, 40), 2, 36, Color.blue);
+            GLHelper.DrawCircle(new Vector2(30, 0), 2, 36, Color.blue);
+            GLHelper.DrawCircle(new Vector2(0, 0), 2, 36, Color.blue);
+        }
+
+        private void Draw()
+        {
+            ///*
+            GL.LoadIdentity();
+            var trs = Matrix4x4.identity;
+            var translate = new Vector2(250, 250) + m_canvasOffset;
+            trs.SetTRS(translate, Quaternion.identity, new Vector3(1 / m_canvasScale, -1 / m_canvasScale, 1));
+            GL.MultMatrix(trs);
+            GL.PushMatrix();
+            //*/
+            //GL.PushMatrix();
+            OnDraw();
             GL.PopMatrix();
         }
-
-        Vector2 CanvasToLocal(Vector2 canvasPos, Rect showRect, Vector2 offset, float scale)
-        {
-            Vector2 originInCanvas = showRect.center + offset;
-            var pos = (canvasPos - originInCanvas) * scale;
-            return pos;
-        }
-
-        Vector2 LocalToCanvas(Vector2 pos, Rect showRect, Vector2 offset, float scale)
-        {
-            Vector2 originInCanvas = showRect.center + offset;
-            var canvasPos = pos / scale + originInCanvas;
-            return canvasPos;
-        }
-
-        void DrawGridLines(Rect rect, int gridSize, Vector2 offset, float scale, Color gridColor)
-        {
-            GL.Color(gridColor);
-            Rect rectLocal = new Rect(CanvasToLocal(rect.center, rect, offset, scale) - rect.size * scale / 2, rect.size * scale);
-
-            for (int x = (int)rectLocal.xMin; x < (int)rectLocal.xMax; x++)
-            {
-                if (x % gridSize == 0)
-                {
-                    DrawLine(LocalToCanvas(new Vector2(x, rectLocal.yMin), rect, offset, scale), LocalToCanvas(new Vector2(x, rectLocal.yMax), rect, offset, scale));
-                }  
-            }
-            for (int y = (int)rectLocal.yMin; y < (int)rectLocal.yMax; y++)
-            {
-                if(y % gridSize == 0)
-                {
-                    DrawLine(LocalToCanvas(new Vector2(rectLocal.xMin, y), rect, offset, scale), LocalToCanvas(new Vector2(rectLocal.xMax, y), rect, offset, scale));
-                }
-            }
-        }
-
-        void DrawLine(Vector2 p1, Vector2 p2)
-        {
-            GL.Vertex(p1);
-            GL.Vertex(p2);
-        }
-
 
         private void OnDrawCanvasBegin()
         {
@@ -96,7 +68,7 @@ namespace bluebean
             if (Event.current.type == EventType.Repaint)
             {
                 new GUIStyle("flow background").Draw(new Rect(0, 0, m_canvasSize.x, m_canvasSize.y), false, false, false, false);
-                DrawGrid();
+                Draw();
             }
         }
 
@@ -125,7 +97,7 @@ namespace bluebean
             }
             if (Event.current.type == EventType.ScrollWheel)
             {
-                m_canvasScale = m_canvasScale + Event.current.delta.y * -0.01f;
+                canvasScale = canvasScale + Event.current.delta.y * CanvasEditorSettings.MouseWheelZoomRadio;
                 Event.current.Use();
             }
         }
