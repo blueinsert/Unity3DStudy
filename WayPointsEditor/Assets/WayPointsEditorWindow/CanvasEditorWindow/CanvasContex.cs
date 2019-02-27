@@ -7,7 +7,7 @@ namespace bluebean
     public class CanvasContex : SubAreaContex
     {
         public Vector2 m_offset = Vector2.zero;
-        public float m_scale = 1;
+        private float m_scale = 1;
         public bool m_isDrawSelection = false;
         public bool m_isDragSelections = false;
         public Vector2 m_dragStartPosition = Vector2.zero;
@@ -15,6 +15,15 @@ namespace bluebean
 
         public List<CanvasElementBase> m_elements = new List<CanvasElementBase>();
         public List<CanvasElementBase> m_selectedElements = new List<CanvasElementBase>();
+
+        public float scale
+        {
+            get
+            {
+                return m_scale;
+            }
+            set { m_scale = Mathf.Clamp(value, 0.1f, 3); }
+        }
 
         public CanvasContex(SubAreaDef areaDef) : base(areaDef)
         {

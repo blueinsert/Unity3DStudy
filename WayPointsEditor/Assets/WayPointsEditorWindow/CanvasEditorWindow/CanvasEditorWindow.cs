@@ -51,7 +51,7 @@ namespace bluebean
         protected virtual void OnDrawSubArea(SubAreaContex areaCtx)
         {
             GUILayout.Label(areaCtx.m_areaDef.m_showName);
-            if (name == "DebugInfos")
+            if (areaCtx.m_areaDef.m_showName == "DebugInfos")
             {
                 DrawDebugInfos();
             }
@@ -105,6 +105,8 @@ namespace bluebean
             {
                 var canvasContex = m_curSubAreaCtx as CanvasContex;
                 GUILayout.Label("LocalPosition:" + canvasContex.m_curLocalPosition);
+                GUILayout.Label("CanvasOffset:" + canvasContex.m_offset);
+                GUILayout.Label("CanvasScale:" + canvasContex.scale);
             }
         }
 
@@ -178,7 +180,7 @@ namespace bluebean
             //鼠标滚轮缩放视图
             if (Event.current.type == EventType.ScrollWheel)
             {
-                canvasContex.m_scale += Event.current.delta.y * -0.01f;
+                canvasContex.scale += Event.current.delta.y * -0.01f;
                 Repaint();
             }
             //按下鼠标左键
