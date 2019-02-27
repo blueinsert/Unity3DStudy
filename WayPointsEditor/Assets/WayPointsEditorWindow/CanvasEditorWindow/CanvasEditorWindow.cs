@@ -75,7 +75,12 @@ namespace bluebean
                 GL.LoadIdentity();
                 GL.MultMatrix(canvasContex.GetTRSMatrix(canvasContex.GetRealRect(width, height, toolBarHeight).size));
                 GL.PushMatrix();
-                GLHelper.DrawGrid(50, new Rect(-100, -100, 200, 200));
+                var p1 = canvasContex.GetLocalPos(new Vector2(0, 1),
+                    canvasContex.GetRealRect(width, height, toolBarHeight).size);
+                var p2 = canvasContex.GetLocalPos(new Vector2(1, 0),
+                    canvasContex.GetRealRect(width, height, toolBarHeight).size);
+                GLHelper.DrawGrid(100, new Rect(p1, p2 - p1));
+                //GLHelper.DrawGrid(100, new Rect(-100,-100, 500,500));
                 OnDrawCanvas(canvasContex);
                 if (canvasContex.m_isDrawSelection)
                 {
@@ -176,15 +181,51 @@ namespace bluebean
                 canvasContex.m_scale += Event.current.delta.y * -0.01f;
                 Repaint();
             }
-            //按下鼠标左键，开始绘制选区
+            //按下鼠标左键
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 canvasContex.m_dragStartPosition = canvasContex.m_curLocalPosition;
-                if (canvasContex.m_curSelected == null)
+                var intersectElem = canvasContex.Overlap(canvasContex.m_curLocalPosition);
+                if (intersectElem == null)
                 {
+                    canvasContex.ClearAllSelected();
+                }
+                if (intersectElem == null)
+                {
+                    //开始绘制选区
                     canvasContex.m_isDrawSelection = true;
                     canvasContex.ClearAllSelected();
                     Repaint();
+                }
+                else
+                {
+                    //开始拖动
+                    if (!canvasContex.m_selectedElements.Contains(intersectElem))
+                    {
+                        canvasContex.ClearAllSelected();
+                        canvasContex.AddSelected(intersectElem);
+                    }
+                    canvasContex.m_isDragSelections = true;
+                    foreach (var ele in canvasContex.m_selectedElements)
+                    {
+                        if (ele.canDrag)
+                        {
+                            ele.m_dragStartPos = ele.position;
+                        }
+                    }
+                }
+            }
+            if (Event.current.type == EventType.MouseDrag && Event.current.button == 0)
+            {
+                if (canvasContex.m_isDragSelections)
+                {
+                    foreach (var ele in canvasContex.m_selectedElements)
+                    {
+                        if (ele.canDrag)
+                        {
+                            ele.position = ele.m_dragStartPos + (canvasContex.m_curLocalPosition - canvasContex.m_dragStartPosition);
+                        }
+                    }
                 }
             }
             //松开鼠标左键
@@ -197,6 +238,11 @@ namespace bluebean
                     var overlaps = canvasContex.Overlap(canvasContex.m_dragStartPosition, canvasContex.m_curLocalPosition);
                     canvasContex.AddSelected(overlaps);
                     Repaint();  
+                }
+                //结束拖动
+                if (canvasContex.m_isDragSelections)
+                {
+                    canvasContex.m_isDragSelections = false;
                 }
             }
         }

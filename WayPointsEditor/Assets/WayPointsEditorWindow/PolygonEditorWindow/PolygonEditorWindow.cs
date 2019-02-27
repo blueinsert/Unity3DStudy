@@ -9,12 +9,12 @@ namespace bluebean
         Editing,
     }
 
-    public class PolygonEditor : CanvasEditorWindow
+    public class PolygonEditorWindow : CanvasEditorWindow
     {
-        [MenuItem("Windows/OpenPolygonEditor")]
-        public static void OpenPolygonEditor()
+        [MenuItem("Windows/OpenPolygonEditorWindow")]
+        public static void OpenPolygonEditorWindow()
         {
-            var win = GetWindow<PolygonEditor>(typeof(PolygonEditor).Name);
+            var win = GetWindow<PolygonEditorWindow>(typeof(PolygonEditorWindow).Name);
             win.wantsMouseMove = true;
             win.Initialize();
         }

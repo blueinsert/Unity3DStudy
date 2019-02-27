@@ -9,8 +9,8 @@ namespace bluebean
         public Vector2 m_offset = Vector2.zero;
         public float m_scale = 1;
         public bool m_isDrawSelection = false;
+        public bool m_isDragSelections = false;
         public Vector2 m_dragStartPosition = Vector2.zero;
-        public CanvasElementBase m_curSelected;
         public Vector2 m_curLocalPosition = Vector2.zero;
 
         public List<CanvasElementBase> m_elements = new List<CanvasElementBase>();
@@ -89,6 +89,18 @@ namespace bluebean
                 }
             }
             return results;
+        }
+
+        public CanvasElementBase Overlap(Vector2 pos)
+        {
+            foreach (var element in this.m_elements)
+            {
+                if (element.canSelected && element.TestPoint(pos))
+                {
+                    return element;
+                }
+            }
+            return null;
         }
     }
 }

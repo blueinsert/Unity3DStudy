@@ -32,6 +32,12 @@ namespace bluebean
             get { return false; }
         }
 
+        public override Vector2 position
+        {
+            get { return (m_point1.position + m_point2.position) / 2; }
+            set { }
+        }
+
         public CanvasElementEdge(CanvasElementPoint point1, CanvasElementPoint point2)
         {
             this.m_point1 = point1;

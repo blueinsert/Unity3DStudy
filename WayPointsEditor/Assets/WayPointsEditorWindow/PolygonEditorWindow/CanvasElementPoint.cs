@@ -9,9 +9,10 @@ namespace bluebean
         protected Vector2 m_position;
         protected float m_radius;
 
-        public Vector2 position
+        public override Vector2 position
         {
             get { return m_position; }
+            set { m_position = value; }
         }
 
         public float radius
@@ -56,7 +57,7 @@ namespace bluebean
         public override bool Overlap(Rect rect)
         {
             return rect.Contains(this.m_position);
-        }
+        }   
     }
 
 }

@@ -11,6 +11,8 @@ namespace bluebean
         public abstract bool canSelected { get; }
         public abstract bool Overlap(Rect rect);
         public abstract void Draw(Color color);
+        public abstract Vector2 position { get; set; }
+        public Vector2 m_dragStartPos = Vector2.zero;
 
         public virtual Color selectedColor {
             get
