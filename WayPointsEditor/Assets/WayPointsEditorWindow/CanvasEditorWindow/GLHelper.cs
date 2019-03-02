@@ -6,7 +6,7 @@ namespace bluebean
 {
     public class GLHelper
     {
-        public static void DrawCircleSolid(Vector2 pos, float radius, int segment, Color color)
+        public static void DrawCircle(Vector2 pos, float radius, int segment, Color color)
         {
             GL.Begin(GL.TRIANGLES);
             GL.Color(color);
@@ -22,23 +22,6 @@ namespace bluebean
             }
             GL.End();
         }
-
-        public static void DrawCircle(Vector2 pos, float radius, int segment, Color color)
-        {
-            GL.Begin(GL.LINES);
-            GL.Color(color);
-            for (int i = 0; i < segment; i++)
-            {
-                float angle1 = i / (float)segment * 360f;
-                float angle2 = ((i + 1) == segment ? 0 : i + 1) / (float)segment * 360f;
-                var pos1 = new Vector2(Mathf.Cos(angle1 * Mathf.Deg2Rad), Mathf.Sin(angle1 * Mathf.Deg2Rad)) * radius + pos;
-                var pos2 = new Vector2(Mathf.Cos(angle2 * Mathf.Deg2Rad), Mathf.Sin(angle2 * Mathf.Deg2Rad)) * radius + pos;
-                GL.Vertex(pos1);
-                GL.Vertex(pos2);
-            }
-            GL.End();
-        }
-
 
         public static void DrawLine(Vector2 p1, Vector2 p2, Color color)
         {
