@@ -52,7 +52,7 @@ namespace bluebean
 
         public override void Draw(Color color)
         {
-            GLHelper.DrawCircle(position, radius, 36, color);
+            GLHelper.DrawCircleSolid(position, radius, 36, color);
         }
     }
 
