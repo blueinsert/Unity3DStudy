@@ -13,5 +13,11 @@ namespace bluebean
             y = u.x * Mathf.Sin(Mathf.Deg2Rad * angle) + u.y * Mathf.Cos(Mathf.Deg2Rad * angle);
             return new Vector3(x, y, 0);
         }
+
+        public static Vector2 GetNormal(this Vector2 v)
+        {
+            var normal = Vector3.Cross(new Vector3(v.x, v.y, 0), new Vector3(0, 0, 1)).normalized;
+            return new Vector2(normal.x, normal.y);
+        }
     }
 }

@@ -7,8 +7,8 @@ namespace bluebean
 {
     public class CanvasEditorWindow : EditorWindow
     {
-        [MenuItem("Windows/CanvasEditorWindow")]
-        public static void OpenWindow()
+        [MenuItem("Windows/OpenCanvasEditorWindow")]
+        public static void OpenCanvasEditorWindow()
         {
             var win = GetWindow<CanvasEditorWindow>(typeof(CanvasEditorWindow).Name);
             win.wantsMouseMove = true;
@@ -174,7 +174,7 @@ namespace bluebean
             UnityEngine.Debug.Log("Leave SubArea:" + subAreaCtx.m_areaDef.m_showName);
         }
 
-        private void ProcessEventInCanvas(CanvasContext canvasCtx)
+        protected virtual void ProcessEventInCanvas(CanvasContext canvasCtx)
         {
             canvasCtx.m_curLocalPosition = canvasCtx.GetLocalPos(canvasCtx.m_curMouseNormalizePosition, canvasCtx.GetRealSize(width, height - toolBarHeight));
             //鼠标中键拖动视图
@@ -186,16 +186,53 @@ namespace bluebean
             //鼠标滚轮缩放视图
             if (Event.current.type == EventType.ScrollWheel)
             {
-                canvasCtx.m_scale += Event.current.delta.y * -0.01f;
+                canvasCtx.scale += Event.current.delta.y * -0.01f;
                 Repaint();
             }
-            //按下鼠标左键，开始绘制选区
+            //选择和移动逻辑
+            //按下鼠标左键
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
-                if (canvasCtx.m_selectedElements.Count == 0)
+                var clickElement = canvasCtx.TestPoint(canvasCtx.m_curLocalPosition);
+                canvasCtx.m_dragStartPosition = canvasCtx.m_curLocalPosition;
+                if (clickElement == null)
                 {
+                    //开始绘制选区
+                    canvasCtx.ClearAllSelected();
                     canvasCtx.m_isDrawSelection = true;
-                    canvasCtx.m_dragStartPosition = canvasCtx.m_curLocalPosition;
+                    Repaint();
+                }
+                else
+                {
+                    if(!canvasCtx.IsSelected(clickElement))
+                    {
+                        canvasCtx.ClearAllSelected();
+                        canvasCtx.AddSelected(clickElement);
+                    }
+                    //开始拖动物体
+                    canvasCtx.m_isDragElement = true;
+                    foreach(var element in canvasCtx.m_selectedElements)
+                    {
+                        if (element.canDrag)
+                        {
+                            element.m_dragStartPosition = element.position;
+                        }
+                    }
+                    Repaint();
+                }   
+            }
+            //鼠标左键拖动
+            if(Event.current.type == EventType.MouseDrag && Event.current.button == 0)
+            {
+                if (canvasCtx.m_isDragElement)
+                {
+                    foreach (var element in canvasCtx.m_selectedElements)
+                    {
+                        if (element.canDrag)
+                        {
+                            element.position = element.m_dragStartPosition + (canvasCtx.m_curLocalPosition - canvasCtx.m_dragStartPosition); 
+                        }
+                    }
                     Repaint();
                 }
             }
@@ -206,12 +243,18 @@ namespace bluebean
                 if (canvasCtx.m_isDrawSelection == true)
                 {
                     canvasCtx.m_isDrawSelection = false;
+                    var selections = canvasCtx.TestRect(canvasCtx.m_dragStartPosition, canvasCtx.m_curLocalPosition);
+                    canvasCtx.ClearAllSelected();
+                    canvasCtx.AddSelected(selections);
                     Repaint();
+                }else if (canvasCtx.m_isDragElement)
+                {
+                    canvasCtx.m_isDragElement = false;
                 }
             }
         }
 
-        private void ProcessEventInSubArea(SubAreaContext subAreaCtx)
+        protected virtual void ProcessEventInSubArea(SubAreaContext subAreaCtx)
         {
 
         }
@@ -245,6 +288,12 @@ namespace bluebean
         }
         #endregion
 
+        private void Update()
+        {
+            m_frameCount++;
+        }
+
+        protected int m_frameCount = 0;
         //划线使用的材质球
         static Material lineMaterial;
         /// <summary>

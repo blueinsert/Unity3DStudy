@@ -8,7 +8,13 @@ namespace bluebean
     {
         public Vector2 m_offset = Vector2.zero;
         public float m_scale = 1;
-
+        public float scale {
+            get { return m_scale; }
+            set
+            {
+                m_scale = Mathf.Clamp(value, 0.1f, 3);
+            }
+        }
         /// <summary>
         /// 是否在绘制选区
         /// </summary>
@@ -19,6 +25,25 @@ namespace bluebean
 
         public List<CanvasElementBase> m_elements = new List<CanvasElementBase>();
         public List<CanvasElementBase> m_selectedElements = new List<CanvasElementBase>();
+        public CanvasElementBase m_curSelected
+        {
+            get {
+                return m_selectedElements.Count == 0 ? null : m_selectedElements[0];
+            }
+            set {
+                if (value != null)
+                {
+                    if (m_selectedElements.Count == 0)
+                    {
+                        m_selectedElements.Add(value);
+                    }
+                    else
+                    {
+                        m_selectedElements[0] = value;
+                    }
+                } 
+            }
+        }
 
         public CanvasContext(SubAreaDef areaDef) : base(areaDef)
         {
@@ -40,6 +65,39 @@ namespace bluebean
             return new Vector2(res.x, res.y);
         }
 
+        public CanvasElementBase TestPoint(Vector2 position)
+        {
+            foreach (var element in m_elements)
+            {
+                if (element.TestPoint(position))
+                {
+                    return element;
+                }
+            }
+            return null;
+        }
+
+        public List<CanvasElementBase> TestRect(Rect rect)
+        {
+            List<CanvasElementBase> results = new List<CanvasElementBase>();
+            foreach (var element in m_elements)
+            {
+                if (element.TestRect(rect))
+                {
+                    results.Add(element);
+                }
+            }
+            return results;
+        }
+
+        public List<CanvasElementBase> TestRect(Vector2 dragStart, Vector2 dragEnd)
+        {
+            Vector2 center = (dragStart + dragEnd) / 2;
+            Vector2 size = new Vector2(Mathf.Abs(dragEnd.x - dragStart.x), Mathf.Abs(dragEnd.y - dragStart.y));
+            Rect rect = new Rect(center - size / 2, size);
+            return TestRect(rect);
+        }
+
         public void AddElement(CanvasElementBase element)
         {
             m_elements.Add(element);
@@ -54,6 +112,11 @@ namespace bluebean
         {
             m_elements.Clear();
             m_selectedElements.Clear();
+        }
+
+        public bool IsSelected(CanvasElementBase element)
+        {
+            return m_selectedElements.Contains(element);
         }
 
         public void AddSelected(CanvasElementBase element)
@@ -79,7 +142,7 @@ namespace bluebean
             }
         }
 
-        public void ClearSelected()
+        public void ClearAllSelected()
         {
             m_selectedElements.Clear();
         }

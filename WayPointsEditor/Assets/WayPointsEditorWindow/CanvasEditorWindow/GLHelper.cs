@@ -6,7 +6,7 @@ namespace bluebean
 {
     public class GLHelper
     {
-        public static void DrawCircle(Vector2 pos, float radius, int segment, Color color)
+        public static void DrawCircleSolid(Vector2 pos, float radius, int segment, Color color)
         {
             GL.Begin(GL.TRIANGLES);
             GL.Color(color);
