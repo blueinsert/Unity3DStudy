@@ -1,0 +1,15 @@
+local LuaManagerInit =
+{
+    -- 注册hotfix
+    RegHotFix = function(luaManager)
+        luaManager:RegHotFix("HotFixTestScript", require("HotFixTestScriptModule"))
+    end
+}
+
+function main()
+    print("lua main")
+    -- 注册hotfix
+    LuaManagerInit.RegHotFix(LuaManager.Instance)
+end
+
+return LuaManagerInit;
