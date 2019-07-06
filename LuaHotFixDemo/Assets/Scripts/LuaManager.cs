@@ -126,19 +126,15 @@ public class LuaManager
     /// <param name="luaModuleName"></param>
     /// <param name="objType"></param>
     [DoNotToLua]
-    public static bool TryInitHotfixForObj(object obj, string luaModuleName = null, Type objType = null)
+    public static bool TryInitHotfixForObj(Type objType, string luaModuleName = null)
     {
-        if (m_instance == null || obj == null)
+        if (m_instance == null)
         {
             return false;
         }
 
         var type = objType;
-        if (objType == null)
-        {
-            type = obj.GetType();
-        }
-
+        
         // 查找hotfix所需要的lua module
         var module = string.IsNullOrEmpty(luaModuleName)
             ? Instance.GetHotFixLuaModuleByTypeFullName(type) // 如果没有提供moduleName则应该是在LuaManagerInit中按类型名注册过的module
@@ -150,7 +146,7 @@ public class LuaManager
             return false;
         }
 
-        var initFun = type.GetMethod("InitHotFix", BindingFlags.DeclaredOnly | BindingFlags.NonPublic | BindingFlags.Instance);
+        var initFun = type.GetMethod("InitHotFix", BindingFlags.DeclaredOnly | BindingFlags.NonPublic | BindingFlags.Static);
 
         if (initFun == null)
         {
@@ -158,7 +154,7 @@ public class LuaManager
             return false;
         }
 
-        return (bool)initFun.Invoke(obj, new object[] { module });
+        return (bool)initFun.Invoke(null, new object[] { module });
     }
 
 

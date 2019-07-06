@@ -12,6 +12,8 @@ public class Main : MonoBehaviour {
         LuaManager.Instance.StartLuaSvr((res)=> { });
         HotFixTestScript testObj = new HotFixTestScript();
         Debug.Log(testObj.Add(1, 3));
+        HotFixTestScript testObj2 = new HotFixTestScript();
+        Debug.Log(testObj2.Add(1, 3));
 	}
 	
 	// Update is called once per frame

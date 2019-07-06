@@ -9,62 +9,39 @@ using SLua;
 public class HotFixTestScript
 {
     #region 这些代码由dll注入,自动化产生，这里写了为了做示范
-    LuaObjHelper m_luaObjHelper = new LuaObjHelper();
 
-    private LuaFunction m_add_fix;
+    private static LuaFunction m_Add_ThisInt32Int32_fix;
 
-    private ObjectLuaHotFixState m_hotfixState = ObjectLuaHotFixState.Uninit;
+    private static ObjectLuaHotFixState m_hotfixState = ObjectLuaHotFixState.Uninit;
 
-    private bool InitHotFix(LuaTable luaTable)
+    private static bool InitHotFix(LuaTable luaModule)
     {
-        this.m_luaObjHelper.InitInCS(this, luaTable);
-        LuaFunction luaFunction = luaTable.get("HotFixObject", rawget: true) as LuaFunction;
-        bool result;
-        if (luaFunction == null)
+        bool result = false;
+        if (luaModule == null)
         {
-            Debug.LogError("Can't find HotFixObject Func");
             result = false;
         }
         else
         {
-            luaFunction.call(new object[]
-            {
-                this,
-                this.m_luaObjHelper
-            });
-            LuaTable luaObj = this.m_luaObjHelper.GetLuaObj();
-            if (luaObj == null)
-            {
-                result = false;
-            }
-            else
-            {
-                this.m_add_fix = (luaObj.get("Add", rawget: true) as LuaFunction);
-                result = true;
-            }
+            m_Add_ThisInt32Int32_fix = (luaModule.get("Add_ThisInt32Int32", rawget: true) as LuaFunction);
+            result = true;
         }
         return result;
     }
 
-    private bool TryInitHotFix(string luaModuleName)
+    private static bool TryInitHotFix(string luaModuleName)
     {
         bool result;
-        if (this.m_hotfixState != ObjectLuaHotFixState.Uninit)
+        if (m_hotfixState != ObjectLuaHotFixState.Uninit)
         {
-            result = (this.m_hotfixState == ObjectLuaHotFixState.InitAvialable);
+            result = (m_hotfixState == ObjectLuaHotFixState.InitAvialable);
         }
         else
         {
-            bool flag = LuaManager.TryInitHotfixForObj(this, luaModuleName, typeof(HotFixTestScript));
-            this.m_hotfixState = ((!flag) ? ObjectLuaHotFixState.InitUnavialable : ObjectLuaHotFixState.InitAvialable);
-            result = flag;
+            result = LuaManager.TryInitHotfixForObj(typeof(HotFixTestScript), luaModuleName);
+            m_hotfixState = ((!result) ? ObjectLuaHotFixState.InitUnavialable : ObjectLuaHotFixState.InitAvialable);
         }
         return result;
-    }
-
-    private bool IsLuaObjHelperDisposed()
-    {
-        return this.m_luaObjHelper != null && this.m_luaObjHelper.IsDisposed();
     }
 
     #endregion
@@ -72,17 +49,24 @@ public class HotFixTestScript
     public int Add(int a, int b)
     {
         #region 这些代码由dll注入,自动化产生，这里写了为了做示范
-        if (this.TryInitHotFix("") && this.m_add_fix != null && !this.IsLuaObjHelperDisposed())
+        if (TryInitHotFix("") && m_Add_ThisInt32Int32_fix != null)
         {
-            var result = this.m_add_fix.call(new object[]
+            var result = m_Add_ThisInt32Int32_fix.call(new object[]
             {
                 this,a,b
             });
-            //Debug.Log(result.GetType().Name);
             return (int)(double)result;
         }
         #endregion
+        return a * b;
+    }
 
+}
+[HotFix]
+public class HotFixTestScript2
+{
+    public int Add(int a, int b)
+    {
         return a * b;
     }
 }

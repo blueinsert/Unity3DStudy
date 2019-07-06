@@ -1,28 +1,11 @@
 
-
-local function CreateLuaObject (csObj, luaObjHelper)
-    local luaObject = 
-    {
-        Add = function(self,a,b)
-			return a + b
-        end,
-
-        m_luaMember = 0,
-    }
-    return luaObject
-end
-
-local HotFixTestScriptModule =
-{
-    HotFixObject = function(csObj, luaObjHelper)
-        -- 创建lua对象
-        luaObj = CreateLuaObject(csObj, luaObjHelper)
-        -- 让CS代码感知luaobj存在
-        luaObjHelper:SetLuaObj(luaObj)
-        -- 让luaobj继承 CS 对象
-        --luaObj = Slua.HotFixObj(csObj, luaObj)
-        return luaObj;
+local HotFixTestScriptHotFixModule = {
+    Add_ThisInt32Int32 = function(self,a,b)
+	    return a + b
     end,
+	Add_Int32Int32 = function(a,b)
+	    return a + b
+	end,
 }
 
-return HotFixTestScriptModule;
+return HotFixTestScriptHotFixModule;
