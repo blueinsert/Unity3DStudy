@@ -1,4 +1,5 @@
 ﻿using Mono.Cecil;
+using Mono.Cecil.Cil;
 using SLua;
 using System;
 using System.Collections;
@@ -26,7 +27,7 @@ public class LuaInjectManager
         var assembly = AssemblyDefinition.ReadAssembly(AssemblyPath, readerParameters);
         if (assembly == null)
         {
-            Debug.LogError(string.Format("InjectTool Inject Load assembly failed: {0}",AssemblyPath));
+            Debug.LogError(string.Format("InjectTool Inject Load assembly failed: {0}", AssemblyPath));
             return;
         }
 
@@ -42,14 +43,15 @@ public class LuaInjectManager
                     continue;
                 }
                 //2.添加ObjectLuaHotFixState
-                InjectHotfixStateField(type);
+                var hotfixStateField = InjectHotfixStateField(type);
                 //3.注入每个方法对应的LuaFunction声明
-                InjectLuaFunctionDefForType(type);
+                var bridgeLuaFuncs = InjectLuaFunctionDefForType(type);
                 //4.注入TryInitHotFix函数
-                InjectTryInitHotFixFunc(type);
+                var tryInitHotFixMethod = InjectTryInitHotFixFunc(type, hotfixStateField);
                 //5.注入InitHotFix函数
-                InjectInitHotFixFunc(type);
+                InjectInitHotFixFunc(type, hotfixStateField, bridgeLuaFuncs);
                 //6.为每个函数注入拦截代码片段
+                InjectRedirectCodeForMethods(type, tryInitHotFixMethod, bridgeLuaFuncs);
             }
             assembly.Write(AssemblyPath, new WriterParameters { WriteSymbols = true });
         }
@@ -79,13 +81,19 @@ public class LuaInjectManager
         typeRef_ObjectLuaHotFixState = module.ImportReference(typeof(ObjectLuaHotFixState));
         typeRef_LuaManager = module.ImportReference(typeof(LuaManager));
         typeRef_bool = module.ImportReference(typeof(bool));
+        typeRef_string = module.ImportReference(typeof(string));
+
+        methodRef_Type_GetTypeFromHandle = module.ImportReference(typeof(Type).GetMethod("GetTypeFromHandle"));
+        methodRef_LuaManager_TryInitHotFix = module.ImportReference(typeof(LuaManager).GetMethod("TryInitHotfixForType"));
+        methodRef_LuaTable_get = module.ImportReference(typeof(LuaTable).GetMethod("get"));
+        methodRef_LuaVar_op_Equality = module.ImportReference(typeof(LuaVar).GetMethod("op_Equality"));
     }
 
     /// <summary>
     /// 注入m_hotfixState变量
     /// </summary>
     /// <param name="typeDefinition"></param>
-    private static void InjectHotfixStateField(TypeDefinition typeDefinition)
+    private static FieldDefinition InjectHotfixStateField(TypeDefinition typeDefinition)
     {
         string varName = "m_hotfixState";
         foreach (var field in typeDefinition.Fields)
@@ -98,17 +106,19 @@ public class LuaInjectManager
         }
         FieldDefinition hotfixStateField = new FieldDefinition(varName, FieldAttributes.Private | FieldAttributes.Static, typeRef_ObjectLuaHotFixState);
         typeDefinition.Fields.Add(hotfixStateField);
+        return hotfixStateField;
     }
 
     /// <summary>
     /// 注入每个热修方法对应的luaFunction定义
     /// </summary>
     /// <param name="typeDefinition"></param>
-    private static void InjectLuaFunctionDefForType(TypeDefinition typeDefinition)
+    private static List<FieldDefinition> InjectLuaFunctionDefForType(TypeDefinition typeDefinition)
     {
+        List<FieldDefinition> bridgeLuaFuncs = new List<FieldDefinition>();
         Type type = Type.GetType(typeDefinition.FullName);
         bool isUnityComponent = type.IsAssignableFrom(typeof(UnityEngine.Component));
-        foreach(var methodDef in typeDefinition.Methods)
+        foreach (var methodDef in typeDefinition.Methods)
         {
             if (!LuaInjectUtil.IsMethodNeedHotFix(methodDef, isUnityComponent))
             {
@@ -116,44 +126,95 @@ public class LuaInjectManager
             }
             var luaFuncVarName = LuaInjectUtil.GetHotFixFunctionNameInCS(methodDef);
             FieldDefinition fieldDefinition = new FieldDefinition(luaFuncVarName, FieldAttributes.Private | FieldAttributes.Static, typeRef_LuaFunction);
-            foreach(var field in typeDefinition.Fields)
+            foreach (var field in typeDefinition.Fields)
             {
-                if(field.Name == luaFuncVarName)
+                if (field.Name == luaFuncVarName)
                 {
                     typeDefinition.Fields.Remove(field);
                     break;
                 }
             }
             typeDefinition.Fields.Add(fieldDefinition);
+            bridgeLuaFuncs.Add(fieldDefinition);
         }
+        return bridgeLuaFuncs;
     }
 
     /// <summary>
     /// 为类型注入TryInitHotFix函数
     /// </summary>
     /// <param name="typeDefinition"></param>
-    private static void InjectTryInitHotFixFunc(TypeDefinition typeDefinition)
+    private static MethodDefinition InjectTryInitHotFixFunc(TypeDefinition typeDefinition, FieldReference hotfixStateField)
     {
         string funcName = "TryInitHotFix";
-        foreach(var method in typeDefinition.Methods)
+        foreach (var method in typeDefinition.Methods)
         {
-            if(method.Name == funcName)
+            if (method.Name == funcName)
             {
                 typeDefinition.Methods.Remove(method);
                 break;
             }
         }
         MethodDefinition tryInitHotFixMethod = new MethodDefinition(funcName, MethodAttributes.Static | MethodAttributes.Private, typeRef_bool);
+        tryInitHotFixMethod.Parameters.Add(new ParameterDefinition("luaModuleName", ParameterAttributes.None, typeRef_string));
         tryInitHotFixMethod.Body = new Mono.Cecil.Cil.MethodBody(tryInitHotFixMethod);
-        //todo
+        tryInitHotFixMethod.Body.MaxStackSize = 2;
+        tryInitHotFixMethod.Body.Variables.Add(new VariableDefinition(typeRef_bool));
+        tryInitHotFixMethod.Body.Variables.Add(new VariableDefinition(typeRef_bool));
+        // 开始注入IL代码
+        var ilProcessor = tryInitHotFixMethod.Body.GetILProcessor();
+        tryInitHotFixMethod.Body.Instructions.Add(ilProcessor.Create(OpCodes.Ret));
+        var insertPoint = tryInitHotFixMethod.Body.Instructions[0];
+
+        // 设置一些标签用于语句跳转
+        var label1 = ilProcessor.Create(OpCodes.Nop);
+        var label2 = ilProcessor.Create(OpCodes.Ldloc_0);
+        var label3 = ilProcessor.Create(OpCodes.Ldc_I4_1);
+        var label4 = ilProcessor.Create(OpCodes.Stsfld, hotfixStateField);
+        var label5 = ilProcessor.Create(OpCodes.Ldloc_1);
+        //if (m_hotFixState == 0)
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldsfld, hotfixStateField));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Brfalse, label1));
+        //flag = (HotFixTestScript.m_hotfixState == ObjectLuaHotFixState.InitAvialable);
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldsfld, hotfixStateField));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_2));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ceq));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, label2));
+        //flag = LuaManager.TryInitHotfixForObj(typeof(HotFixTestScript), luaModuleName);
+        ilProcessor.InsertBefore(insertPoint, label1);//OpCodes.Nop
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldtoken, typeDefinition));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, methodRef_Type_GetTypeFromHandle));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, methodRef_LuaManager_TryInitHotFix));
+        //HotFixTestScript.m_hotfixState = ((!flag) ? ObjectLuaHotFixState.InitUnavialable : ObjectLuaHotFixState.InitAvialable);
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Brfalse, label3));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_2));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, label4));
+        ilProcessor.InsertBefore(insertPoint, label3);//OpCodes.Ldc_I4_1
+        ilProcessor.InsertBefore(insertPoint, label4);//OpCodes.Stsfld, hotfixState
+        //return flag
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, label2);//OpCodes.Ldloc_0
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_1));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, label5));
+        ilProcessor.InsertBefore(insertPoint, label5);//OpCodes.Ldloc_1
+
         typeDefinition.Methods.Add(tryInitHotFixMethod);
+
+        return tryInitHotFixMethod;
     }
 
     /// <summary>
     /// 为类型注入InitHotFix函数
     /// </summary>
     /// <param name="typeDefinition"></param>
-    private static void InjectInitHotFixFunc(TypeDefinition typeDefinition)
+    private static void InjectInitHotFixFunc(TypeDefinition typeDefinition, FieldReference hotfixState, List<FieldDefinition> bridgeLuaFuncs)
     {
         string funcName = "InitHotFix";
         foreach (var method in typeDefinition.Methods)
@@ -164,10 +225,115 @@ public class LuaInjectManager
                 break;
             }
         }
-        MethodDefinition tryInitHotFixMethod = new MethodDefinition(funcName, MethodAttributes.Static | MethodAttributes.Private, typeRef_bool);
-        tryInitHotFixMethod.Body = new Mono.Cecil.Cil.MethodBody(tryInitHotFixMethod);
-        //todo
-        typeDefinition.Methods.Add(tryInitHotFixMethod);
+        MethodDefinition initHotFixMethod = new MethodDefinition(funcName, MethodAttributes.Static | MethodAttributes.Private, typeRef_bool);
+        initHotFixMethod.Body = new Mono.Cecil.Cil.MethodBody(initHotFixMethod);
+        initHotFixMethod.Parameters.Add(new ParameterDefinition("luaModule", ParameterAttributes.None, typeRef_LuaTable));
+        initHotFixMethod.Body = new Mono.Cecil.Cil.MethodBody(initHotFixMethod);
+        initHotFixMethod.Body.MaxStackSize = 4;
+        initHotFixMethod.Body.Variables.Add(new VariableDefinition(typeRef_bool));
+        initHotFixMethod.Body.Variables.Add(new VariableDefinition(typeRef_bool));
+        // 开始注入IL代码
+        var ilProcessor = initHotFixMethod.Body.GetILProcessor();
+        initHotFixMethod.Body.Instructions.Add(ilProcessor.Create(OpCodes.Ret));
+        var insertPoint = initHotFixMethod.Body.Instructions[0];
+
+        // 设置一些标签用于语句跳转
+        var label1 = ilProcessor.Create(OpCodes.Nop);
+        var label2 = ilProcessor.Create(OpCodes.Ldloc_0);
+        var label3 = ilProcessor.Create(OpCodes.Ldloc_1);
+        // if (luaModule == null)
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldnull));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, methodRef_LuaVar_op_Equality));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Brfalse, label1));
+        //result = false; 将0压入局部变量索引零处
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, label2));
+
+        //luaModule != null
+        ilProcessor.InsertBefore(insertPoint, label1);//OpCodes.Nop   
+        //初始化方法对应的luaFunction变量
+        Type type = Type.GetType(typeDefinition.FullName);
+        bool isUnityComponent = type.IsAssignableFrom(typeof(UnityEngine.Component));
+        foreach (var methodDef in typeDefinition.Methods)
+        {
+            //for example: 
+            //m_Add_ThisInt32Int32_fix = (luaModule.get("Add_ThisInt32Int32", rawget: true) as LuaFunction);
+            if (!LuaInjectUtil.IsMethodNeedHotFix(methodDef, isUnityComponent))
+            {
+                continue;
+            }
+            var bridgeLuaFunc = bridgeLuaFuncs.Find((field) =>
+            {
+                return field.Name == LuaInjectUtil.GetHotFixFunctionNameInCS(methodDef);
+            });
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg_0));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldstr, LuaInjectUtil.GetHotFixFunctionNameInLua(methodDef)));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_0));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_1));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Callvirt, methodRef_LuaTable_get));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Isinst, typeRef_LuaFunction));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stsfld, bridgeLuaFunc));
+        }
+        ////result = true; 将1压入局部变量索引零处
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4_1));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_0));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+
+        ilProcessor.InsertBefore(insertPoint, label2);//OpCodes.Ldloc_0
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc_1));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, label3));
+        ilProcessor.InsertBefore(insertPoint, label3);//OpCodes.Ldloc_1
+
+        typeDefinition.Methods.Add(initHotFixMethod);
+    }
+
+    /// <summary>
+    /// 为每个热修方法注入劫持代码
+    /// </summary>
+    private static void InjectRedirectCodeForMethods(TypeDefinition typeDefinition, MethodDefinition tryInitHotFixMethod, List<FieldDefinition> bridgeLuaFuncs)
+    {
+        /*
+         * example:
+         *  if (TryInitHotFix("") && m_Add_ThisInt32Int32_fix != null)
+            {
+                var result = m_Add_ThisInt32Int32_fix.call(new object[]
+                {
+                    this,a,b
+                });
+               return (int)(double)result;
+            }
+         */
+        Type type = Type.GetType(typeDefinition.FullName);
+        bool isUnityComponent = type.IsAssignableFrom(typeof(UnityEngine.Component));
+        foreach (var methodDef in typeDefinition.Methods)
+        {
+            if (!LuaInjectUtil.IsMethodNeedHotFix(methodDef, isUnityComponent))
+            {
+                continue;
+            }
+            var bridgeLuaFunc = bridgeLuaFuncs.Find((field) =>
+            {
+                return field.Name == LuaInjectUtil.GetHotFixFunctionNameInCS(methodDef);
+            });
+            // 开始注入IL代码
+            var ilProcessor = methodDef.Body.GetILProcessor();
+            var insertPoint = methodDef.Body.Instructions[0];
+
+            // 设置一些标签用于语句跳转
+            var label1 = ilProcessor.Create(OpCodes.Nop);
+            var label2 = ilProcessor.Create(OpCodes.Ldloc_0);
+            var label3 = ilProcessor.Create(OpCodes.Ldloc_1);
+
+
+        }
+
     }
 
     private static TypeReference typeRef_LuaManager;
@@ -175,6 +341,12 @@ public class LuaInjectManager
     private static TypeReference typeRef_LuaFunction;
     private static TypeReference typeRef_LuaTable;
     private static TypeReference typeRef_bool;
+    private static TypeReference typeRef_string;
 
     private static MethodReference methodRef_LuaManager_TryInitHotFix;
+    private static MethodReference methodRef_Type_GetTypeFromHandle;
+    private static MethodReference methodRef_LuaVar_op_Equality;
+    private static MethodReference methodRef_LuaTable_get;
+
+    private static FieldReference fieldRef_m_hotfixState;
 }

@@ -16,9 +16,9 @@ public static class LuaInjectUtil
     {
         //如果没有添加HotFixAttribute则不需要热修
         bool hasHotFixAttribute = false;
-        foreach(var attribute in typeDefinition.CustomAttributes)
+        foreach (var attribute in typeDefinition.CustomAttributes)
         {
-            if(attribute.AttributeType.FullName == typeof(HotFixAttribute).FullName)
+            if (attribute.AttributeType.FullName == typeof(HotFixAttribute).FullName)
             {
                 hasHotFixAttribute = true;
                 break;
@@ -42,14 +42,20 @@ public static class LuaInjectUtil
     /// <returns></returns>
     public static bool IsMethodNeedHotFix(MethodDefinition methodDefinition, bool isUnityComponent)
     {
-        var isCtor = methodDefinition.IsConstructor;
+        //自己注入的方法不需要热修复
+        if (methodDefinition.Name == "InitHotFix"
+            || methodDefinition.Name == "TryInitHotFix")
+        {
+            return false;
+        }
         //unity组件类的构成方法不需要插入代码片段
-        if(isUnityComponent && isCtor)
+        var isCtor = methodDefinition.IsConstructor;
+        if (isUnityComponent && isCtor)
         {
             return false;
         }
         //没有方法体
-        if(!methodDefinition.HasBody || methodDefinition.Body == null)
+        if (!methodDefinition.HasBody || methodDefinition.Body == null)
         {
             return false;
         }
@@ -75,7 +81,7 @@ public static class LuaInjectUtil
         {
             sb.Append("this");
         }
-        foreach(var param in methodDefinition.Parameters)
+        foreach (var param in methodDefinition.Parameters)
         {
             sb.Append(param.ParameterType.Name);
         }

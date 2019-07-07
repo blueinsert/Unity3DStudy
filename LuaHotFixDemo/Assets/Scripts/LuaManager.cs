@@ -126,7 +126,7 @@ public class LuaManager
     /// <param name="luaModuleName"></param>
     /// <param name="objType"></param>
     [DoNotToLua]
-    public static bool TryInitHotfixForObj(Type objType, string luaModuleName = null)
+    public static bool TryInitHotfixForType(Type objType, string luaModuleName = null)
     {
         if (m_instance == null)
         {

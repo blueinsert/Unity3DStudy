@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SLua;
+using System;
 
 /// <summary>
 /// 热修测试对象
@@ -38,8 +39,8 @@ public class HotFixTestScript
         }
         else
         {
-            result = LuaManager.TryInitHotfixForObj(typeof(HotFixTestScript), luaModuleName);
-            m_hotfixState = ((!result) ? ObjectLuaHotFixState.InitUnavialable : ObjectLuaHotFixState.InitAvialable);
+            result = LuaManager.TryInitHotfixForType(typeof(HotFixTestScript), luaModuleName);
+            m_hotfixState = (result ? ObjectLuaHotFixState.InitAvialable : ObjectLuaHotFixState.InitUnavialable);
         }
         return result;
     }
@@ -55,7 +56,7 @@ public class HotFixTestScript
             {
                 this,a,b
             });
-            return (int)(double)result;
+            return Convert.ToInt32(result);
         }
         #endregion
         return a * b;
