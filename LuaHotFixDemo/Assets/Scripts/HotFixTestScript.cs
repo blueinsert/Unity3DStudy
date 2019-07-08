@@ -62,6 +62,18 @@ public class HotFixTestScript
         return a * b;
     }
 
+    public void Test1(int a, int b)
+    {
+        #region 这些代码由dll注入,自动化产生，这里写了为了做示范
+        if (TryInitHotFix("") && m_Add_ThisInt32Int32_fix != null)
+        {
+            var result = m_Add_ThisInt32Int32_fix.call(new object[]
+            {
+                this,a,b
+            });
+        }
+        #endregion
+    }
 }
 [HotFix]
 public class HotFixTestScript2

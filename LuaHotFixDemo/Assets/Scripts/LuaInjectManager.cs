@@ -51,7 +51,21 @@ public class LuaInjectManager
                 //5.注入InitHotFix函数
                 InjectInitHotFixFunc(type, hotfixStateField, bridgeLuaFuncs);
                 //6.为每个函数注入拦截代码片段
-                InjectRedirectCodeForMethods(type, tryInitHotFixMethod, bridgeLuaFuncs);
+                Type realType = Type.GetType(type.FullName);
+                bool isUnityComponent = typeof(UnityEngine.Component).IsAssignableFrom(realType);
+                foreach (var methodDef in type.Methods)
+                {
+                    if (!LuaInjectUtil.IsMethodNeedHotFix(methodDef, isUnityComponent))
+                    {
+                        continue;
+                    }
+                    var bridgeLuaFunc = bridgeLuaFuncs.Find((field) =>
+                    {
+                        return field.Name == LuaInjectUtil.GetHotFixFunctionNameInCS(methodDef);
+                    });
+                    InjectRedirectCodeForMethod(module, type, methodDef, tryInitHotFixMethod, bridgeLuaFunc);
+                }
+
             }
             assembly.Write(AssemblyPath, new WriterParameters { WriteSymbols = true });
         }
@@ -80,6 +94,7 @@ public class LuaInjectManager
         typeRef_LuaTable = module.ImportReference(typeof(LuaTable));
         typeRef_ObjectLuaHotFixState = module.ImportReference(typeof(ObjectLuaHotFixState));
         typeRef_LuaManager = module.ImportReference(typeof(LuaManager));
+        typeRef_object = module.ImportReference(typeof(object));
         typeRef_bool = module.ImportReference(typeof(bool));
         typeRef_string = module.ImportReference(typeof(string));
 
@@ -87,6 +102,8 @@ public class LuaInjectManager
         methodRef_LuaManager_TryInitHotFix = module.ImportReference(typeof(LuaManager).GetMethod("TryInitHotfixForType"));
         methodRef_LuaTable_get = module.ImportReference(typeof(LuaTable).GetMethod("get"));
         methodRef_LuaVar_op_Equality = module.ImportReference(typeof(LuaVar).GetMethod("op_Equality"));
+        methodRef_LuaVar_op_Inequality = module.ImportReference(typeof(LuaVar).GetMethod("op_Inequality"));
+        methodRef_LuaFunction_call = module.ImportReference(typeof(LuaFunction).GetMethod("call", new Type[] {typeof(object[])}));
     }
 
     /// <summary>
@@ -297,7 +314,7 @@ public class LuaInjectManager
     /// <summary>
     /// 为每个热修方法注入劫持代码
     /// </summary>
-    private static void InjectRedirectCodeForMethods(TypeDefinition typeDefinition, MethodDefinition tryInitHotFixMethod, List<FieldDefinition> bridgeLuaFuncs)
+    private static void InjectRedirectCodeForMethod(ModuleDefinition module, TypeDefinition typeDefinition, MethodDefinition hotfixedMethodDefinition, MethodDefinition tryInitHotFixMethod, FieldDefinition bridgeLuaFunc)
     {
         /*
          * example:
@@ -310,43 +327,126 @@ public class LuaInjectManager
                return (int)(double)result;
             }
          */
-        Type type = Type.GetType(typeDefinition.FullName);
-        bool isUnityComponent = type.IsAssignableFrom(typeof(UnityEngine.Component));
-        foreach (var methodDef in typeDefinition.Methods)
+        bool hasReturnValue = hotfixedMethodDefinition.ReturnType.Name != module.TypeSystem.Void.Name;
+        int paramCount = hotfixedMethodDefinition.Parameters.Count;
+
+        VariableDefinition objectLocalVar = new VariableDefinition(typeRef_object);
+        //存放调用luaFunction的返回值
+        hotfixedMethodDefinition.Body.Variables.Add(new VariableDefinition(typeRef_object));
+        VariableDefinition returunLocalVar = new VariableDefinition(hotfixedMethodDefinition.ReturnType);
+        if (hasReturnValue)
         {
-            if (!LuaInjectUtil.IsMethodNeedHotFix(methodDef, isUnityComponent))
-            {
-                continue;
-            }
-            var bridgeLuaFunc = bridgeLuaFuncs.Find((field) =>
-            {
-                return field.Name == LuaInjectUtil.GetHotFixFunctionNameInCS(methodDef);
-            });
-            // 开始注入IL代码
-            var ilProcessor = methodDef.Body.GetILProcessor();
-            var insertPoint = methodDef.Body.Instructions[0];
-
-            // 设置一些标签用于语句跳转
-            var label1 = ilProcessor.Create(OpCodes.Nop);
-            var label2 = ilProcessor.Create(OpCodes.Ldloc_0);
-            var label3 = ilProcessor.Create(OpCodes.Ldloc_1);
-
-
+           //用于存放convert后的返回值
+           hotfixedMethodDefinition.Body.Variables.Add(returunLocalVar);
         }
+        int localVarCount = hotfixedMethodDefinition.Body.Variables.Count;
+        Instruction retInstruction = hotfixedMethodDefinition.Body.Instructions[hotfixedMethodDefinition.Body.Instructions.Count - 1];
 
+        // 开始注入IL代码
+        var ilProcessor = hotfixedMethodDefinition.Body.GetILProcessor();
+        Instruction insertPoint;
+        if (tryInitHotFixMethod.IsConstructor)
+        {
+            //如果是构造方法在最后插入
+            insertPoint = hotfixedMethodDefinition.Body.Instructions[hotfixedMethodDefinition.Body.Instructions.Count - 1];
+        }
+        else
+        {
+            insertPoint = hotfixedMethodDefinition.Body.Instructions[0];
+        }
+        
+
+        // 设置一些标签用于语句跳转
+        var label1 = ilProcessor.Create(OpCodes.Nop);
+
+        //if (TryInitHotFix(""))
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldstr, ""));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, tryInitHotFixMethod));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Brfalse, label1));
+        //if (m_Add_ThisInt32Int32_fix != null)
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldsfld, bridgeLuaFunc));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldnull));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, methodRef_LuaVar_op_Inequality));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Brfalse, label1));
+        //两个条件都满足
+        //for example
+        //var result = m_Add_ThisInt32Int32_fix.call(new object[]
+        //{
+        //    this,a,b
+        //});
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldsfld, bridgeLuaFunc));
+        //创建new object[]{}
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, hotfixedMethodDefinition.IsStatic ? paramCount : paramCount + 1));
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Newarr, typeRef_object));
+        //往数组里插入this
+        int i = 0;
+        if (!hotfixedMethodDefinition.IsStatic)
+        {
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Dup));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, i++));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg_0));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stelem_Ref));
+        }
+        //插入剩余参数
+        for(int j = 0; j < hotfixedMethodDefinition.Parameters.Count; j++)
+        {
+            var paramType = hotfixedMethodDefinition.Parameters[j];
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Dup));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, i++));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg, j));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Box, paramType.ParameterType));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stelem_Ref));
+        }
+        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Callvirt, methodRef_LuaFunction_call));
+        if (!hasReturnValue)
+        {
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, objectLocalVar));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, retInstruction));
+        }
+        else
+        {
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, objectLocalVar));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldloc, objectLocalVar));
+            if (hotfixedMethodDefinition.ReturnType.IsPrimitive)
+            {
+                string methodName = "To" + hotfixedMethodDefinition.ReturnType.Name;
+                var convertMethod = module.ImportReference(typeof(Convert).GetMethod(methodName, new Type[] { typeof(object) }));
+                ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, convertMethod));
+            }
+            //else if () { } todo 枚举
+            else {
+                if (hotfixedMethodDefinition.ReturnType.IsValueType)
+                {
+                    ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Unbox_Any));
+                }
+                else
+                {
+                    ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Castclass, hotfixedMethodDefinition.ReturnType));
+                }
+            }
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, returunLocalVar));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldloc, returunLocalVar));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, retInstruction));
+        }
+        ilProcessor.InsertBefore(insertPoint, label1);//OpCodes.Nop
     }
 
     private static TypeReference typeRef_LuaManager;
     private static TypeReference typeRef_ObjectLuaHotFixState;
     private static TypeReference typeRef_LuaFunction;
     private static TypeReference typeRef_LuaTable;
+    private static TypeReference typeRef_object;
     private static TypeReference typeRef_bool;
     private static TypeReference typeRef_string;
 
     private static MethodReference methodRef_LuaManager_TryInitHotFix;
     private static MethodReference methodRef_Type_GetTypeFromHandle;
     private static MethodReference methodRef_LuaVar_op_Equality;
+    private static MethodReference methodRef_LuaVar_op_Inequality;
     private static MethodReference methodRef_LuaTable_get;
-
+    private static MethodReference methodRef_LuaFunction_call;
+    
     private static FieldReference fieldRef_m_hotfixState;
 }
