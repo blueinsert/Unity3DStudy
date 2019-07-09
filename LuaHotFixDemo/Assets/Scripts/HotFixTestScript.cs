@@ -24,7 +24,7 @@ public class HotFixTestScript
         }
         else
         {
-            m_Add_ThisInt32Int32_fix = (luaModule.get("Add_ThisInt32Int32", rawget: true) as LuaFunction);
+            m_Add_ThisInt32Int32_fix = (luaModule.get("Add_thisInt32Int32", rawget: true) as LuaFunction);
             result = true;
         }
         return result;
@@ -81,5 +81,6 @@ public class HotFixTestScript2
     public int Add(int a, int b)
     {
         return a * b;
+
     }
 }

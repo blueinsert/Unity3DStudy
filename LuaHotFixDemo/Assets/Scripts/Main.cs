@@ -12,7 +12,7 @@ public class Main : MonoBehaviour {
         LuaManager.Instance.StartLuaSvr((res)=> { });
         HotFixTestScript testObj = new HotFixTestScript();
         Debug.Log(testObj.Add(1, 3));
-        HotFixTestScript testObj2 = new HotFixTestScript();
+        HotFixTestScript2 testObj2 = new HotFixTestScript2();
         Debug.Log(testObj2.Add(1, 3));
 	}
 	

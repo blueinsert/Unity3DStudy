@@ -1,8 +1,9 @@
-local LuaManagerInit =
+﻿local LuaManagerInit =
 {
     -- 注册hotfix
     RegHotFix = function(luaManager)
         luaManager:RegHotFix("HotFixTestScript", require("HotFixTestScriptModule"))
+        luaManager:RegHotFix("HotFixTestScript2", require("HotFixTestScript2Module"))
     end
 }
 

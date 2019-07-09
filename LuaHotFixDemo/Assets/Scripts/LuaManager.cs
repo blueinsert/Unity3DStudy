@@ -109,7 +109,6 @@ public class LuaManager
     /// <returns></returns>
     public void RegHotFix(string typeFullName, LuaTable module)
     {
-        // todo:baizihan 类型是否存在
         if (module == null)
         {
             Debug.LogWarning(string.Format("LuaManager RegHotFix failed, can't find module {0}", typeFullName));

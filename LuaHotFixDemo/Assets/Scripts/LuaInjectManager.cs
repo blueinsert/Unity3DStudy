@@ -328,34 +328,33 @@ public class LuaInjectManager
             }
          */
         bool hasReturnValue = hotfixedMethodDefinition.ReturnType.Name != module.TypeSystem.Void.Name;
-        int paramCount = hotfixedMethodDefinition.Parameters.Count;
 
-        VariableDefinition objectLocalVar = new VariableDefinition(typeRef_object);
-        //存放调用luaFunction的返回值
-        hotfixedMethodDefinition.Body.Variables.Add(new VariableDefinition(typeRef_object));
-        VariableDefinition returunLocalVar = new VariableDefinition(hotfixedMethodDefinition.ReturnType);
+        VariableDefinition returunLocalVar = null;
         if (hasReturnValue)
         {
-           //用于存放convert后的返回值
-           hotfixedMethodDefinition.Body.Variables.Add(returunLocalVar);
+            //用于存放返回值
+            returunLocalVar = new VariableDefinition(hotfixedMethodDefinition.ReturnType);
+            hotfixedMethodDefinition.Body.Variables.Add(returunLocalVar);
         }
-        int localVarCount = hotfixedMethodDefinition.Body.Variables.Count;
-        Instruction retInstruction = hotfixedMethodDefinition.Body.Instructions[hotfixedMethodDefinition.Body.Instructions.Count - 1];
-
+        Instruction lastInst = hotfixedMethodDefinition.Body.Instructions[hotfixedMethodDefinition.Body.Instructions.Count - 1];
+        if (lastInst.OpCode != OpCodes.Ret)
+        {
+            Debug.LogError(string.Format("The last opcode is't 'return' in {0}.{1}",typeDefinition.Name, hotfixedMethodDefinition.Name));
+            return;
+        }
         // 开始注入IL代码
         var ilProcessor = hotfixedMethodDefinition.Body.GetILProcessor();
         Instruction insertPoint;
         if (tryInitHotFixMethod.IsConstructor)
         {
             //如果是构造方法在最后插入
-            insertPoint = hotfixedMethodDefinition.Body.Instructions[hotfixedMethodDefinition.Body.Instructions.Count - 1];
+            insertPoint = lastInst;
         }
         else
         {
             insertPoint = hotfixedMethodDefinition.Body.Instructions[0];
         }
         
-
         // 设置一些标签用于语句跳转
         var label1 = ilProcessor.Create(OpCodes.Nop);
 
@@ -378,44 +377,51 @@ public class LuaInjectManager
         ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Nop));
         ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldsfld, bridgeLuaFunc));
         //创建new object[]{}
-        ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, hotfixedMethodDefinition.IsStatic ? paramCount : paramCount + 1));
+        int paramCount = hotfixedMethodDefinition.Parameters.Count;
+        ilProcessor.InsertBefore(insertPoint,
+            ilProcessor.Create(OpCodes.Ldc_I4, hotfixedMethodDefinition.IsStatic ? paramCount : paramCount + 1));
         ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Newarr, typeRef_object));
+        
+        
+        int arrayIndex = 0;
         //往数组里插入this
-        int i = 0;
         if (!hotfixedMethodDefinition.IsStatic)
         {
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Dup));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, i++));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, arrayIndex++));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg_0));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stelem_Ref));
         }
         //插入剩余参数
-        for(int j = 0; j < hotfixedMethodDefinition.Parameters.Count; j++)
+        for(int i = 0; i < hotfixedMethodDefinition.Parameters.Count; i++)
         {
-            var paramType = hotfixedMethodDefinition.Parameters[j];
+            var paramType = hotfixedMethodDefinition.Parameters[i];
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Dup));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, i++));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg, j));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, arrayIndex++));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg, i+1));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Box, paramType.ParameterType));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stelem_Ref));
         }
         ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Callvirt, methodRef_LuaFunction_call));
         if (!hasReturnValue)
         {
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, objectLocalVar));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, retInstruction));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Pop));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ret));
         }
         else
         {
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, objectLocalVar));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldloc, objectLocalVar));
             if (hotfixedMethodDefinition.ReturnType.IsPrimitive)
             {
                 string methodName = "To" + hotfixedMethodDefinition.ReturnType.Name;
                 var convertMethod = module.ImportReference(typeof(Convert).GetMethod(methodName, new Type[] { typeof(object) }));
                 ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, convertMethod));
             }
-            //else if () { } todo 枚举
+            else if (hotfixedMethodDefinition.ReturnType.Resolve().IsEnum)
+            {
+                string methodName = "ToInt32";
+                var convertMethod = module.ImportReference(typeof(Convert).GetMethod(methodName, new Type[] { typeof(object) }));
+                ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Call, convertMethod));
+            }
             else {
                 if (hotfixedMethodDefinition.ReturnType.IsValueType)
                 {
@@ -428,7 +434,7 @@ public class LuaInjectManager
             }
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stloc, returunLocalVar));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldloc, returunLocalVar));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Br, retInstruction));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ret));
         }
         ilProcessor.InsertBefore(insertPoint, label1);//OpCodes.Nop
     }
