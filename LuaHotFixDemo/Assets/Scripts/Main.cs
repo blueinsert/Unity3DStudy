@@ -14,7 +14,8 @@ public class Main : MonoBehaviour {
         Debug.Log(testObj.Add(1, 3));
         HotFixTestScript2 testObj2 = new HotFixTestScript2();
         Debug.Log(testObj2.Add(1, 3));
-	}
+        Debug.Log(HotFixTestScript2.s_Add(1, 3));
+    }
 	
 	// Update is called once per frame
 	void Update () {

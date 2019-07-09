@@ -42,6 +42,7 @@ public class LuaInjectManager
                 {
                     continue;
                 }
+                Debug.Log(string.Format("InjectTool start inject for type:{0}", type.Name));
                 //2.添加ObjectLuaHotFixState
                 var hotfixStateField = InjectHotfixStateField(type);
                 //3.注入每个方法对应的LuaFunction声明
@@ -398,7 +399,7 @@ public class LuaInjectManager
             var paramType = hotfixedMethodDefinition.Parameters[i];
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Dup));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldc_I4, arrayIndex++));
-            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg, i+1));
+            ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Ldarg, hotfixedMethodDefinition.IsStatic ? i : i + 1));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Box, paramType.ParameterType));
             ilProcessor.InsertBefore(insertPoint, ilProcessor.Create(OpCodes.Stelem_Ref));
         }
