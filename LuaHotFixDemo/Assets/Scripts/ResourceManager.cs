@@ -2,26 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceManager
+namespace bluebean
 {
 
-    private ResourceManager() { }
-    public static ResourceManager Instance
+    public class ResourceManager
     {
-        get
+
+        private ResourceManager() { }
+        public static ResourceManager Instance
         {
-            if (m_instance == null)
+            get
             {
-                m_instance = new ResourceManager();
+                if (m_instance == null)
+                {
+                    m_instance = new ResourceManager();
+                }
+                return m_instance;
             }
-            return m_instance;
         }
-    }
-    public static ResourceManager m_instance;
+        public static ResourceManager m_instance;
 
-    public T LoadAsset<T>(string path) where T : UnityEngine.Object
-    {
-        return Resources.Load<T>(path);
-    }
+        public T LoadAsset<T>(string path) where T : UnityEngine.Object
+        {
+            return Resources.Load<T>(path);
+        }
 
+    }
 }

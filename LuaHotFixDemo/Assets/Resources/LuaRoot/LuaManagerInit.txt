@@ -10,7 +10,7 @@
 function main()
     print("lua main")
     -- 注册hotfix
-    LuaManagerInit.RegHotFix(LuaManager.Instance)
+    LuaManagerInit.RegHotFix(bluebean.LuaManager.Instance)
 end
 
 return LuaManagerInit;

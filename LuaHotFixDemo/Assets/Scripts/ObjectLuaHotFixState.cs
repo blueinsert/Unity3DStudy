@@ -1,6 +1,9 @@
-﻿public enum ObjectLuaHotFixState
+﻿namespace bluebean
 {
-    Uninit,
-    InitUnavialable,
-    InitAvialable,
+    public enum ObjectLuaHotFixState
+    {
+        Uninit,
+        InitUnavialable,
+        InitAvialable,
+    }
 }

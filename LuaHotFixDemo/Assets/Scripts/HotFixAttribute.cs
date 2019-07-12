@@ -1,7 +1,9 @@
 ﻿using System;
-
-[AttributeUsage(AttributeTargets.Class)]
-public class HotFixAttribute:Attribute
+namespace bluebean
 {
-    
+    [AttributeUsage(AttributeTargets.Class)]
+    public class HotFixAttribute : Attribute
+    {
+
+    }
 }
