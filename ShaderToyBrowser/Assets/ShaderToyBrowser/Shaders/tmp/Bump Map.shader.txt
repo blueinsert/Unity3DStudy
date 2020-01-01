@@ -1,0 +1,190 @@
+#define AA 2
+
+#define SpherePos vec3(0.0,0.0,0.0)
+#define SphereRadius 2.0
+
+//作为基础的随机函数
+float hash21(vec2 p)
+{
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+//基于晶格的值噪声
+float value_noise(vec2 p){
+    vec2 i = floor( p );
+    vec2 f = fract( p );
+	
+    // Ease Curve 平滑曲线
+    vec2 u = f*f*f*(6.0*f*f - 15.0*f + 10.0);
+    
+    return mix(mix(hash21(i+vec2(0.0,0.0)),hash21(i+vec2(1.0,0.0)),u.x),
+               mix(hash21(i+vec2(0.0,1.0)),hash21(i+vec2(1.0,1.0)),u.x),
+               u.y);
+}
+
+//基于值噪声的分形噪声
+float fractal_noise(in vec2 p)
+{
+	p *= 5.0;
+    mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+	float f  = 0.5000*value_noise(p); p = m*p;
+	f += 0.2500*value_noise(p); p = m*p;
+	f += 0.1250*value_noise(p); p = m*p;
+	f += 0.0625*value_noise(p); p = m*p;
+    
+    return f;
+}
+
+float sdSphere( vec3 p, float s )
+{
+    return length(p)-s;
+}
+
+vec2 opU( vec2 d1, vec2 d2 )
+{
+	return (d1.x<d2.x) ? d1 : d2;
+}
+
+vec2 map( in vec3 pos )
+{
+    vec2 res = vec2(1e10, 0.0);
+   
+    res = opU(res, vec2(sdSphere(pos - SpherePos, SphereRadius),1));
+        
+    return res;
+}
+
+vec2 getSphereUV(in vec3 pos)
+{
+    vec3 posLocal = pos - SpherePos;
+    //经纬角度
+    float longitudeAngle = atan(posLocal.x/posLocal.z)/3.1415926*180.0;
+    float latitudeAngle = acos(posLocal.y/SphereRadius)/3.1415926*180.0;
+    
+    return vec2(longitudeAngle,latitudeAngle);
+}
+
+float getBumpMap(in vec2 uv){
+    uv *= 0.0081;
+    return fractal_noise(uv)*25.23;
+}
+
+vec2 getPerturbationVector(in vec2 uv)
+{
+    vec2 size = vec2(.00001,0.0);
+    float  perturbationU = (getBumpMap(uv+size.xy) - getBumpMap(uv-size.xy))/(2.0*size.x);
+    float  perturbationV = (getBumpMap(uv+size.yx) - getBumpMap(uv-size.yx))/(2.0*size.x);
+    return vec2(perturbationU,perturbationV);
+}
+
+vec3 getSphereNormal(in vec3 pos)
+{
+    vec3 posLocal = pos - SpherePos;
+    
+    vec3 nW = normalize(posLocal);
+    vec3 uW = normalize(vec3(-nW.z,0.0,nW.x));
+    vec3 vW = normalize(cross(nW,uW));
+    
+    vec2 uv = getSphereUV(pos);
+    vec2 perturbation = getPerturbationVector(uv);
+    vec3 n = nW + uW*perturbation.x + vW*perturbation.y;
+    n = normalize(n);
+    //n =  normalize(vec3(dot(n,uW),dot(n,vW),dot(n,nW)));
+    return n;
+}
+
+vec2 castRay( in vec3 ro, in vec3 rd )
+{
+    vec2 res = vec2(-1.0,-1.0);
+
+    float tmin = 1.0;
+    float tmax = 20.0;
+
+    float t = tmin;
+    for( int i = 0; i < 70 && t < tmax; i++ )
+    {
+        vec2 h = map( ro+rd*t );
+        if( abs(h.x)<(0.0001*t) )
+        { 
+            res = vec2(t,h.y); 
+            break;
+        }
+        t += h.x;
+    }
+    
+    return res;
+}
+
+
+const vec3 LightPos = vec3(5,5,5);
+const vec3 LightColor = vec3(1,1,1);
+const vec3 Ambient = vec3(0.4,0.4,0.4);
+
+vec3 lambert(in vec3 objColor, in vec3 pos, in vec3 normal, in vec3 view)
+{
+    float ka = 0.01;
+    float kd = 0.5;
+    //float ks = 0.3;
+    float shininess = 8.0;
+    vec3 l = normalize(LightPos - pos);
+    vec3 ref = reflect(-l, normal);
+    vec3 a = ka * Ambient * objColor;
+    vec3 d = kd * LightColor * clamp(dot(normal, l),0.0,1.0) * objColor;
+    //vec3 s = ks * LightColor * pow(dot(ref, view), shininess) * objColor;
+    return a + d;// + s;
+}   
+
+
+vec3 render(in vec3 ro, in vec3 rd)
+{
+    vec2 res = castRay(ro,rd);
+    float t = res.x;
+	float m = res.y; 
+    vec3 pos = ro + t * rd;
+    vec3 col = vec3(0,0,0); 
+    if(m <= -1.0)//skyBox
+    {
+        col = vec3(0.3,0.8,1.0);
+    } else{
+        vec3 n = getSphereNormal(pos);
+        col = lambert(vec3(1,0.8,0.2), pos, n, -rd);
+    }
+    return col;
+}
+
+mat3 getViewMatrix(in vec3 cameraPos, in vec3 targetPos)
+{
+    vec3 w = normalize(targetPos - cameraPos);
+    vec3 up = vec3(0,1,0);
+    vec3 u = normalize(cross(w, up));
+    vec3 v = normalize(cross(u,w));
+    return mat3(u,v,w);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    
+    vec2 mousePos = iMouse.xy / iResolution.xy - vec2(0.5,0.5);
+    float time = iTime * 0.1;
+    vec3 cameraPos = vec3((3.0 + -3.0*mousePos.y) * cos(time + 6.0*mousePos.x), 2.0 , (3.0 + -3.0*mousePos.y) * sin(time + + 6.0*mousePos.x));
+    vec3 lookAtPos = vec3(0,0.0,0);
+    mat3 viewMatrix = getViewMatrix(cameraPos, lookAtPos);
+    
+    
+    vec3 sum = vec3(0.0);
+    for(int i = 0;i<AA;i++){
+        for(int j = 0;j<AA;j++){
+             vec2 diff = vec2(float(i),float(j))/float(AA)-0.5;
+             vec2 p = (-iResolution.xy + 2.0*(fragCoord+diff))/iResolution.y;
+             vec3 rayDir = viewMatrix * normalize(vec3(p, 1.0));
+             vec3 col = render(cameraPos, rayDir);
+             col = pow( col, vec3(0.4545) );
+             sum += col;
+        }
+    }
+    
+    sum /= float(AA*AA);
+
+    fragColor = vec4(sum, 1);
+    
+}

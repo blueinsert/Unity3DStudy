@@ -1,0 +1,139 @@
+
+//作为基础的随机函数
+vec2 hash22( vec2 p )
+{
+	p = vec2( dot(p,vec2(127.1,311.7)),
+			  dot(p,vec2(269.5,183.3)) );
+ 
+	return -1.0 + 2.0*fract(sin(p)*43758.5453123);
+}
+ 
+//作为基础的随机函数
+float hash21(vec2 p)
+{
+	return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+//白噪声
+float white_noise(vec2 p){
+    return hash21(ceil(fract(0.77)*12.0)*p);
+}
+
+//基于晶格的值噪声
+float value_noise(vec2 p){
+    vec2 i = floor( p );
+    vec2 f = fract( p );
+	
+    // Ease Curve 平滑曲线
+    vec2 u = f*f*f*(6.0*f*f - 15.0*f + 10.0);
+    
+    return mix(mix(hash21(i+vec2(0.0,0.0)),hash21(i+vec2(1.0,0.0)),u.x),
+               mix(hash21(i+vec2(0.0,1.0)),hash21(i+vec2(1.0,1.0)),u.x),
+               u.y);
+}
+
+
+//基于晶格的梯度噪声
+// 算法解析：创建一个由若干虚拟晶格组成的平面，接着给每个晶格的顶点赋予一个随机的向量（通过hash函数生成），
+// 然后通过fract函数将该点平移到【x:0-1, y:0-1】的空间中，再计算到各个晶格顶点的距离向量，
+// 然后将这两个向量进行dot，最后dot的结果利用ease curves（即u）进行双线性插值。
+float gradient_noise( in vec2 p )
+{
+    vec2 i = floor( p );
+    vec2 f = fract( p );
+	
+    // Ease Curve 平滑曲线
+    vec2 u = f*f*f*(6.0*f*f - 15.0*f + 10.0);
+ 
+    return mix( mix( dot( hash22( i + vec2(0.0,0.0) ), f - vec2(0.0,0.0) ), 
+                     dot( hash22( i + vec2(1.0,0.0) ), f - vec2(1.0,0.0) ), u.x),
+                mix( dot( hash22( i + vec2(0.0,1.0) ), f - vec2(0.0,1.0) ), 
+                   dot( hash22( i + vec2(1.0,1.0) ), f - vec2(1.0,1.0) ), u.x), u.y);
+}
+
+
+ 
+//simplex噪声 
+float simplex_noise(vec2 p)
+{
+    const float K1 = 0.366025404; // (sqrt(3)-1)/2;
+    const float K2 = 0.211324865; // (3-sqrt(3))/6;
+	// 变换到新网格的(0, 0)点
+    vec2 i = floor(p + (p.x + p.y) * K1);
+	// i - (i.x+i.y)*K2换算到旧网格点
+    // a:变形前输入点p到该网格点的距离
+    vec2 a = p - (i - (i.x + i.y) * K2);
+    vec2 o = (a.x < a.y) ? vec2(0.0, 1.0) : vec2(1.0, 0.0);
+    // 新网格(1.0, 0.0)或(0.0, 1.0)
+    // b = p - (i+o - (i.x + i.y + 1.0)*K2);
+    vec2 b = a - o + K2;
+    // 新网格(1.0, 1.0)
+    // c = p - (i+vec2(1.0, 1.0) - (i.x+1.0 + i.y+1.0)*K2);
+    vec2 c = a - 1.0 + 2.0 * K2;
+	// 计算每个顶点的权重向量，r^2 = 0.5
+    vec3 h = max(0.5 - vec3(dot(a, a), dot(b, b), dot(c, c)), 0.0);
+    // 每个顶点的梯度向量和距离向量的点乘，然后再乘上权重向量
+    vec3 n = h * h * h * h * vec3(dot(a, hash22(i)), dot(b, hash22(i + o)), dot(c, hash22(i + 1.0)));
+	
+    // 之所以乘上70，是在计算了n每个分量的和的最大值以后得出的，这样才能保证将n各个分量相加以后的结果在[-1, 1]之间
+    return dot(vec3(70.0, 70.0, 70.0), n);
+}
+
+//基于值噪声的分形噪声
+float fractal_noise(in vec2 p)
+{
+	p *= 5.0;
+    mat2 m = mat2( 1.6,  1.2, -1.2,  1.6 );
+	float f  = 0.5000*value_noise(p); p = m*p;
+	f += 0.2500*value_noise(p); p = m*p;
+	f += 0.1250*value_noise(p); p = m*p;
+	f += 0.0625*value_noise(p); p = m*p;
+    
+    return f;
+}
+
+ 
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec2 p = fragCoord.xy / iResolution.xy;
+ 
+	vec2 uv = p * vec2(iResolution.x/iResolution.y,1.0);
+	
+	float f = 0.0;
+	
+    // 1: white noise	
+	if( p.x<0.2 )
+	{
+		f = white_noise(uv);
+	}
+    // 2: value noise
+    else if(p.x>=0.2 && p.x<0.4)	
+	{
+        f = value_noise(uv*56.0);
+	}
+    // 3. gradient noise
+    else if(p.x>=0.4 && p.x<0.6)
+    {
+    	f = gradient_noise(uv*32.0);
+    }
+    // 4: simplex noise
+    else if(p.x>=0.6 && p.x<0.8)
+    {
+    	f = simplex_noise(uv*32.0);
+    }
+    // 5: fractal noise
+    else
+    {
+    	f = fractal_noise(8.0*uv);
+    }
+ 
+	f = 0.5 + 0.5*f;
+	
+    // 分割线：注意如果第三个参数超过了限定范围就不进行插值
+    f *= smoothstep(0.0, 0.005, abs(p.x-0.2));
+    f *= smoothstep(0.0, 0.005, abs(p.x-0.4));	
+	f *= smoothstep(0.0, 0.005, abs(p.x-0.6));
+    f *= smoothstep(0.0, 0.005, abs(p.x-0.8));
+    
+	fragColor = vec4( f, f, f, 1.0 );
+}
