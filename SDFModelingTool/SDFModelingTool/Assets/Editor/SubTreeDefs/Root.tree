@@ -1,0 +1,140 @@
+{
+    "target": [
+        {
+            "m_position": {
+                "x": 0.0,
+                "y": 0.0
+            },
+            "m_name": "Root",
+            "m_type": 0,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": -1,
+            "m_lIndex": 1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -6.99627685546875,
+                "y": -155.7333221435547
+            },
+            "m_name": "Union",
+            "m_type": 4,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": 0,
+            "m_lIndex": 2,
+            "m_rIndex": 3
+        },
+        {
+            "m_position": {
+                "x": -148.52041625976563,
+                "y": -305.3575134277344
+            },
+            "m_name": "Union",
+            "m_type": 4,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": 1,
+            "m_lIndex": 4,
+            "m_rIndex": 5
+        },
+        {
+            "m_position": {
+                "x": 216.4847412109375,
+                "y": -325.7211608886719
+            },
+            "m_name": "Union",
+            "m_type": 4,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": 1,
+            "m_lIndex": 6,
+            "m_rIndex": 7
+        },
+        {
+            "m_position": {
+                "x": -307.03564453125,
+                "y": -469.23638916015627
+            },
+            "m_name": "Sphere",
+            "m_type": 1,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 1.0
+            },
+            "m_parentIndex": 2,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -94.95016479492188,
+                "y": -469.23638916015627
+            },
+            "m_name": "Box",
+            "m_type": 3,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 1.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": 2,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 78.9586181640625,
+                "y": -481.45452880859377
+            },
+            "m_name": "Box",
+            "m_type": 3,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 1.0,
+                "m_param4": 0.0
+            },
+            "m_parentIndex": 3,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 319.02935791015627,
+                "y": -495.7091064453125
+            },
+            "m_name": "Sphere",
+            "m_type": 1,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 1.0
+            },
+            "m_parentIndex": 3,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        }
+    ]
+}

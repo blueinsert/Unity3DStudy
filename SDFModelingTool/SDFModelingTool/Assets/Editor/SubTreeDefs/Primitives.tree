@@ -1,0 +1,754 @@
+{
+    "target": [
+        {
+            "m_position": {
+                "x": -136.89431762695313,
+                "y": 213.4736785888672
+            },
+            "m_name": "Root",
+            "m_type": 0,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": -1,
+            "m_lIndex": 1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -118.48927307128906,
+                "y": 8.194656372070313
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 0,
+            "m_lIndex": 2,
+            "m_rIndex": 3
+        },
+        {
+            "m_position": {
+                "x": -459.33416748046877,
+                "y": -152.86288452148438
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 1,
+            "m_lIndex": 4,
+            "m_rIndex": 5
+        },
+        {
+            "m_position": {
+                "x": 147.7508544921875,
+                "y": -126.25883483886719
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 1,
+            "m_lIndex": 6,
+            "m_rIndex": 7
+        },
+        {
+            "m_position": {
+                "x": -644.024169921875,
+                "y": -334.57623291015627
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 2,
+            "m_lIndex": 8,
+            "m_rIndex": 9
+        },
+        {
+            "m_position": {
+                "x": -277.1742858886719,
+                "y": -331.98028564453127
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 2,
+            "m_lIndex": 10,
+            "m_rIndex": 11
+        },
+        {
+            "m_position": {
+                "x": 70.07564544677735,
+                "y": -363.70574951171877
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 3,
+            "m_lIndex": 12,
+            "m_rIndex": 13
+        },
+        {
+            "m_position": {
+                "x": 690.6656494140625,
+                "y": -358.14453125
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 3,
+            "m_lIndex": 14,
+            "m_rIndex": 15
+        },
+        {
+            "m_position": {
+                "x": -873.0040893554688,
+                "y": -508.29656982421877
+            },
+            "m_name": "Sphere",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": -6.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 4,
+            "m_lIndex": 16,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -629.104248046875,
+                "y": -522.1995239257813
+            },
+            "m_name": "Box",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": -3.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 4,
+            "m_lIndex": 17,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -439.404296875,
+                "y": -505.5159912109375
+            },
+            "m_name": "RoundBox",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 5,
+            "m_lIndex": 18,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -154.8543243408203,
+                "y": -505.5159912109375
+            },
+            "m_name": "Torus",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 3.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 5,
+            "m_lIndex": 19,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 34.84564971923828,
+                "y": -544.4442138671875
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 6.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 6,
+            "m_lIndex": 20,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 257.0655517578125,
+                "y": -536.1731567382813
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": -6.0,
+                "m_param2": 0.0,
+                "m_param3": -5.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 6,
+            "m_lIndex": 21,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 533.4857177734375,
+                "y": -527.8313598632813
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 7,
+            "m_lIndex": 22,
+            "m_rIndex": 23
+        },
+        {
+            "m_position": {
+                "x": 1059.2255859375,
+                "y": -541.7342529296875
+            },
+            "m_name": "Union",
+            "m_type": 13,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 7,
+            "m_lIndex": 24,
+            "m_rIndex": 25
+        },
+        {
+            "m_position": {
+                "x": -874.3093872070313,
+                "y": -675.5215454101563
+            },
+            "m_name": "Sphere",
+            "m_type": 1,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 1.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 8,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -615.5542602539063,
+                "y": -694.5963134765625
+            },
+            "m_name": "Box",
+            "m_type": 3,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 1.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 9,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -425.85418701171877,
+                "y": -711.2798461914063
+            },
+            "m_name": "RoundBox",
+            "m_type": 4,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 1.0,
+                "m_param4": 0.20000000298023225,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 10,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": -157.56414794921876,
+                "y": -689.0350341796875
+            },
+            "m_name": "Torus",
+            "m_type": 5,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 0.20999999344348908,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 11,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 45.68564987182617,
+                "y": -702.9380493164063
+            },
+            "m_name": "Cylinder",
+            "m_type": 6,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 12,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 259.7757263183594,
+                "y": -700.22802734375
+            },
+            "m_name": "HexPrism",
+            "m_type": 8,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 13,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 473.5907897949219,
+                "y": -704.0704345703125
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": -3.0,
+                "m_param2": 0.0,
+                "m_param3": -5.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 14,
+            "m_lIndex": 26,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 687.9108276367188,
+                "y": -699.3916625976563
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": -5.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 14,
+            "m_lIndex": 27,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 934.15087890625,
+                "y": -722.7855834960938
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 3.0,
+                "m_param2": 0.0,
+                "m_param3": -5.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 15,
+            "m_lIndex": 28,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 1210.031005859375,
+                "y": -706.4098510742188
+            },
+            "m_name": "Position",
+            "m_type": 16,
+            "m_data": {
+                "m_param1": 6.0,
+                "m_param2": 0.0,
+                "m_param3": -5.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 15,
+            "m_lIndex": 29,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 478.1507873535156,
+                "y": -893.5612182617188
+            },
+            "m_name": "TriPrism",
+            "m_type": 9,
+            "m_data": {
+                "m_param1": 1.0,
+                "m_param2": 1.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 0.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 22,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 724.3908081054688,
+                "y": -893.5612182617188
+            },
+            "m_name": "Capsule",
+            "m_type": 10,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 2.0,
+                "m_param6": 0.0,
+                "m_param7": 1.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 23,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 954.6708374023438,
+                "y": -916.955078125
+            },
+            "m_name": "Triangle",
+            "m_type": 11,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 0.0,
+                "m_param5": 1.0,
+                "m_param6": 0.0,
+                "m_param7": 1.0,
+                "m_param8": 0.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 0.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 24,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        },
+        {
+            "m_position": {
+                "x": 1257.9107666015625,
+                "y": -909.9369506835938
+            },
+            "m_name": "Quad",
+            "m_type": 12,
+            "m_data": {
+                "m_param1": 0.0,
+                "m_param2": 0.0,
+                "m_param3": 0.0,
+                "m_param4": 1.0,
+                "m_param5": 0.0,
+                "m_param6": 0.0,
+                "m_param7": 1.0,
+                "m_param8": 1.0,
+                "m_param9": 0.0,
+                "m_param10": 0.0,
+                "m_param11": 1.0,
+                "m_param12": 0.0
+            },
+            "m_parentIndex": 25,
+            "m_lIndex": -1,
+            "m_rIndex": -1
+        }
+    ]
+}
