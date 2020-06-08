@@ -2,6 +2,5 @@ Temp
 Library
 obj
 Packages
-*.sln
-*.csproj
 *.vs
+bin
