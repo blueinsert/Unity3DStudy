@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaHotFixDemo.Plugins", "LuaHotFixDemo.Plugins.csproj", "{1A8155FE-8E76-4B77-B0E4-5BBBB754A8F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaHotFixDemo", "LuaHotFixDemo.csproj", "{4337386B-AA94-3ADA-AE32-72516ADC3116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaHotFixDemo.Editor", "LuaHotFixDemo.Editor.csproj", "{B13A1B79-C6FB-2636-3CB0-B546D36F078B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuaHotFixDemo.Editor.Plugins", "LuaHotFixDemo.Editor.Plugins.csproj", "{E658A59B-990D-7698-B929-920FEF0E5859}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A8155FE-8E76-4B77-B0E4-5BBBB754A8F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A8155FE-8E76-4B77-B0E4-5BBBB754A8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A8155FE-8E76-4B77-B0E4-5BBBB754A8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A8155FE-8E76-4B77-B0E4-5BBBB754A8F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4337386B-AA94-3ADA-AE32-72516ADC3116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4337386B-AA94-3ADA-AE32-72516ADC3116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4337386B-AA94-3ADA-AE32-72516ADC3116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4337386B-AA94-3ADA-AE32-72516ADC3116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B13A1B79-C6FB-2636-3CB0-B546D36F078B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B13A1B79-C6FB-2636-3CB0-B546D36F078B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B13A1B79-C6FB-2636-3CB0-B546D36F078B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B13A1B79-C6FB-2636-3CB0-B546D36F078B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E658A59B-990D-7698-B929-920FEF0E5859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E658A59B-990D-7698-B929-920FEF0E5859}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E658A59B-990D-7698-B929-920FEF0E5859}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E658A59B-990D-7698-B929-920FEF0E5859}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
