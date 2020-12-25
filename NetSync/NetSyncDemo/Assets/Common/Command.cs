@@ -16,6 +16,7 @@ public class CommandResult {
 public class CommandFlags
 {
     public const int HAS_EXECUTED = 1 << 0;
+    public const int HAS_SEND = 1 << 1;
 }
 
 public class Command {

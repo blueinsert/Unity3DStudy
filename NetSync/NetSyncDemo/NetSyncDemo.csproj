@@ -235,11 +235,11 @@
   <ItemGroup>
     <Compile Include="Assets\Client\ClientGame.cs" />
     <Compile Include="Assets\Common\Command.cs" />
-    <Compile Include="Assets\Common\CustomMessage.cs" />
     <Compile Include="Assets\Common\Entity.cs" />
     <Compile Include="Assets\Common\GameWorld.cs" />
     <Compile Include="Assets\Common\Packet.cs" />
     <Compile Include="Assets\Common\PacketPool.cs" />
+    <Compile Include="Assets\Common\Proto\Proto.cs" />
     <Compile Include="Assets\Common\State.cs" />
     <Compile Include="Assets\Launcher.cs" />
     <Compile Include="Assets\Server\Connection.cs" />

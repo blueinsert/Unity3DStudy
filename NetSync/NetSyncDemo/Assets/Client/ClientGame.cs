@@ -17,25 +17,23 @@ public class ClientGame  {
 
     private void OnDisConnectedServer(NetworkMessage msg)
     {
-
+        Debug.Log("ClientGame:OnDisConnectedServer");
+        Application.Quit();
     }
 
-    private void OnRecvStateBroadcastMsg(CustomMessage msg)
+    private void OnAllocateTargetNtf(NetworkMessage message)
     {
-
-    }
-
-    private void OnRecvCustomMsg(NetworkMessage message)
-    {
-        Debug.Log("OnRecvCustomMsg");
-        CustomMessage msg = new CustomMessage();
+        ProtoAllocateTargetNtf msg = new ProtoAllocateTargetNtf();
         msg.Deserialize(message.reader);
-        switch (msg.messageId)
-        {
-            case CustomMessageId.StateBroadcast:
-                break;
-        }
+        m_targetId = msg.m_targetId;
+        Debug.Log(string.Format("ClientGame:OnAllocateTargetNtf targetId:{0}", m_targetId)); 
     }
+
+    private void OnStateBroadcastNtf(NetworkMessage message)
+    {
+
+    }
+
 
     public void ConnectToServer(string ip, int port)
     {
@@ -43,7 +41,8 @@ public class ClientGame  {
         m_client.RegisterHandler(MsgType.Connect, OnConnectedServer);
         m_client.RegisterHandler(MsgType.Disconnect, OnDisConnectedServer);
         m_client.RegisterHandler(MsgType.Error, OnError);
-        m_client.RegisterHandler(CustomMsgTypes.InGameMsg, OnRecvCustomMsg);
+        m_client.RegisterHandler(ProtoType.AllocateTargetNtf, OnAllocateTargetNtf);
+        m_client.RegisterHandler(ProtoType.StateBroadcastNtf, OnStateBroadcastNtf);
         m_client.Connect(ip, port);
     }
 
@@ -74,20 +73,26 @@ public class ClientGame  {
         command.input = input;
         command.result = new CommandResult();
         command.sequence = (uint)( m_gameWorld.m_frame + 1);
-        //command.target = -1;
+        command.target = m_targetId;
         m_gameWorld.AddCommandToExe(command);
         m_gameWorld.Step();
-        if (m_gameWorld.m_frame % m_sendRate == 0)
+        if (m_connect != null && m_gameWorld.m_frame % m_sendRate == 0)
         {
             Packet packet = m_packetPool.Get();
-
+            m_gameWorld.PacketUnsendCommands(packet);
+            Send(CustomMessageId.ClientCommandUpload, packet.data);
+            m_packetPool.Back(packet);
         }
+    }
+
+    public void Send(ProtoMessageBase msg)
+    {
+        m_connect.Send(msg.GetProtoType(), msg);
     }
 
     int m_sendRate = 1;
     GameWorld m_gameWorld;
-
+    int m_targetId;//entity id
     NetworkClient m_client;
     NetworkConnection m_connect;
-    PacketPool m_packetPool = new PacketPool(64, 256);
 }

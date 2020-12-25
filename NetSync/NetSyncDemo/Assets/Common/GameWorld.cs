@@ -20,6 +20,30 @@ public class GameWorld {
         m_toExeCommands.Add(command);
     }
 
+    public void PacketUnsendCommands(Packet packet)
+    {
+        m_tempCommands.Clear();
+        for (int i = 0; i < m_commands.Count; i++)
+        {
+            var command = m_commands[i];
+            if((command.flag & CommandFlags.HAS_SEND) == 0)
+            {
+                m_tempCommands.Add(command);
+                command.flag |= CommandFlags.HAS_SEND;
+            }
+        }
+        packet.WriteInt(m_tempCommands.Count);
+        for(int i = 0; i < m_tempCommands.Count; i++)
+        {
+            var command = m_tempCommands[i];
+            packet.WriteUint(command.sequence);
+            packet.WriteBool(command.input.left);
+            packet.WriteBool(command.input.right);
+            packet.WriteBool(command.input.forward);
+            packet.WriteBool(command.input.back);
+        }
+    }
+
     public void Initialize() {
         Entity[] entities = GameObject.FindObjectsOfType<Entity>();
         m_entityList.AddRange(entities);

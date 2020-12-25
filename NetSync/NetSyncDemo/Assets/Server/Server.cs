@@ -7,7 +7,7 @@ public class Server {
 
     private void OnClientConnected(NetworkMessage message)
     {
-        Debug.Log(string.Format("OnClientConnected {0}"));
+        Debug.Log(string.Format("OnClientConnected"));
         m_connections.Add(message.conn);
         Connection connection = new Connection(m_connections.Count);
         connection.Initialize(message.conn);
@@ -28,6 +28,7 @@ public class Server {
             }
         }
         m_connDic.Add(message.conn, connection);
+        connection.SendTargetId();
     }
 
     private void OnClientDisConnected(NetworkMessage message)
@@ -42,38 +43,28 @@ public class Server {
 
     }
 
-    private void OnMsgClientCommand(NetworkConnection conn, CustomMessage message)
+
+    private void OnClientCommandUpload(NetworkMessage message)
     {
-        Connection connection = m_connDic[conn];
-        Packet packet = new Packet(message.bytes);
+        Debug.Log("Server:OnClientCommandUpload");
+        Connection connection = m_connDic[message.conn];
+        ProtoClientCommandUpload msg = new ProtoClientCommandUpload();
+        msg.Deserialize(message.reader);
         List<Command> commands = new List<Command>();
-        int count = packet.ReadInt();
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < msg.m_commands.Count; i++)
         {
+            var commandProto = msg.m_commands[i];
             Command command = new Command();
-            command.Read(packet);
+            command.sequence = commandProto.m_frame;
+            command.input = new CommandInput();
+            command.input.left = commandProto.m_left;
+            command.input.right = commandProto.m_right;
+            command.input.forward = commandProto.m_forward;
+            command.input.back = commandProto.m_backward;
             command.target = connection.m_targetId;
             commands.Add(command);
         }
         m_gameWorld.AddCommandsToExe(commands);
-    }
-
-    private void OnRecvCustomMsg(NetworkMessage message)
-    {
-        Debug.Log("OnRecvCustomMsg");
-        CustomMessage msg = new CustomMessage();
-        msg.Deserialize(message.reader);
-        Debug.LogWarning("OnRecvCustomMsg");
-        Debug.LogWarning("messageId:" + msg.messageId);
-        Debug.LogWarning("content:" + msg.content);
-        Debug.LogWarning("vector:" + msg.vector);
-        Debug.LogWarning("bytesLength:" + msg.bytes.Length);
-        switch (msg.messageId)
-        {
-            case CustomMessageId.ClientCommand:
-                OnMsgClientCommand(message.conn, msg);
-                break;
-        }
     }
 
     public bool StartServer(int port)
@@ -81,7 +72,7 @@ public class Server {
         NetworkServer.RegisterHandler(MsgType.Connect, OnClientConnected);
         NetworkServer.RegisterHandler(MsgType.Disconnect, OnClientDisConnected);
         NetworkServer.RegisterHandler(MsgType.Error, OnError);
-        NetworkServer.RegisterHandler(CustomMsgTypes.InGameMsg, OnRecvCustomMsg);
+        NetworkServer.RegisterHandler(ProtoType.ClientCommandUpload, OnClientCommandUpload);
         bool succeed = NetworkServer.Listen(port);
         if (succeed)
             Debug.Log("服务器启动成功");
@@ -103,24 +94,11 @@ public class Server {
 
     public void SyncStateToClient()
     {
-        var packet = m_packetPool.Get();
-        foreach (var entity in m_gameWorld.m_entityList)
-        {
-            entity.m_currentState.Pack(packet);
-        }
-        CustomMessage stateBroardcastMsg = new CustomMessage();
-        stateBroardcastMsg.messageId = CustomMessageId.StateBroadcast;
-        stateBroardcastMsg.bytes = packet.data;
-        foreach (var connect in m_connections)
-        {
-            connect.Send(CustomMsgTypes.InGameMsg, stateBroardcastMsg);
-        }
-        m_packetPool.Back(packet);
+        
     }
 
     int m_sendRate = 10;
     GameWorld m_gameWorld;
     List<NetworkConnection> m_connections = new List<NetworkConnection>();
     Dictionary<NetworkConnection, Connection> m_connDic = new Dictionary<NetworkConnection, Connection>();
-    PacketPool m_packetPool = new PacketPool(64, 256);
 }

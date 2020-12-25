@@ -24,7 +24,7 @@ public class Entity : MonoBehaviour {
             movingDir.x = command.input.right ? 1 : -1;
         Vector3 velocity = movingSpeed * movingDir;
         transform.position = transform.position + velocity * Time.fixedDeltaTime;
-        command.result.position = transform.position;
+        //command.result.position = transform.position;
     }
 
     public int m_id;
