@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// https://github.com/justinhj/astar-algorithm-cpp
+
 public struct NodePosition
 {
     public int x;
