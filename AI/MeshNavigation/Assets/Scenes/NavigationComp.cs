@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Text;
 
 public class NavigationComp : MonoBehaviour
 {
     // 顶一个网格导航器，然后在面板里面直接将Capsule直接拖过来
     public NavMeshAgent agent;
+    NavMeshPath m_curPath;
     // Start is called before the first frame update  
     void Start()
     {
@@ -26,8 +28,36 @@ public class NavigationComp : MonoBehaviour
             {
                 Debug.Log(hit.collider.gameObject.name);
                 this.agent.SetDestination(hit.point);
+                NavMeshPath path = new NavMeshPath();
+                m_curPath = path;
+                if (agent.CalculatePath(hit.point, path))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("path:[");
+                    var corners = path.corners;
+                    for(int i = 0; i < corners.Length; i++)
+                    {
+                        sb.Append(corners[i].ToString()).Append(",");
+                    }
+                    sb.Append("]");
+                    Debug.Log(sb.ToString());
+                }
             }
         }
-    }  
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (m_curPath == null)
+        {
+            return;
+        }
+        Gizmos.color = Color.blue;
+        var corners = m_curPath.corners;
+        for (int i = 0; i < corners.Length; i++)
+        {
+            Gizmos.DrawSphere(corners[i], 0.1f);
+        }
+    }
 
 }
