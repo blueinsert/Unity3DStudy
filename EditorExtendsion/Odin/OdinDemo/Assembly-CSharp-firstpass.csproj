@@ -126,6 +126,42 @@
      <Compile Include="Assets\Plugins\Sirenix\Demos\Attributes Overview\Scripts\ValueDropdownExamples.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Demos\Attributes Overview\Scripts\VerticalGroupExamples.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Demos\Attributes Overview\Scripts\WrapExamples.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\AttributeProcessorForListItemsExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\AttributeProcessorPriorityExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\Bar.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\BasicAttributeProcessorExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\CustomAttributeProcessorLocatorExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\CustomizeDictionaryKeyValueExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\Foo.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\PutAttributesOnAnyType.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\SelfAndChildrenExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Attribute Processors\Scripts\TabGroupByDeclaringType.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\CustomDrawerExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\CustomGroupExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\GenericDrawerExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\GenericMenuExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\HealthBarExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\InstancedDrawerExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\MinesweeperExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\PriorityExamples.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\ReflectionExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\StringMemberHelperExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Custom Drawers\Scripts\ValidationExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Character\Character.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Character\CharacterAlignment.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Character\CharacterEquipment.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Character\CharacterOverview.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Character\CharacterStats.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\Armor.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\ConsumableItem.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\EquipableItem.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\Item.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\ItemTypes.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Items\WeaponItem.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Misc\ItemSlot.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Misc\StatList.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Misc\StatType.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Misc\StatValue.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Odin Inspector\Scripts\SerializedNetworkBehaviour.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Odin Inspector\Scripts\VectorIntFormatters.cs" />
      <None Include="Assets\Plugins\Sirenix\Assemblies\Sirenix.Utilities.xml" />
@@ -133,6 +169,7 @@
      <None Include="Assets\Plugins\Sirenix\Assemblies\link.xml" />
      <None Include="Assets\Plugins\Sirenix\Readme.txt" />
      <None Include="Assets\Plugins\Sirenix\Assemblies\Sirenix.OdinInspector.Editor.xml" />
+     <None Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Icons\icons_by_ravenmore.txt" />
      <None Include="Assets\Plugins\Sirenix\Assemblies\Sirenix.Serialization.Config.xml" />
      <None Include="Assets\Plugins\Sirenix\Assemblies\Sirenix.Utilities.Editor.xml" />
  <Reference Include="UnityEngine.CoreModule">
@@ -300,6 +337,24 @@
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>C:/Program Files/Unity2017.4.27f1/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
+ <Reference Include="Sirenix.OdinInspector.Attributes">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Attributes.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.OdinInspector.Editor">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Serialization.Config">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Serialization">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Utilities">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Utilities.Editor">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Users/Administrator/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.13/UnityEngine.Analytics.dll</HintPath>
  </Reference>
@@ -308,24 +363,6 @@
  </Reference>
  <Reference Include="UnityEngine.StandardEvents">
  <HintPath>C:/Users/Administrator/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.OdinInspector.Attributes">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Attributes.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Utilities">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Utilities.Editor">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Serialization">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Serialization.Config">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.OdinInspector.Editor">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Editor.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

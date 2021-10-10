@@ -51,6 +51,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\BasicOdinEditorExampleWindow.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\OdinMenuEditorWindowExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\OdinMenuStyleExample.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\OverrideGetTargetsExampleWindow.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\QuicklyInspectObjects.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\SomeData.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Editor Windows\Scripts\Editor\SomeTextureToolWindow.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Editor\CharacterTable.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Editor\ItemDrawer.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Editor\ItemSlotCellDrawer.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Editor\RPGEditorWindow.cs" />
+     <Compile Include="Assets\Plugins\Sirenix\Demos\Sample - RPG Editor\Scripts\Editor\ScriptableObjectCreator.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Odin Inspector\Scripts\Editor\AssemblyImportSettingsAutomation.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Odin Inspector\Scripts\Editor\BuildAOTAutomation.cs" />
      <Compile Include="Assets\Plugins\Sirenix\Odin Inspector\Scripts\Editor\EnsureOdinInspectorDefine.cs" />
@@ -261,6 +273,24 @@
  <Reference Include="UnityEditor.WindowsStandalone.Extensions">
  <HintPath>C:/Program Files/Unity2017.4.27f1/Editor/Data/PlaybackEngines/windowsstandalonesupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
+ <Reference Include="Sirenix.OdinInspector.Attributes">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Attributes.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.OdinInspector.Editor">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Editor.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Serialization.Config">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Serialization">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Utilities">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.dll</HintPath>
+ </Reference>
+ <Reference Include="Sirenix.Utilities.Editor">
+ <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.Editor.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEditor.Advertisements">
  <HintPath>C:/Users/Administrator/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.8/Editor/UnityEditor.Advertisements.dll</HintPath>
  </Reference>
@@ -278,24 +308,6 @@
  </Reference>
  <Reference Include="UnityEngine.StandardEvents">
  <HintPath>C:/Users/Administrator/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.OdinInspector.Attributes">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Attributes.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Utilities">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Utilities.Editor">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Utilities.Editor.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Serialization">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.Serialization.Config">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll</HintPath>
- </Reference>
- <Reference Include="Sirenix.OdinInspector.Editor">
- <HintPath>D:/WorkSpace/Unity3DStudy/EditorExtendsion/Odin/OdinDemo/Assets/Plugins/Sirenix/Assemblies/Sirenix.OdinInspector.Editor.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
