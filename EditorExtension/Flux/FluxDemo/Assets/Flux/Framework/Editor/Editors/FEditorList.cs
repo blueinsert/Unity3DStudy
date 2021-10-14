@@ -113,10 +113,9 @@ namespace FluxEditor
 				Vector3 pt0 = new Vector3( rect.xMin+halfLineWidth, rect.yMin+halfLineWidth );
 				Vector3 pt1 = new Vector3( rect.xMin+halfLineWidth, rect.yMax-halfLineWidth );
 				Vector3 pt2 = new Vector3( rect.xMax-halfLineWidth, rect.yMax-halfLineWidth );
-				Vector3 pt3 = new Vector3( rect.xMax-halfLineWidth, rect.yMin+halfLineWidth );
-//				Handles.DrawAAPolyLine( lineWidth, pt0, pt1, pt2, pt3, pt0 );
-				Handles.DrawSolidRectangleWithOutline( new Vector3[]{ pt0, pt1, pt2, pt3 }, new Color( 0, 0, 0, 0 ), c );
-				//				Handles.DrawPolyLine( pt0, pt1, pt2, pt3, pt0 );
+				Vector3 pt3 = new Vector3( rect.xMax-halfLineWidth, rect.yMin+halfLineWidth ); 
+				Handles.DrawAAPolyLine( lineWidth, pt0, pt1, pt2, pt3, pt0 );
+				//Handles.DrawSolidRectangleWithOutline( new Vector3[]{ pt0, pt1, pt2, pt3 }, new Color( 0, 0, 0, 0 ), c );
 			}
 
 			Handles.color = FGUI.GetLineColor();

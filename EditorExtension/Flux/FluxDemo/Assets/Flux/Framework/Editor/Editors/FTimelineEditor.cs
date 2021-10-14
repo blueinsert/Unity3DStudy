@@ -79,21 +79,6 @@ namespace FluxEditor
 			}
 		}
 
-		public FTrackEditor GetTrackEditor( Vector2 pos )
-		{
-			if( !_showTracks 
-			   || !Rect.Contains( pos ) 
-			   || (_showHeader && pos.y < Rect.yMin + HEADER_HEIGHT) ) return null;
-
-			for( int i = 0; i != Editors.Count; ++i )
-			{
-				if( Editors[i].Rect.Contains( pos ) )
-					return Editors[i];
-			}
-
-			return null; // shouldn't happen
-		}
-
 		protected override Color BackgroundColor {
 			get {
 				return FGUI.GetTimelineColor();
@@ -240,30 +225,6 @@ namespace FluxEditor
 			if( !SequenceEditor.Sequence.IsStopped )
 				Timeline.Init();
 		}
-
-		void DuplicateTimeline()
-		{
-			UnityEngine.Object[] objsToSave = new UnityEngine.Object[]{ SequenceEditor, Timeline.Container };
-			Undo.RecordObjects( objsToSave, string.Empty );
-			GameObject duplicateTimeline = (GameObject)Instantiate( Timeline.gameObject );
-			duplicateTimeline.name = Timeline.gameObject.name;
-			Undo.SetTransformParent( duplicateTimeline.transform, Timeline.Container.transform, string.Empty );
-			Undo.RegisterCreatedObjectUndo( duplicateTimeline, "duplicate Timeline" );
-
-			if( !SequenceEditor.Sequence.IsStopped )
-				duplicateTimeline.GetComponent<FTimeline>().Init();
-		}
-
-		void DeleteTimeline()
-		{
-			UnityEngine.Object[] objsToSave = new UnityEngine.Object[]{ Timeline.Container, Timeline };
-			Undo.RegisterCompleteObjectUndo( objsToSave, string.Empty );
-			OnDelete();
-			Undo.SetTransformParent( Timeline.transform, null, string.Empty );
-			Timeline.Container.Remove( Timeline );
-			Undo.DestroyObjectImmediate( Timeline.gameObject );
-		}
-
 
 		public override FSequenceEditor SequenceEditor { get { return ContainerEditor != null ? ContainerEditor.SequenceEditor : null; } }
 

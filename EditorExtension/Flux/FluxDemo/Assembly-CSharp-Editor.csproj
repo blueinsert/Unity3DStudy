@@ -53,13 +53,13 @@
   <ItemGroup>
      <Compile Include="Assets\Flux\Framework\Editor\Drawers\FrameRangeDrawer.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FContainerEditor.cs" />
+     <Compile Include="Assets\Flux\Framework\Editor\Editors\FEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FEditorList.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FEventEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FSequenceEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FTimelineEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\Editors\FTrackEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\FChangeFrameRateWindow.cs" />
-     <Compile Include="Assets\Flux\Framework\Editor\FEditor.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\FEditorCache.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\FGUI.cs" />
      <Compile Include="Assets\Flux\Framework\Editor\FInspectorWindow.cs" />
