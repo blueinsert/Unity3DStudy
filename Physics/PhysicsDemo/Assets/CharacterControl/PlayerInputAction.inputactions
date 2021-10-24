@@ -1,0 +1,41 @@
+{
+    "name": "PlayerInputAction",
+    "maps": [
+        {
+            "name": "Default",
+            "id": "49826e25-1bec-4dd4-bf84-cc8d99beaf6c",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Button",
+                    "id": "e0e7531a-a134-4061-8669-e795a01af321",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Look",
+                    "type": "Value",
+                    "id": "4b595d21-7d64-448b-ab21-190cc8aa8548",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9835993a-6e23-4c56-9fde-762125ff616f",
+                    "path": "<Pointer>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
