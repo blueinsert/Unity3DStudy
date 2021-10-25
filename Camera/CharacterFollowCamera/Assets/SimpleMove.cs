@@ -15,6 +15,12 @@ public class SimpleMove : MonoBehaviour
     public Transform m_target;
     public CharacterController m_cc;
     public Rigidbody m_rigidbody;
+    public bool m_isOnGround = false;
+    public Vector3 m_vVel;
+    public Vector3 m_hvel;
+    [Header("重力加速度")]
+    public Vector3 m_g = new Vector3(0,-9.7f,0);
+    [Header("行走速度")]
     public float m_speed = 2.0f;
 
     void Awake()
@@ -55,16 +61,41 @@ public class SimpleMove : MonoBehaviour
     void UpdateMove()
     {
         var moveValue = InputHandler.Instance.MoveValue;
-        if (moveValue.x == 0 && moveValue.y == 0)
-            return;
-        var forward = FollowCamera.Instance != null ? FollowCamera.Instance.GetForward() : Vector3.forward;
-        forward.y = 0;
-        var left = - Vector3.Cross(forward, Vector2.up);
-        left = left.normalized;
-        var dir = forward * moveValue.y + left * moveValue.x;
-        dir = dir.normalized;
-        var velocity = dir * m_speed;
-        Move(velocity);
+        m_hvel = Vector3.zero;
+        if (moveValue.x != 0 || moveValue.y != 0) {
+            var forward = FollowCamera.Instance != null ? FollowCamera.Instance.GetForward() : Vector3.forward;
+            forward.y = 0;
+            var left = -Vector3.Cross(forward, Vector2.up);
+            left = left.normalized;
+            var dir = forward * moveValue.y + left * moveValue.x;
+            dir = dir.normalized;
+            m_hvel = dir * m_speed;
+        }
+        if(!m_isOnGround)
+            m_vVel += m_g * Time.deltaTime;
+        else
+        {
+            m_vVel = Vector3.zero;
+            m_vVel += m_g * Time.deltaTime;
+        }
+        Move(m_hvel + m_vVel);
+    }
+
+    void UpdateIsOnGround()
+    {
+        if(m_moveType == MoveType.CharacterController)
+        {
+            m_isOnGround = m_cc.isGrounded;
+        }else if(m_moveType == MoveType.Rigidbody || m_moveType == MoveType.Transform)
+        {
+            int layerMask = LayerMask.GetMask("Scene");
+            var collides = Physics.OverlapSphere(this.transform.position, 0.03f, layerMask);
+            m_isOnGround = collides.Length != 0;
+        }
+        else
+        {
+
+        }
     }
 
     // Update is called once per frame
@@ -73,5 +104,6 @@ public class SimpleMove : MonoBehaviour
         if (m_target == null)
             return;
         UpdateMove();
+        UpdateIsOnGround();
     }
 }
