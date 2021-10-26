@@ -57,7 +57,6 @@ public class FollowCamera : MonoBehaviour {
 		var rotate = InputHandler.Instance.RotateValue;
 		if (rotate.x == 0 && rotate.y == 0)
 			return;
-		rotate.y = -rotate.y;
 		rotate.x /= Screen.width;
 		rotate.y /= Screen.height;
 		rotate.x *= 360* m_rotateXRate;

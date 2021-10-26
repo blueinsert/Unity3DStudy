@@ -18,6 +18,7 @@ public class SimpleMove : MonoBehaviour
     public bool m_isOnGround = false;
     public Vector3 m_vVel;
     public Vector3 m_hvel;
+    public Vector3 m_frontDir;
     [Header("重力加速度")]
     public Vector3 m_g = new Vector3(0,-9.7f,0);
     [Header("行走速度")]
@@ -56,6 +57,10 @@ public class SimpleMove : MonoBehaviour
                 transform.position += vel * Time.deltaTime;
                 break;
         }
+        m_frontDir = vel;
+        m_frontDir.y = 0;
+        m_frontDir.Normalize();
+        m_target.transform.LookAt(m_target.transform.position + m_frontDir);
     }
 
     void UpdateMove()
@@ -81,6 +86,14 @@ public class SimpleMove : MonoBehaviour
         Move(m_hvel + m_vVel);
     }
 
+    void UpdateRotate()
+    {
+        var curForward = m_target.transform.forward;
+        curForward.y = 0;
+        var rotate = Quaternion.FromToRotation(curForward, m_frontDir);
+        m_target.transform.rotation = Quaternion.Lerp(m_target.transform.rotation, rotate * m_target.transform.rotation, 2f * Time.deltaTime);
+    }
+
     void UpdateIsOnGround()
     {
         if(m_moveType == MoveType.CharacterController)
@@ -104,6 +117,7 @@ public class SimpleMove : MonoBehaviour
         if (m_target == null)
             return;
         UpdateMove();
+        UpdateRotate();
         UpdateIsOnGround();
     }
 }
