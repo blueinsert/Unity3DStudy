@@ -21,6 +21,7 @@ public class ObstacleCollect : MonoBehaviour
                          boxColliders[i].size.z*boxColliders[i].transform.lossyScale.z*0.5f;
 
             IList<Vector2> obstacle = new List<Vector2>();
+            //逆时针
             obstacle.Add(new Vector2(maxX, maxZ));
             obstacle.Add(new Vector2(minX, maxZ));
             obstacle.Add(new Vector2(minX, minZ));

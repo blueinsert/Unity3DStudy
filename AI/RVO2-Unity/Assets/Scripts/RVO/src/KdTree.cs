@@ -44,12 +44,16 @@ namespace RVO
         /**
          * <summary>Defines a node of an agent k-D tree.</summary>
          */
+        ///end-begin+1<MAX_LEAF_SIZE时为叶子节点，
+        ///非叶子本身不存放数据，只是用来拆分空间
+        ///叶子节点的数据就是begin-end之间指示的数据
         private struct AgentTreeNode
         {
-            internal int begin_;
-            internal int end_;
-            internal int left_;
-            internal int right_;
+            internal int begin_;//agent数组中开始索引
+            internal int end_;//agent数组中结束索引
+            internal int left_;//树节点数组中左子树索引
+            internal int right_;//树节点数组中右子树索引
+            //范围大小
             internal float maxX_;
             internal float maxY_;
             internal float minX_;
@@ -172,7 +176,7 @@ namespace RVO
                     agents_[i] = Simulator.Instance.agents_[i];
                 }
 
-                agentTree_ = new AgentTreeNode[2 * agents_.Length];
+                agentTree_ = new AgentTreeNode[2 * agents_.Length];//?
 
                 for (int i = 0; i < agentTree_.Length; ++i)
                 {
@@ -322,7 +326,7 @@ namespace RVO
                 }
 
                 agentTree_[node].left_ = node + 1;
-                agentTree_[node].right_ = node + 2 * leftSize;
+                agentTree_[node].right_ = node + 2 * leftSize;//?
 
                 buildAgentTreeRecursive(begin, left, agentTree_[node].left_);
                 buildAgentTreeRecursive(left, end, agentTree_[node].right_);
@@ -553,8 +557,15 @@ namespace RVO
             }
             else
             {
-                float distSqLeft = RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].left_].minX_ - agent.position_.x_)) + RVOMath.sqr(Math.Max(0.0f, agent.position_.x_ - agentTree_[agentTree_[node].left_].maxX_)) + RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].left_].minY_ - agent.position_.y_)) + RVOMath.sqr(Math.Max(0.0f, agent.position_.y_ - agentTree_[agentTree_[node].left_].maxY_));
-                float distSqRight = RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].right_].minX_ - agent.position_.x_)) + RVOMath.sqr(Math.Max(0.0f, agent.position_.x_ - agentTree_[agentTree_[node].right_].maxX_)) + RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].right_].minY_ - agent.position_.y_)) + RVOMath.sqr(Math.Max(0.0f, agent.position_.y_ - agentTree_[agentTree_[node].right_].maxY_));
+                //在范围内部返回零，在外边返回距离矩形的最短长度平方
+                float distSqLeft = RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].left_].minX_ - agent.position_.x_)) 
+                    + RVOMath.sqr(Math.Max(0.0f, agent.position_.x_ - agentTree_[agentTree_[node].left_].maxX_)) 
+                    + RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].left_].minY_ - agent.position_.y_)) 
+                    + RVOMath.sqr(Math.Max(0.0f, agent.position_.y_ - agentTree_[agentTree_[node].left_].maxY_));
+                float distSqRight = RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].right_].minX_ - agent.position_.x_)) 
+                    + RVOMath.sqr(Math.Max(0.0f, agent.position_.x_ - agentTree_[agentTree_[node].right_].maxX_))
+                    + RVOMath.sqr(Math.Max(0.0f, agentTree_[agentTree_[node].right_].minY_ - agent.position_.y_)) 
+                    + RVOMath.sqr(Math.Max(0.0f, agent.position_.y_ - agentTree_[agentTree_[node].right_].maxY_));
 
                 if (distSqLeft < distSqRight)
                 {

@@ -303,7 +303,9 @@ namespace RVO
                 }
                 else
                 {
-                    obstacle.convex_ = (RVOMath.leftOf(vertices[(i == 0 ? vertices.Count - 1 : i - 1)], vertices[i], vertices[(i == vertices.Count - 1 ? 0 : i + 1)]) >= 0.0f);
+                    obstacle.convex_ = RVOMath.leftOf(vertices[(i == 0 ? vertices.Count - 1 : i - 1)], 
+                        vertices[i], 
+                        vertices[(i == vertices.Count - 1 ? 0 : i + 1)]) >= 0.0f;
                 }
 
                 obstacle.id_ = obstacles_.Count;

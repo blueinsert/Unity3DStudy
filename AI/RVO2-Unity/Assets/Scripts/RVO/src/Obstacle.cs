@@ -35,14 +35,15 @@ namespace RVO
     /**
      * <summary>Defines static obstacles in the simulation.</summary>
      */
+    //代表多边形obstacle中的其中一个顶点
     internal class Obstacle
     {
 
-        internal Obstacle next_;
-        internal Obstacle previous_;
-        internal Vector2 direction_;
+        internal Obstacle next_;//下一个顶点，环形队列
+        internal Obstacle previous_;//上一个顶点
+        internal Vector2 direction_;//下一个顶点指向当前顶点
         internal Vector2 point_;
         internal int id_;
-        internal bool convex_;
+        internal bool convex_;//凸或凹
     }
 }
