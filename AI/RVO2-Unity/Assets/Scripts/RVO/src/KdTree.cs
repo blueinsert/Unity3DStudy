@@ -355,13 +355,15 @@ namespace RVO
             int minRight = obstacles.Count;
 
             for (int i = 0; i < obstacles.Count; ++i)
-            {
-                int leftSize = 0;
-                int rightSize = 0;
-
+            {    
+                //遍历多边形obstacle的每一条边
+                //以这条边拆分二维空间
                 Obstacle obstacleI1 = obstacles[i];
                 Obstacle obstacleI2 = obstacleI1.next_;
-
+                //统计在这条边左边和右边的所有其他边的数据
+                //以此来选择最优拆分边
+                int leftSize = 0;
+                int rightSize = 0;
                 /* Compute optimal split node. */
                 for (int j = 0; j < obstacles.Count; ++j)
                 {
@@ -369,7 +371,7 @@ namespace RVO
                     {
                         continue;
                     }
-
+                    //遍历所有其他边
                     Obstacle obstacleJ1 = obstacles[j];
                     Obstacle obstacleJ2 = obstacleJ1.next_;
 
@@ -386,16 +388,18 @@ namespace RVO
                     }
                     else
                     {
+                        //当拆分边所在直线与其他边相交时
                         ++leftSize;
                         ++rightSize;
                     }
 
                     if (new FloatPair(Math.Max(leftSize, rightSize), Math.Min(leftSize, rightSize)) >= new FloatPair(Math.Max(minLeft, minRight), Math.Min(minLeft, minRight)))
                     {
+                        //已经不如当前最优的拆分边，提前结束遍历
                         break;
                     }
                 }
-
+                //
                 if (new FloatPair(Math.Max(leftSize, rightSize), Math.Min(leftSize, rightSize)) < new FloatPair(Math.Max(minLeft, minRight), Math.Min(minLeft, minRight)))
                 {
                     minLeft = leftSize;
@@ -451,7 +455,8 @@ namespace RVO
                     else
                     {
                         /* Split obstacle j. */
-                        float t = RVOMath.det(obstacleI2.point_ - obstacleI1.point_, obstacleJ1.point_ - obstacleI1.point_) / RVOMath.det(obstacleI2.point_ - obstacleI1.point_, obstacleJ1.point_ - obstacleJ2.point_);
+                        float t = RVOMath.det(obstacleI2.point_ - obstacleI1.point_, obstacleJ1.point_ - obstacleI1.point_) 
+                            / RVOMath.det(obstacleI2.point_ - obstacleI1.point_, obstacleJ1.point_ - obstacleJ2.point_);
 
                         Vector2 splitPoint = obstacleJ1.point_ + t * (obstacleJ2.point_ - obstacleJ1.point_);
 
@@ -665,25 +670,40 @@ namespace RVO
 
             if (q1LeftOfI >= 0.0f && q2LeftOfI >= 0.0f)
             {
-                return queryVisibilityRecursive(q1, q2, radius, node.left_) && ((RVOMath.sqr(q1LeftOfI) * invLengthI >= RVOMath.sqr(radius) && RVOMath.sqr(q2LeftOfI) * invLengthI >= RVOMath.sqr(radius)) || queryVisibilityRecursive(q1, q2, radius, node.right_));
+                return queryVisibilityRecursive(q1, q2, radius, node.left_) 
+                    && (
+                    (RVOMath.sqr(q1LeftOfI) * invLengthI >= RVOMath.sqr(radius) 
+                    && RVOMath.sqr(q2LeftOfI) * invLengthI >= RVOMath.sqr(radius)) 
+                    || queryVisibilityRecursive(q1, q2, radius, node.right_)
+                    );
             }
 
             if (q1LeftOfI <= 0.0f && q2LeftOfI <= 0.0f)
             {
-                return queryVisibilityRecursive(q1, q2, radius, node.right_) && ((RVOMath.sqr(q1LeftOfI) * invLengthI >= RVOMath.sqr(radius) && RVOMath.sqr(q2LeftOfI) * invLengthI >= RVOMath.sqr(radius)) || queryVisibilityRecursive(q1, q2, radius, node.left_));
+                return queryVisibilityRecursive(q1, q2, radius, node.right_) 
+                    && (
+                    (RVOMath.sqr(q1LeftOfI) * invLengthI >= RVOMath.sqr(radius) 
+                    && RVOMath.sqr(q2LeftOfI) * invLengthI >= RVOMath.sqr(radius)) 
+                    || queryVisibilityRecursive(q1, q2, radius, node.left_)
+                    );
             }
 
             if (q1LeftOfI >= 0.0f && q2LeftOfI <= 0.0f)
             {
                 /* One can see through obstacle from left to right. */
-                return queryVisibilityRecursive(q1, q2, radius, node.left_) && queryVisibilityRecursive(q1, q2, radius, node.right_);
+                return queryVisibilityRecursive(q1, q2, radius, node.left_) 
+                    && queryVisibilityRecursive(q1, q2, radius, node.right_);
             }
 
             float point1LeftOfQ = RVOMath.leftOf(q1, q2, obstacle1.point_);
             float point2LeftOfQ = RVOMath.leftOf(q1, q2, obstacle2.point_);
             float invLengthQ = 1.0f / RVOMath.absSq(q2 - q1);
 
-            return point1LeftOfQ * point2LeftOfQ >= 0.0f && RVOMath.sqr(point1LeftOfQ) * invLengthQ > RVOMath.sqr(radius) && RVOMath.sqr(point2LeftOfQ) * invLengthQ > RVOMath.sqr(radius) && queryVisibilityRecursive(q1, q2, radius, node.left_) && queryVisibilityRecursive(q1, q2, radius, node.right_);
+            return point1LeftOfQ * point2LeftOfQ >= 0.0f 
+                && RVOMath.sqr(point1LeftOfQ) * invLengthQ > RVOMath.sqr(radius) 
+                && RVOMath.sqr(point2LeftOfQ) * invLengthQ > RVOMath.sqr(radius) 
+                && queryVisibilityRecursive(q1, q2, radius, node.left_) 
+                && queryVisibilityRecursive(q1, q2, radius, node.right_);
         }
     }
 }
