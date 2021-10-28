@@ -11,6 +11,25 @@ public class CCMove : MonoBehaviour
         
     }
 
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        var cc = hit.collider as CharacterController;
+        if (cc != null)
+        {
+            var dir = cc.transform.position - this.transform.position;
+            cc.Move(dir.normalized * 1.0f * Time.deltaTime);
+            return;
+        }
+        Rigidbody rig = hit.collider.attachedRigidbody;
+        if (rig != null && !rig.isKinematic)
+        {
+            var dir = rig.transform.position - this.transform.position;
+            rig.velocity = dir.normalized * 1.0f;
+            return;
+        }
+        Debug.Log(hit.collider);
+    }
+
     // Update is called once per frame
     void Update()
     {
