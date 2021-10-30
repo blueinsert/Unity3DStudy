@@ -1,0 +1,11 @@
+
+local HotFixTestScriptHotFixModule = {
+    Add_thisInt32Int32 = function(self,a,b)
+	    return a + b
+    end,
+	s_Add_Int32Int32 = function(a,b)
+	    return a + b
+    end,
+}
+
+return HotFixTestScriptHotFixModule;
