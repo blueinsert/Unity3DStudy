@@ -11,7 +11,10 @@ public class Test : MonoBehaviour
     public int m_rangeXMax = 50;
     public int m_rangeYMin = -50;
     public int m_rangeYMax = 50;
+    public float m_searchRadius = 5.0f;
     public const int LevelMax = 8;
+    private Plane m_hPlane = new Plane(Vector3.up, Vector3.zero);
+    public Vector3 m_mousePosition;
     public Color[] m_levelColor = new Color[LevelMax];
     private List<GameObject> m_points = new List<GameObject>();
     KDTree.TNode m_kdTree = null;
@@ -43,12 +46,31 @@ public class Test : MonoBehaviour
         stopwatch.Start();
         m_kdTree = KDTree.BuildTree(datas);
         var consume = stopwatch.ElapsedMilliseconds;
-        UnityEngine.Debug.Log(string.Format("BuildKDTree consume {0}ms", consume));
+        UnityEngine.Debug.Log(string.Format("frame:{0} BuildKDTree consume {1}ms", Time.frameCount, consume));
+    }
+
+    private void UpdateMousePosition()
+    {
+        Vector3 position = Vector3.zero;
+        Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+        float rayDistance;
+        if (m_hPlane.Raycast(mouseRay, out rayDistance))
+            position = mouseRay.GetPoint(rayDistance);
+
+        m_mousePosition = position;
     }
 
     // Update is called once per frame
     void Update()
     {
+        UpdateMousePosition();
+        if (Input.mouseScrollDelta.y < 0)
+        {
+            m_searchRadius *= 1.2f;
+        }else if (Input.mouseScrollDelta.y > 0)
+        {
+            m_searchRadius /= 1.2f;
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
             GeneratePoints();
@@ -106,11 +128,40 @@ public class Test : MonoBehaviour
         }
     }
 
+    void DrawCircle(Vector3 pos, float radius,float fragment = 36f)
+    {
+        for(int i = 0; i < fragment; i++)
+        {
+            var start = new Vector3(pos.x + radius * Mathf.Cos((i + 1) / fragment * (2*Mathf.PI)), 0, pos.z + radius * Mathf.Sin((i + 1) / fragment * 2 * Mathf.PI));
+            var end = new Vector3(pos.x + radius * Mathf.Cos((i + 2) / fragment * 2 * Mathf.PI), 0, pos.z + radius * Mathf.Sin((i + 2) / fragment * 2 * Mathf.PI));
+            Gizmos.DrawLine(start, end);
+        }
+    }
+
     void OnDrawGizmos()
     {
         if (m_kdTree != null)
         {
             DrawKDTree(m_kdTree, m_rangeXMin, m_rangeXMax, m_rangeYMin, m_rangeYMax, 1);
+            Gizmos.color = new Color(0, 1, 1, 0.5f);
+            // Gizmos.DrawSphere(m_mousePosition, m_searchRadius);
+            DrawCircle(m_mousePosition, m_searchRadius);
+            List<KDTree.Data> nearests = null;
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            KDTree.SearchNearest(m_kdTree, new KDTree.Data() { x = m_mousePosition.x, y = m_mousePosition.z }, m_searchRadius, out nearests);
+            var consume = stopwatch.ElapsedMilliseconds;
+            UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms", Time.frameCount, consume));
+            Gizmos.color = new Color(1, 0, 0, 1f);
+            foreach (var p in nearests)
+            {
+                Gizmos.DrawSphere(new Vector3(p.x, 0, p.y), 1);
+            }
         }
+        Gizmos.color = new Color(0, 0, 0, 1f);
+        Gizmos.DrawLine(new Vector3(m_rangeXMin, 0, m_rangeYMin), new Vector3(m_rangeXMin, 0, m_rangeYMax));
+        Gizmos.DrawLine(new Vector3(m_rangeXMin, 0, m_rangeYMax), new Vector3(m_rangeXMax, 0, m_rangeYMax));
+        Gizmos.DrawLine(new Vector3(m_rangeXMax, 0, m_rangeYMax), new Vector3(m_rangeXMax, 0, m_rangeYMin));
+        Gizmos.DrawLine(new Vector3(m_rangeXMax, 0, m_rangeYMin), new Vector3(m_rangeXMin, 0, m_rangeYMin));
     }
 }

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class KDTree {
+public class KDTree
+{
     public struct Data
     {
         public float x;
@@ -20,7 +21,7 @@ public class KDTree {
 
     public int DataSorter1(Data d1, Data d2)
     {
-        return  (int)(d1.x - d2.x);
+        return (int)(d1.x - d2.x);
     }
 
     public int DataSorter2(Data d1, Data d2)
@@ -28,7 +29,8 @@ public class KDTree {
         return (int)(d1.y - d2.y);
     }
 
-    void ChooseSplit(List<Data> datas, out int split, out Data splitData, out List<Data> leftDatas, out List<Data> rightDatas) {
+    void ChooseSplit(List<Data> datas, out int split, out Data splitData, out List<Data> leftDatas, out List<Data> rightDatas)
+    {
         float temp1 = 0, temp2 = 0;
         int size = datas.Count;
         leftDatas = new List<Data>();
@@ -63,7 +65,7 @@ public class KDTree {
         }
         int index = size / 2;
         splitData.x = datas[index].x;
-        splitData.y = datas[index].y;      
+        splitData.y = datas[index].y;
         for (int i = 0; i < index; i++)
         {
             leftDatas.Add(datas[i]);
@@ -83,7 +85,7 @@ public class KDTree {
         List<Data> leftDatas;
         List<Data> rightDatas;
         ChooseSplit(datas, out split, out splitData, out leftDatas, out rightDatas);
-        TNode node = new TNode() { m_data = splitData, m_split = split};
+        TNode node = new TNode() { m_data = splitData, m_split = split };
         node.m_left = null;
         node.m_right = null;
         if (leftDatas.Count != 0)
@@ -94,6 +96,162 @@ public class KDTree {
         {
             node.m_right = BuildTree(rightDatas);
         }
-        return node; 
+        return node;
+    }
+
+    private float Distance(Data d1, Data d2)
+    {
+        return Mathf.Sqrt((d1.x - d2.x) * (d1.x - d2.x) + (d2.y - d1.y) * (d2.y - d1.y));
+    }
+
+    public void SearchNearest(TNode tree, Data pos, float radius, out List<Data> nearest)
+    {
+        nearest = new List<Data>();
+        Stack<TNode> searchPath = new Stack<TNode>();
+        TNode searchNode = tree;
+        while (searchNode != null)
+        {
+            searchPath.Push(searchNode);
+            if (searchNode.m_split == 0)
+            {
+                if (pos.x <= searchNode.m_data.x)
+                {
+                    searchNode = searchNode.m_left;
+                }
+                else
+                {
+                    searchNode = searchNode.m_right;
+                }
+            }
+            else if (searchNode.m_split == 1)
+            {
+                if (pos.y <= searchNode.m_data.y)
+                {
+                    searchNode = searchNode.m_left;
+                }
+                else
+                {
+                    searchNode = searchNode.m_right;
+                }
+            }
+            else
+            {
+                searchNode = null;
+            }
+        }
+        List<TNode> originSearchPath = new List<TNode>(searchPath.ToArray());
+        TNode backNode = null;
+        while (searchPath.Count != 0)
+        {
+            backNode = searchPath.Pop();
+            if (Distance(backNode.m_data, pos) <= radius)
+            {
+                nearest.Add(backNode.m_data);
+            }
+            //叶子节点
+            if (backNode.m_left == null && backNode.m_right == null)
+            {
+
+            }
+            else
+            {
+                if (originSearchPath.Contains(backNode))
+                {
+                    if (backNode.m_split == 0)
+                    {
+                        //以目标点为中心的圆与分离轴相近，需要将搜索路径的另一半加入
+                        if (Mathf.Abs(pos.x - backNode.m_data.x) < radius)
+                        {
+
+                            if (pos.x <= backNode.m_data.x)
+                            {
+                                searchNode = backNode.m_right;
+                            }
+                            else
+                            {
+                                searchNode = backNode.m_left;
+                            }
+                            if (searchNode != null)
+                                searchPath.Push(searchNode);
+                        }
+                    }
+                    else if (backNode.m_split == 1)
+                    {
+                        //以目标点为中心的圆与分离轴相近，需要将搜索路径的另一半加入
+                        if (Mathf.Abs(pos.y - backNode.m_data.y) < radius)
+                        {
+                            if (pos.y <= backNode.m_data.y)
+                            {
+                                searchNode = backNode.m_right;
+                            }
+                            else
+                            {
+                                searchNode = backNode.m_left;
+                            }
+                            if (searchNode != null)
+                                searchPath.Push(searchNode);
+                        }
+                    }
+                }
+                else
+                {
+                    if (backNode.m_split == 0)
+                    {
+                        if (pos.x <= backNode.m_data.x)
+                        {
+                            searchNode = backNode.m_left;
+                        }
+                        else
+                        {
+                            searchNode = backNode.m_right;
+                        }
+                        if (searchNode != null)
+                            searchPath.Push(searchNode);
+                        //以目标点为中心的圆与分离轴相近，需要将搜索路径的另一半加入
+                        if (Mathf.Abs(pos.x - backNode.m_data.x) < radius)
+                        {
+                            if (pos.x <= backNode.m_data.x)
+                            {
+                                searchNode = backNode.m_right;
+                            }
+                            else
+                            {
+                                searchNode = backNode.m_left;
+                            }
+                            if (searchNode != null)
+                                searchPath.Push(searchNode);
+                        }
+                    }
+                    else if (backNode.m_split == 1)
+                    {
+                        if (pos.y <= backNode.m_data.y)
+                        {
+                            searchNode = backNode.m_left;
+                        }
+                        else
+                        {
+                            searchNode = backNode.m_right;
+                        }
+                        if(searchNode != null)
+                            searchPath.Push(searchNode);
+                        //以目标点为中心的圆与分离轴相近，需要将搜索路径的另一半加入
+                        if (Mathf.Abs(pos.y - backNode.m_data.y) < radius)
+                        {
+                            if (pos.y <= backNode.m_data.y)
+                            {
+                                searchNode = backNode.m_right;
+                            }
+                            else
+                            {
+                                searchNode = backNode.m_left;
+                            }
+                            if (searchNode != null)
+                                searchPath.Push(searchNode);
+                        }
+                    }      
+                }
+            }
+        }
+
     }
 }
