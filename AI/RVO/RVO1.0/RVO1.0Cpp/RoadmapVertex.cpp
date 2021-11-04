@@ -50,11 +50,14 @@ namespace RVO {
 			float l2p1_leftof_l1 = leftOf(l1p1, l1p2, l2p1);
 			float l2p2_leftof_l1 = leftOf(l1p1, l1p2, l2p2);
 
+			//使用l2拆分二维空间，如果l1在l2的左边
 			if (l1p1_leftof_l2 >= 0 && l1p2_leftof_l2 >= 0) {
+				//如果p在l2的右边，说明l2距离点p更近
 				if (p_leftof_l2 < 0) {
 					return false;
 				}
 				else if (p_leftof_l2 > 0) {
+					//如果p也在l2的左边，并不能说明l1距离点p更近？
 					return true;
 				}
 			}
@@ -66,10 +69,15 @@ namespace RVO {
 					return false;
 				}
 			}
+			//使用l1拆分二维平面
+			//如果l2在l1的左边
 			if (l2p1_leftof_l1 >= 0 && l2p2_leftof_l1 >= 0) {
+				//如果p在l1的右边
+				//说明点p距离l1更近
 				if (p_leftof_l1 < 0) {
 					return true;
 				}
+				//？条件不充分
 				else if (p_leftof_l1 > 0) {
 					return false;
 				}
@@ -113,8 +121,13 @@ namespace RVO {
 			if (p_leftof_l > 0) { // lp1 is right, lp2 is left
 				obstacle_vertices.push_back(std::make_pair(angle_lp1, std::make_pair(RIGHT, i)));
 				obstacle_vertices.push_back(std::make_pair(angle_lp2, std::make_pair(LEFT, i)));
-
+				//只有lp1位于以点p为原点的坐标系的第二象限
+				//lp2位于第三象限时才会angle_lp1 > angle_lp2
 				if (angle_lp1 > angle_lp2) {
+					//这种情况下
+					//以p为起点，方向为-RVO_PI的射线一定与线段(lp1,lp2)相交
+					//_visibility.push_back(std::make_pair(-RVO_PI, i));
+					//SweeplineComparator进行排序，距离p最近的obstacle线段会在set的最前面
 					sweepline_status.insert(i);
 				}
 			}
@@ -127,6 +140,7 @@ namespace RVO {
 				}
 			}
 		}
+		//逆时针
 		std::sort(obstacle_vertices.begin(), obstacle_vertices.end());
 
 		// Compute visibility
@@ -138,12 +152,14 @@ namespace RVO {
 			last_inserted = *(sweepline_status.begin());
 		}
 		_visibility.push_back(std::make_pair(-RVO_PI, last_inserted));
-		// iterate counterclockwise through obstacle vertices
+		// iterate counterclockwise through obstacle vertices 逆时针
 		for (std::vector<std::pair<float, std::pair<int, int> > >::iterator i = obstacle_vertices.begin(); i != obstacle_vertices.end(); ++i) {
 			float angle = i->first;
 			int obstacle_vertex_type = i->second.first;
 			int line_segment_id = i->second.second;
 
+			//逆时针扫描，会扫到obstacle线段的右顶点(左右相对于点p)
+			//所以扫到右顶点时将线段加入自动排序集合，扫到左顶点时将其删除
 			if (obstacle_vertex_type == LEFT) { // remove line segment from sweepline status
 				sweepline_status.erase(line_segment_id);
 			}
@@ -155,9 +171,11 @@ namespace RVO {
 			if (sweepline_status.empty()) {
 				if (last_inserted != -1) {
 					last_inserted = -1;
+					//这个角度没有obstacle阻挡
 					_visibility.push_back(std::make_pair(angle, last_inserted));
 				}
 			}
+			//同一角度的顶点有两个，进入顺序先后有差异，可能产生的结果会不同
 			else if (*(sweepline_status.begin()) != last_inserted) {
 				last_inserted = *(sweepline_status.begin());
 				_visibility.push_back(std::make_pair(angle, last_inserted));

@@ -135,6 +135,7 @@ xcopy "$(SolutionDir)vector2.h" "..\include" /y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Agent.cpp" />
+    <ClCompile Include="example.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="KDTree.cpp" />
     <ClCompile Include="Obstacle.cpp" />
