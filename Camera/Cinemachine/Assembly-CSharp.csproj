@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\CameraMgr.cs" />
+    <Compile Include="Assets\Shake\GenerateShake.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
