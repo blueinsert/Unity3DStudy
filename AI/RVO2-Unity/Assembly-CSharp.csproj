@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{E9B91F23-724D-853E-9338-6810F3ED2E6B}</ProjectGuid>
+    <ProjectGuid>{296AC906-D80F-25D1-E89A-3441646DF8B0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -51,11 +51,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\ConfigDataManager\ConfigDataBase.cs" />
-     <Compile Include="Assets\ConfigDataManager\ConfigDataManager.cs" />
-     <Compile Include="Assets\ConfigDataManager\ConfigDataManager_TestConfig.cs" />
-     <Compile Include="Assets\ConfigDataManager\CsvParser.cs" />
-     <Compile Include="Assets\Test.cs" />
+     <Compile Include="Assets\Scripts\GameAgent.cs" />
+     <Compile Include="Assets\Scripts\GameMainManager.cs" />
+     <Compile Include="Assets\Scripts\LeanPool\Scripts\LeanClassPool.cs" />
+     <Compile Include="Assets\Scripts\LeanPool\Scripts\LeanPool.cs" />
+     <Compile Include="Assets\Scripts\LeanPool\Scripts\LeanPooledRigidbody.cs" />
+     <Compile Include="Assets\Scripts\LeanPool\Scripts\LeanPooledRigidbody2D.cs" />
+     <Compile Include="Assets\Scripts\ObstacleCollect.cs" />
+     <Compile Include="Assets\Scripts\RVO\examples\Blocks.cs" />
+     <Compile Include="Assets\Scripts\RVO\examples\Circle.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\Agent.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\KdTree.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\Line.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\Obstacle.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\RVOMath.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\Simulator.cs" />
+     <Compile Include="Assets\Scripts\RVO\src\Vector2.cs" />
+     <Compile Include="Assets\Scripts\Singleton.cs" />
  <Reference Include="UnityEngine.CoreModule">
  <HintPath>C:/Program Files/Unity2017.4.27f1/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
  </Reference>

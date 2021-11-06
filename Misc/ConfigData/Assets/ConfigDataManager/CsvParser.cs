@@ -211,7 +211,7 @@ public class CsvParser
     {
         CsvParser parse = new CsvParser();
         parse._Parse(content);
-        parse.DebugOutputmGrid();
+        //parse.DebugOutputmGrid();
         return parse.m_grid;
     }
 
