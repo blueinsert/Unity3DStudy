@@ -690,7 +690,7 @@ namespace Pathfinding.RVO {
 					Quadtree.Insert(agents[i]);
 				}
 
-				//quadtree.DebugDraw ();
+				Quadtree.DebugDraw ();
 			}
 
 			Quadtree.CalculateSpeeds();
@@ -767,7 +767,8 @@ namespace Pathfinding.RVO {
 						for (int i = 0; i < workers.Length; i++) workers[i].WaitOne();
 						for (int i = 0; i < agents.Count; i++) agents[i].PostCalculation();
 					}
-				} else {
+				} 
+				else {
 					PreCalculation();
 					CleanAndUpdateObstaclesIfNecessary();
 					BuildQuadtree();

@@ -34,9 +34,10 @@ namespace Pathfinding.RVO {
 			/// </summary>
 			public void Distribute (Node[] nodes, Rect r) {
 				Vector2 c = r.center;
-
+				//遍历当前节点的agent
 				while (linkedList != null) {
 					Agent nx = linkedList.next;
+					//根据所在象限将其分别到子节点中
 					var index = child00 + (linkedList.position.x > c.x ? 2 : 0) + (linkedList.position.y > c.y ? 1 : 0);
 					nodes[index].Add(linkedList);
 					linkedList = nx;
@@ -122,7 +123,8 @@ namespace Pathfinding.RVO {
 						break;
 					} else {
 						// Split
-						nodes[i].child00 = GetNodeIndex();
+						nodes[i].child00 = GetNodeIndex();//分配子节点
+						//拆分，将agent分配到子节点空间中
 						nodes[i].Distribute(nodes, r);
 					}
 				}
@@ -132,17 +134,21 @@ namespace Pathfinding.RVO {
 					Vector2 c = r.center;
 					if (p.x > c.x) {
 						if (p.y > c.y) {
+							//第一象限
 							i = nodes[i].child00+3;
 							r = Rect.MinMaxRect(c.x, c.y, r.xMax, r.yMax);
 						} else {
+							//第四象限
 							i = nodes[i].child00+2;
 							r = Rect.MinMaxRect(c.x, r.yMin, r.xMax, c.y);
 						}
 					} else {
 						if (p.y > c.y) {
+							//第二象限
 							i = nodes[i].child00+1;
 							r = Rect.MinMaxRect(r.xMin, c.y, c.x, r.yMax);
 						} else {
+							//第三象限
 							i = nodes[i].child00;
 							r = Rect.MinMaxRect(r.xMin, r.yMin, c.x, c.y);
 						}

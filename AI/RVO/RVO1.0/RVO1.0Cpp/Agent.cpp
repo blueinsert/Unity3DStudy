@@ -260,6 +260,7 @@ namespace RVO {
 		Roadmap * roadmap = _sim->_roadmap;
 		Goal * goal = _sim->_goals[_goalID];
 
+		//_subGoal³õÊ¼Öµ-2
 		if (_subGoal == -1) { // sub_goal is goal
 			if (goal->_vertex->isVisibleFrom(_p)) { // goal is visible
 				_subGoal = -1;

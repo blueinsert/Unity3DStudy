@@ -138,6 +138,20 @@ public class Test : MonoBehaviour
         }
     }
 
+    void WildSearch(Vector2 p, float radius, out List<GameObject> nearest)
+    {
+        nearest = new List<GameObject>();
+        for(int i = 0; i < m_points.Count; i++)
+        {
+            var go = m_points[i];
+            var d = (p - new Vector2(go.transform.position.x, go.transform.position.z)).magnitude;
+            if (d < radius)
+            {
+                nearest.Add(go);
+            }
+        }
+    }
+
     void OnDrawGizmos()
     {
         if (m_kdTree != null)
@@ -147,11 +161,16 @@ public class Test : MonoBehaviour
             // Gizmos.DrawSphere(m_mousePosition, m_searchRadius);
             DrawCircle(m_mousePosition, m_searchRadius);
             List<KDTree.Data> nearests = null;
+            List<GameObject> nearestGos = null;
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+            WildSearch(new Vector2(m_mousePosition.x, m_mousePosition.z), m_searchRadius, out nearestGos);
+            UnityEngine.Debug.Log(string.Format("frame:{0} WildSearch consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+
+            stopwatch.Reset();
+            stopwatch.Start();
             KDTree.SearchNearest(m_kdTree, new KDTree.Data() { x = m_mousePosition.x, y = m_mousePosition.z }, m_searchRadius, out nearests);
-            var consume = stopwatch.ElapsedMilliseconds;
-            UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms", Time.frameCount, consume));
+            UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
             Gizmos.color = new Color(1, 0, 0, 1f);
             foreach (var p in nearests)
             {
