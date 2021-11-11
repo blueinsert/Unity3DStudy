@@ -806,8 +806,8 @@ namespace Pathfinding.RVO.Sampled {
 				var voCenter = Vector2.Lerp(optimalVelocity, otherOptimalVelocity, avoidanceStrength);
 
 				vos.Add(new VO(voBoundingOrigin, voCenter, totalRadius, inverseAgentTimeHorizon, 1 / simulator.DeltaTime));
-				if (DebugDraw)
-					DrawVO(position + voBoundingOrigin * inverseAgentTimeHorizon + voCenter, totalRadius * inverseAgentTimeHorizon, position + voCenter);
+				//if (DebugDraw)
+					//DrawVO(position + voBoundingOrigin * inverseAgentTimeHorizon + voCenter, totalRadius * inverseAgentTimeHorizon, position + voCenter);
 			}
 		}
 

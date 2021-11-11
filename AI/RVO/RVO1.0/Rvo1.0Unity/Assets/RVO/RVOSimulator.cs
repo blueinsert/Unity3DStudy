@@ -6,24 +6,8 @@ using UnityEngine.Profiling;
 namespace Pathfinding.RVO {
 	using Pathfinding.Util;
 
-	/// <summary>
-	/// Unity front end for an RVO simulator.
-	/// Attached to any GameObject in a scene, scripts such as the RVOController will use the
-	/// simulator exposed by this class to handle their movement.
-	/// In pretty much all cases you should only have a single RVOSimulator in the scene.
-	///
-	/// You can have more than one of these, however most scripts which make use of the RVOSimulator
-	/// will use the <see cref="active"/> property which just returns the first simulator in the scene.
-	///
-	/// This is only a wrapper class for a Pathfinding.RVO.Simulator which simplifies exposing it
-	/// for a unity scene.
-	///
-	/// See: Pathfinding.RVO.Simulator
-	/// See: local-avoidance (view in online documentation for working links)
-	/// </summary>
 	[ExecuteInEditMode]
-	[AddComponentMenu("Pathfinding/Local Avoidance/RVO Simulator")]
-	[HelpURL("http://arongranberg.com/astar/docs/class_pathfinding_1_1_r_v_o_1_1_r_v_o_simulator.php")]
+	[AddComponentMenu("Local Avoidance/RVO Simulator")]
 	public class RVOSimulator : MonoBehaviour {
 		/// <summary>First RVOSimulator in the scene (usually there is only one)</summary>
 		public static RVOSimulator active { get; private set; }

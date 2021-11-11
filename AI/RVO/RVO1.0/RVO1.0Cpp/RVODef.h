@@ -109,7 +109,8 @@ namespace RVO {
           time = RVO_INFTY;
         }
       }
-    } else {
+    } 
+	else {
       if (collision) {
         time = -RVO_INFTY;
       } else {
