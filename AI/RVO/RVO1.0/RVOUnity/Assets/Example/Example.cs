@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Text;
 
 [RequireComponent(typeof(MeshFilter))]
 [RequireComponent(typeof(MeshRenderer))]
 public class Example : MonoBehaviour
 {
-    public int agentCount = 100;
+
+    public int m_agentCount = 2;
 
     public enum RVOExampleType
     {
@@ -16,11 +18,12 @@ public class Example : MonoBehaviour
         Crossing
     }
 
-    public RVOExampleType type = RVOExampleType.Circle;
-
-    public float radius = 3;
-    public float maxSpeed = 2;
-    public int maxNeighbours = 10;
+    public RVOExampleType type = RVOExampleType.Crossing;
+    public float m_timeStep = 1 / 60f;
+    public float m_safetyFactor = 1.0f;
+    public float m_radius = 3;
+    public float m_maxSpeed = 2;
+    public int m_maxNeighbours = 10;
 
     /// <summary>
     /// Offset from the agent position the actual drawn postition.
@@ -54,9 +57,9 @@ public class Example : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         sim = RVO.Simulator.Instance;
-        sim.SetTimeStep(0.25f);
-        sim.SetAgentDefaults(saftyFactor: 1, velSampleCount: 250, neighborDist: 15, maxNeighbors: 10, radius: 2, prefSpeed: 2, maxSpeed: 3, maxAccel:20);
-        CreateAgents(agentCount);
+        sim.SetTimeStep(m_timeStep);
+        sim.SetAgentDefaults(saftyFactor: m_safetyFactor, velSampleCount: 250, neighborDist: 15, maxNeighbors: 10, radius: 2, prefSpeed: 2, maxSpeed: 3, maxAccel:20);
+        CreateAgents(m_agentCount);
     }
 
     public void OnGUI()
@@ -73,31 +76,31 @@ public class Example : MonoBehaviour
         if (GUILayout.Button("Random Streams"))
         {
             type = RVOExampleType.RandomStreams;
-            CreateAgents(agentCount);
+            CreateAgents(m_agentCount);
         }
 
         if (GUILayout.Button("Line"))
         {
             type = RVOExampleType.Line;
-            CreateAgents(agentCount);
+            CreateAgents(m_agentCount);
         }
 
         if (GUILayout.Button("Circle"))
         {
             type = RVOExampleType.Circle;
-            CreateAgents(agentCount);
+            CreateAgents(m_agentCount);
         }
 
         if (GUILayout.Button("Point"))
         {
             type = RVOExampleType.Point;
-            CreateAgents(agentCount);
+            CreateAgents(m_agentCount);
         }
 
         if (GUILayout.Button("Crossing"))
         {
             type = RVOExampleType.Crossing;
-            CreateAgents(agentCount);
+            CreateAgents(m_agentCount);
         }
     }
 
@@ -112,30 +115,30 @@ public class Example : MonoBehaviour
     /// <summary>Create a number of agents in circle and restart simulation</summary>
     public void CreateAgents(int num)
     {
-        this.agentCount = num;
+        this.m_agentCount = num;
 
-        goals = new List<Vector3>(agentCount);
-        colors = new List<Color>(agentCount);
+        goals = new List<Vector3>(m_agentCount);
+        colors = new List<Color>(m_agentCount);
 
         sim.ClearAgents();
 
         if (type == RVOExampleType.Circle)
         {
-            float circleRad = Mathf.Sqrt(agentCount * radius * radius * 4 / Mathf.PI) * exampleScale * 0.05f;
+            float circleRad = Mathf.Sqrt(m_agentCount * m_radius * m_radius * 4 / Mathf.PI) * exampleScale * 0.05f;
 
-            for (int i = 0; i < agentCount; i++)
+            for (int i = 0; i < m_agentCount; i++)
             {
-                Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / agentCount)) * circleRad * (1 + Random.value * 0.01f);
+                Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / m_agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / m_agentCount)) * circleRad * (1 + Random.value * 0.01f);
                 sim.AddAgent(new Vector2(pos.x, pos.z));
                 goals.Add(-pos);
-                colors.Add(ColorUtility.HSVToRGB(i * 360.0f / agentCount, 0.8f, 0.6f));
+                colors.Add(ColorUtility.HSVToRGB(i * 360.0f / m_agentCount, 0.8f, 0.6f));
             }
         }
         else if (type == RVOExampleType.Line)
         {
-            for (int i = 0; i < agentCount; i++)
+            for (int i = 0; i < m_agentCount; i++)
             {
-                Vector3 pos = new Vector3((i % 2 == 0 ? 1 : -1) * exampleScale, 0, (i / 2) * radius * 2.5f);
+                Vector3 pos = new Vector3((i % 2 == 0 ? 1 : -1) * exampleScale, 0, (i / 2) * m_radius * 2.5f);
                 sim.AddAgent(new Vector2(pos.x, pos.z));
                 goals.Add(new Vector3(-pos.x, pos.y, pos.z));
                 colors.Add(i % 2 == 0 ? Color.red : Color.blue);
@@ -143,19 +146,19 @@ public class Example : MonoBehaviour
         }
         else if (type == RVOExampleType.Point)
         {
-            for (int i = 0; i < agentCount; i++)
+            for (int i = 0; i < m_agentCount; i++)
             {
-                Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / agentCount)) * exampleScale;
+                Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / m_agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / m_agentCount)) * exampleScale;
                 sim.AddAgent(new Vector2(pos.x, pos.z));
                 goals.Add(new Vector3(0, pos.y, 0));
-                colors.Add(ColorUtility.HSVToRGB(i * 360.0f / agentCount, 0.8f, 0.6f));
+                colors.Add(ColorUtility.HSVToRGB(i * 360.0f / m_agentCount, 0.8f, 0.6f));
             }
         }
         else if (type == RVOExampleType.RandomStreams)
         {
-            float circleRad = Mathf.Sqrt(agentCount * radius * radius * 4 / Mathf.PI) * exampleScale * 0.05f;
+            float circleRad = Mathf.Sqrt(m_agentCount * m_radius * m_radius * 4 / Mathf.PI) * exampleScale * 0.05f;
 
-            for (int i = 0; i < agentCount; i++)
+            for (int i = 0; i < m_agentCount; i++)
             {
                 float angle = Random.value * Mathf.PI * 2.0f;
                 float targetAngle = Random.value * Mathf.PI * 2.0f;
@@ -167,12 +170,12 @@ public class Example : MonoBehaviour
         }
         else if (type == RVOExampleType.Crossing)
         {
-            float distanceBetweenGroups = exampleScale * radius * 0.5f;
-            int directions = (int)Mathf.Sqrt(agentCount / 25f);
+            float distanceBetweenGroups = exampleScale * m_radius * 0.5f;
+            int directions = (int)Mathf.Sqrt(m_agentCount / 25f);
             directions = Mathf.Max(directions, 2);
 
             const int AgentsPerDistance = 10;
-            for (int i = 0; i < agentCount; i++)
+            for (int i = 0; i < m_agentCount; i++)
             {
                 float angle = ((i % directions) / (float)directions) * Mathf.PI * 2.0f;
                 var dist = distanceBetweenGroups * ((i / (directions * AgentsPerDistance) + 1) + 0.3f * Random.value);
@@ -183,12 +186,13 @@ public class Example : MonoBehaviour
             }
         }
 
-        verts = new Vector3[4 * agentCount];
+        verts = new Vector3[4 * m_agentCount];
         uv = new Vector2[verts.Length];
-        tris = new int[agentCount * 2 * 3];
+        tris = new int[m_agentCount * 2 * 3];
         meshColors = new Color[verts.Length];
     }
 
+    private StringBuilder m_sb = new StringBuilder();
 
     public void Update()
     {
@@ -199,17 +203,19 @@ public class Example : MonoBehaviour
                 sim.DoStep();
                 m_timeSum -= sim.m_timeStep;
             }
-            
         }
-        for (int i = 0; i < agentCount; i++)
+        m_sb.Length = 0;
+        for (int i = 0; i < m_agentCount; i++)
         {
-
             Vector2 pos = RVO.Simulator.Instance.GetAgentPos(i);
+            Vector2 vel = RVO.Simulator.Instance.GetAgentVel(i);
             var radius = RVO.Simulator.Instance.GetAgentRadius(i);
-
+            float orient = RVO.Simulator.Instance.GetAgentOrient(i);
+            m_sb.Append(string.Format("id:{0} pos:{1} vel:{2} orieng:{3}", i, pos, vel, orient));
+            m_sb.AppendLine("");
             var target = new Vector2(goals[i].x, goals[i].z);
             RVO.Simulator.Instance.SetAgentTarget(i, target);
-            float orient = RVO.Simulator.Instance.GetAgentOrient(i);
+            
 
             Vector3 forward = new Vector3(Mathf.Cos(orient), 0, Mathf.Sin(orient)).normalized * radius;
             if (forward == Vector3.zero) forward = new Vector3(0, 0, radius);
@@ -241,7 +247,7 @@ public class Example : MonoBehaviour
             tris[tc + 4] = (vc + 2);
             tris[tc + 5] = (vc + 3);
         }
-
+        Debug.Log(m_sb.ToString());
         //Update the mesh
         mesh.Clear();
         mesh.vertices = verts;

@@ -229,13 +229,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38f01ed3037af584abf1702025c849c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentCount: 10
-  type: 0
-  radius: 3
-  maxSpeed: 2
-  maxNeighbours: 10
+  m_agentCount: 2
+  type: 4
+  m_timeStep: 0.016666668
+  m_safetyFactor: 10
+  m_radius: 3
+  m_maxSpeed: 2
+  m_maxNeighbours: 10
   renderingOffset: {x: 0, y: 0.1, z: 0}
-  exampleScale: 100
+  exampleScale: 20
   m_timeSum: 0
 --- !u!33 &947792911
 MeshFilter:

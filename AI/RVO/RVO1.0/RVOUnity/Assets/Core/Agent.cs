@@ -136,7 +136,7 @@ namespace RVO
             {
                 if (collision)
                 {
-                    time = Vector2.Dot(v, ba) + RVOMath.Sqr(discr) / RVOMath.AbsSq(v);
+                    time = (Vector2.Dot(v, ba) + Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);
                     if (time < 0)
                     {
                         time = -float.MaxValue;
@@ -144,7 +144,7 @@ namespace RVO
                 }
                 else
                 {
-                    time = Vector2.Dot(v, ba) - RVOMath.Sqr(discr) / RVOMath.AbsSq(v);//正确
+                    time = (Vector2.Dot(v, ba) - Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);//正确
                     if (time < 0)
                     {
                         time = float.MaxValue;
@@ -188,8 +188,10 @@ namespace RVO
                 {
                     var distSq = pair.Key;
                     var other = pair.Value;
-                    Vector2 vab = 2 * velCand - m_vel - other.m_vel;
+                    Vector2 vab = velCand - other.m_vel; //VO
+                    //Vector2 vab = 2 * velCand - m_vel - other.m_vel;//RVO
                     float time = time2Collision(m_position, vab, other.m_position, m_radius + other.m_radius, false);
+                    velCand = (velCand + m_vel) / 2.0f;
                     if (time < collisionTime)
                     {
                         collisionTime = time;

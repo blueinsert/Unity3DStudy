@@ -79,6 +79,11 @@ namespace RVO
             return m_agents[id].m_position;
         }
 
+        public Vector2 GetAgentVel(int id)
+        {
+            return m_agents[id].m_vel;
+        }
+
         public float GetAgentOrient(int id)
         {
             return m_agents[id].m_orient;
