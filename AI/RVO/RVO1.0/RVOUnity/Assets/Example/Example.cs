@@ -23,7 +23,10 @@ public class Example : MonoBehaviour
     public float m_safetyFactor = 1.0f;
     public float m_radius = 3;
     public float m_maxSpeed = 2;
+    public float m_maxAccel = 10;
     public int m_maxNeighbours = 10;
+    public int m_velSampleCount = 10;
+    public int m_angleSampleCount = 36;
 
     /// <summary>
     /// Offset from the agent position the actual drawn postition.
@@ -57,8 +60,7 @@ public class Example : MonoBehaviour
         GetComponent<MeshFilter>().mesh = mesh;
 
         sim = RVO.Simulator.Instance;
-        sim.SetTimeStep(m_timeStep);
-        sim.SetAgentDefaults(saftyFactor: m_safetyFactor, velSampleCount: 250, neighborDist: 15, maxNeighbors: 10, radius: 2, prefSpeed: 2, maxSpeed: 3, maxAccel:20);
+       
         CreateAgents(m_agentCount);
     }
 
@@ -121,7 +123,9 @@ public class Example : MonoBehaviour
         colors = new List<Color>(m_agentCount);
 
         sim.ClearAgents();
-
+        sim.SetTimeStep(m_timeStep);
+        sim.SetAgentDefaults(saftyFactor: m_safetyFactor,angleSampleCount: m_angleSampleCount, velSampleCount: m_velSampleCount, neighborDist: 15, maxNeighbors: 10, radius: m_radius, prefSpeed: m_maxSpeed, maxSpeed: m_maxSpeed, maxAccel: m_maxAccel);
+        
         if (type == RVOExampleType.Circle)
         {
             float circleRad = Mathf.Sqrt(m_agentCount * m_radius * m_radius * 4 / Mathf.PI) * exampleScale * 0.05f;

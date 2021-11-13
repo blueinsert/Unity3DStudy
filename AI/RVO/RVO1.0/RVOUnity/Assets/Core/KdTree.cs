@@ -119,6 +119,11 @@ namespace RVO
         private Agent[] agents_;
         private AgentTreeNode[] agentTree_;
 
+        internal void Clear()
+        {
+            agents_ = null;
+        }
+
         /**
          * <summary>Builds an agent k-D tree.</summary>
          */

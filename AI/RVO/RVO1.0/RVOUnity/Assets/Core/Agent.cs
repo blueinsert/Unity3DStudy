@@ -8,6 +8,7 @@ namespace RVO
     {
         public float m_safetyFactor;
         public int m_velSampleCount;
+        public int m_angleSampleCount;
         public float m_neighborDist;
         public int m_maxNeighbors = 0;
         public float m_maxSpeed;
@@ -29,7 +30,9 @@ namespace RVO
         {
             m_position = pos;
             m_goalPosition = goalPos;
+            this.m_safetyFactor = Simulator.Instance.m_agentDefault.m_safetyFactor;
             this.m_velSampleCount = Simulator.Instance.m_agentDefault.m_velSampleCount;
+            this.m_angleSampleCount = Simulator.Instance.m_agentDefault.m_angleSampleCount;
             this.m_neighborDist = Simulator.Instance.m_agentDefault.m_neighborDist;
             this.m_maxNeighbors = Simulator.Instance.m_agentDefault.m_maxNeighbors;
             this.m_maxSpeed = Simulator.Instance.m_agentDefault.m_maxSpeed;
@@ -43,6 +46,7 @@ namespace RVO
             m_position = pos;
             this.m_safetyFactor = Simulator.Instance.m_agentDefault.m_safetyFactor;
             this.m_velSampleCount = Simulator.Instance.m_agentDefault.m_velSampleCount;
+            this.m_angleSampleCount = Simulator.Instance.m_agentDefault.m_angleSampleCount;
             this.m_neighborDist = Simulator.Instance.m_agentDefault.m_neighborDist;
             this.m_maxNeighbors = Simulator.Instance.m_agentDefault.m_maxNeighbors;
             this.m_maxSpeed = Simulator.Instance.m_agentDefault.m_maxSpeed;
@@ -168,45 +172,47 @@ namespace RVO
         internal void computeNewVelocity()
         {
             float minPenalty = float.MaxValue;
-            Vector2 velCand;
-            for(int i = 0; i < m_velSampleCount; i++)
-            {
-                if (i == 0)
-                {
-                    velCand = m_velPref;
-                }
-                else
-                {
-                    float angle = Random.Range(0, 1.0f) * 2 * Mathf.PI;
-                    float radius = Mathf.Sqrt(Random.Range(0, 1.0f));
-                    velCand = new Vector2(radius * m_maxSpeed * Mathf.Cos(angle), radius * m_maxSpeed * Mathf.Sin(angle));  
-                }
-                float dv = (velCand - m_velPref).magnitude;
-
-                float collisionTime = float.MaxValue;
-                foreach (var pair in m_agentNeighbors)
-                {
-                    var distSq = pair.Key;
-                    var other = pair.Value;
-                    Vector2 vab = velCand - other.m_vel; //VO
-                    //Vector2 vab = 2 * velCand - m_vel - other.m_vel;//RVO
-                    float time = time2Collision(m_position, vab, other.m_position, m_radius + other.m_radius, false);
-                    velCand = (velCand + m_vel) / 2.0f;
-                    if (time < collisionTime)
+            Vector2 velCand; 
+            for (int i = 0; i < m_angleSampleCount; i++) {
+                float angle = m_orient + i / (float)m_angleSampleCount * 2 * Mathf.PI;
+                for (int j = 0; j < m_velSampleCount; j++)
+                {    
+                    if (i==0 && j == 0)
                     {
-                        collisionTime = time;
-                        if (m_safetyFactor / collisionTime + dv >= minPenalty)
-                            break;
+                        velCand = m_velPref;
                     }
-                }
-                float penalty = m_safetyFactor / collisionTime + dv;
-                if (penalty < minPenalty)
-                {
-                    minPenalty = penalty;
-                    m_velNew = velCand;
-                }
+                    else
+                    {
+                        float radius = (j+1) / (float)m_velSampleCount;
+                        velCand = new Vector2(radius * m_maxSpeed * Mathf.Cos(angle), radius * m_maxSpeed * Mathf.Sin(angle));
+                    }
+                    float dv = (velCand - m_velPref).magnitude;
 
+                    float collisionTime = float.MaxValue;
+                    foreach (var pair in m_agentNeighbors)
+                    {
+                        var distSq = pair.Key;
+                        var other = pair.Value;
+                        //Vector2 vab = velCand - other.m_vel; //VO
+                        Vector2 vab = 2 * velCand - m_vel - other.m_vel;//RVO
+                        float time = time2Collision(m_position, vab, other.m_position, m_radius + other.m_radius, false);
+                        if (time < collisionTime)
+                        {
+                            collisionTime = time;
+                            if (m_safetyFactor / collisionTime + dv > minPenalty)
+                                break;
+                        }
+                    }
+                    float penalty = m_safetyFactor / collisionTime + dv;
+                    if (penalty <= minPenalty-0.001f)
+                    {
+                        minPenalty = penalty;
+                        m_velNew = velCand;
+                    }
+
+                }
             }
+            
         }
 
         internal void update()

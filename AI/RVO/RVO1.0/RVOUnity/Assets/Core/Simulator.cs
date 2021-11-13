@@ -26,6 +26,8 @@ namespace RVO
 
         public void DoStep()
         {
+            if (m_agents.Count == 0)
+                return;
             m_kdTree.buildAgentTree();
             for (int i = 0; i < m_agents.Count; i++)
             {
@@ -44,10 +46,11 @@ namespace RVO
             m_timeStep = timeStep;
         }
 
-        public void SetAgentDefaults(float saftyFactor, int velSampleCount, float neighborDist,int maxNeighbors,float maxSpeed, float maxAccel,float prefSpeed, float radius)
+        public void SetAgentDefaults(float saftyFactor, int velSampleCount,int angleSampleCount, float neighborDist,int maxNeighbors,float maxSpeed, float maxAccel,float prefSpeed, float radius)
         {
             m_agentDefault.m_safetyFactor = saftyFactor;
             m_agentDefault.m_velSampleCount = velSampleCount;
+            m_agentDefault.m_angleSampleCount = angleSampleCount;
             m_agentDefault.m_neighborDist = neighborDist;
             m_agentDefault.m_maxNeighbors = maxNeighbors;
             m_agentDefault.m_maxSpeed = maxSpeed;
@@ -72,6 +75,12 @@ namespace RVO
 
         public void ClearAgents() {
             m_agents.Clear();
+            m_kdTree.Clear();
+        }
+
+        public int GetAgentCount()
+        {
+            return m_agents.Count;
         }
 
         public Vector2 GetAgentPos(int id)
