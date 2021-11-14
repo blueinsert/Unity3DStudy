@@ -172,7 +172,7 @@ namespace Pathfinding.Examples {
 				}
 			} else if (type == RVOExampleType.Point) {
 				for (int i = 0; i < agentCount; i++) {
-					Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / agentCount)) * exampleScale;
+					Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / agentCount)) * radius;
 					IAgent agent = sim.AddAgent(new Vector2(pos.x, pos.z), pos.y);
 					agents.Add(agent);
 					goals.Add(new Vector3(0, pos.y, 0));

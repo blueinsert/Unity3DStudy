@@ -231,8 +231,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   desiredSimulationFPS: 20
-  workerThreads: 0
-  doubleBuffering: 0
+  workerThreads: 8
+  doubleBuffering: 1
   symmetryBreakingBias: 0.1
   movementPlane: 0
   drawObstacles: 0

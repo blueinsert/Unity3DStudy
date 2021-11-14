@@ -21,14 +21,14 @@ public class GroupController : MonoBehaviour
 
         if (m_adjustCamera)
         {
-            int count = m_sim.GetAgentCount();
+            int count = m_sim.getNumAgents();
 
             float max = 0;
             for (int i = 0; i < count; i++)
             {
-                var pos = m_sim.GetAgentPos(i);
-                var radius = m_sim.GetAgentRadius(i);
-                float d = Mathf.Max(Mathf.Abs(pos.x+radius), Mathf.Abs(pos.y+radius));
+                var pos = m_sim.getAgentPosition(i);
+                var radius = m_sim.getAgentRadius(i);
+                float d = Mathf.Max(Mathf.Abs(pos.x()+radius), Mathf.Abs(pos.y()+radius));
                 if (d > max)
                 {
                     max = d;

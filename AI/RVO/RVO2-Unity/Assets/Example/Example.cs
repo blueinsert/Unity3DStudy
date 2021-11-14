@@ -42,8 +42,9 @@ public class Example : MonoBehaviour
     /// <summary>Reference to the simulator in the scene</summary>
     RVO.Simulator sim;
 
+    public List<int> m_agentIds;
     /// <summary>Goals for each agent</summary>
-    List<Vector3> goals;
+    Dictionary<int,Vector3> goals;
 
     /// <summary>Color for each agent</summary>
     List<Color> colors;
@@ -120,12 +121,13 @@ public class Example : MonoBehaviour
     {
         this.m_agentCount = num;
 
-        goals = new List<Vector3>(m_agentCount);
+        goals = new Dictionary<int, Vector3>();
         colors = new List<Color>(m_agentCount);
+        m_agentIds = new List<int>(num);
 
-        sim.ClearAgents();
-        sim.SetTimeStep(m_timeStep);
-        sim.SetAgentDefaults(saftyFactor: m_safetyFactor,angleSampleCount: m_angleSampleCount, velSampleCount: m_velSampleCount, neighborDist: m_neighbourDist, maxNeighbors: 10, radius: m_radius, prefSpeed: m_maxSpeed, maxSpeed: m_maxSpeed, maxAccel: m_maxAccel);
+        sim.Clear();
+        sim.setTimeStep(m_timeStep);
+        sim.setAgentDefaults(neighborDist: m_neighbourDist, maxNeighbors: m_maxNeighbours, radius: m_radius, maxSpeed: m_maxSpeed, timeHorizon: 2, timeHorizonObst: 2,velocity:new RVO.Vector2(1,1));
         
         if (type == RVOExampleType.Circle)
         {
@@ -134,8 +136,9 @@ public class Example : MonoBehaviour
             for (int i = 0; i < m_agentCount; i++)
             {
                 Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / m_agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / m_agentCount)) * circleRad * (1 + Random.value * 0.01f);
-                sim.AddAgent(new Vector2(pos.x, pos.z));
-                goals.Add(-pos);
+                var id = sim.addAgent(new RVO.Vector2(pos.x,pos.z));
+                m_agentIds.Add(id);
+                goals.Add(id, -pos);
                 colors.Add(ColorUtility.HSVToRGB(i * 360.0f / m_agentCount, 0.8f, 0.6f));
             }
         }
@@ -144,8 +147,9 @@ public class Example : MonoBehaviour
             for (int i = 0; i < m_agentCount; i++)
             {
                 Vector3 pos = new Vector3((i % 2 == 0 ? 1 : -1) * exampleScale, 0, (i / 2) * m_radius * 2.5f);
-                sim.AddAgent(new Vector2(pos.x, pos.z));
-                goals.Add(new Vector3(-pos.x, pos.y, pos.z));
+                var id = sim.addAgent(new RVO.Vector2(pos.x, pos.z));
+                m_agentIds.Add(id);
+                goals.Add(id,new Vector3(-pos.x, pos.y, pos.z));
                 colors.Add(i % 2 == 0 ? Color.red : Color.blue);
             }
         }
@@ -154,9 +158,10 @@ public class Example : MonoBehaviour
             for (int i = 0; i < m_agentCount; i++)
             {
                 Vector3 pos = new Vector3(Mathf.Cos(i * Mathf.PI * 2.0f / m_agentCount), 0, Mathf.Sin(i * Mathf.PI * 2.0f / m_agentCount)) * m_radius;
-                sim.AddAgent(new Vector2(pos.x, pos.z));
+                var id = sim.addAgent(new RVO.Vector2(pos.x, pos.z));
+                m_agentIds.Add(id);
                 //sim.AddAgent(new Vector2(0, 0));
-                goals.Add(new Vector3(0, pos.y, 0));
+                goals.Add(id, new Vector3(0, pos.y, 0));
                 colors.Add(ColorUtility.HSVToRGB(i * 360.0f / m_agentCount, 0.8f, 0.6f));
             }
         }
@@ -169,8 +174,9 @@ public class Example : MonoBehaviour
                 float angle = Random.value * Mathf.PI * 2.0f;
                 float targetAngle = Random.value * Mathf.PI * 2.0f;
                 Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * uniformDistance(circleRad);
-                sim.AddAgent(new Vector2(pos.x, pos.z));
-                goals.Add(new Vector3(Mathf.Cos(targetAngle), 0, Mathf.Sin(targetAngle)) * uniformDistance(circleRad));
+                var id = sim.addAgent(new RVO.Vector2(pos.x, pos.z));
+                m_agentIds.Add(id);
+                goals.Add(id, new Vector3(Mathf.Cos(targetAngle), 0, Mathf.Sin(targetAngle)) * uniformDistance(circleRad));
                 colors.Add(ColorUtility.HSVToRGB(targetAngle * Mathf.Rad2Deg, 0.8f, 0.6f));
             }
         }
@@ -186,8 +192,9 @@ public class Example : MonoBehaviour
                 float angle = ((i % directions) / (float)directions) * Mathf.PI * 2.0f;
                 var dist = distanceBetweenGroups * ((i / (directions * AgentsPerDistance) + 1) + 0.3f * Random.value);
                 Vector3 pos = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * dist;
-                sim.AddAgent(new Vector2(pos.x, pos.z));
-                goals.Add(-pos.normalized * distanceBetweenGroups * 3);
+                var id = sim.addAgent(new RVO.Vector2(pos.x, pos.z));
+                m_agentIds.Add(id);
+                goals.Add(id, -pos.normalized * distanceBetweenGroups * 3);
                 colors.Add(ColorUtility.HSVToRGB(angle * Mathf.Rad2Deg, 0.8f, 0.6f));
             }
         }
@@ -204,29 +211,29 @@ public class Example : MonoBehaviour
     {
         m_timeSum += Time.deltaTime;
         if (sim != null)
-        {    if(m_timeSum > sim.m_timeStep)
+        {    if(m_timeSum > sim.timeStep_)
             {
-                sim.DoStep();
-                m_timeSum -= sim.m_timeStep;
+                sim.doStep();
+                m_timeSum -= sim.timeStep_;
             }
         }
         m_sb.Length = 0;
-        for (int i = 0; i < m_agentCount; i++)
+        foreach (var i in m_agentIds)
         {
-            Vector2 pos = RVO.Simulator.Instance.GetAgentPos(i);
-            Vector2 vel = RVO.Simulator.Instance.GetAgentVel(i);
-            var radius = RVO.Simulator.Instance.GetAgentRadius(i);
-            float orient = RVO.Simulator.Instance.GetAgentOrient(i);
+            var pos = RVO.Simulator.Instance.getAgentPosition(i);
+            var vel = RVO.Simulator.Instance.getAgentVelocity(i);
+            var radius = RVO.Simulator.Instance.getAgentRadius(i);
+            float orient = Mathf.Atan2(vel.y(), vel.x());
             m_sb.Append(string.Format("id:{0} pos:{1} vel:{2} orieng:{3}", i, pos, vel, orient));
             m_sb.AppendLine("");
-            var target = new Vector2(goals[i].x, goals[i].z);
-            RVO.Simulator.Instance.SetAgentTarget(i, target);
+            var target = new RVO.Vector2(goals[i].x, goals[i].z);
+            RVO.Simulator.Instance.setAgentPrefVelocity(i, RVO.RVOMath.normalize(target-pos)*m_maxSpeed);
             
 
             Vector3 forward = new Vector3(Mathf.Cos(orient), 0, Mathf.Sin(orient)).normalized * radius;
             if (forward == Vector3.zero) forward = new Vector3(0, 0, radius);
             Vector3 right = Vector3.Cross(Vector3.up, forward);
-            Vector3 orig = new Vector3(pos.x, 0, pos.y) + renderingOffset;
+            Vector3 orig = new Vector3(pos.x(), 0, pos.y()) + renderingOffset;
 
             int vc = 4 * i;
             int tc = 2 * 3 * i;

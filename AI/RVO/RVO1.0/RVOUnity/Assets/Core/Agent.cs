@@ -21,8 +21,10 @@ namespace RVO
         public float m_orient;
         public Vector2 m_velPref;
         public Vector2 m_velNew;
-         
+        public int m_priority = 1;
+        public bool m_isCollide = false;
         public IList<KeyValuePair<float, Agent>> m_agentNeighbors = new List<KeyValuePair<float, Agent>>();
+        private Simulator m_sim;
 
         public Agent() { }
 
@@ -39,6 +41,7 @@ namespace RVO
             this.m_maxAccel = Simulator.Instance.m_agentDefault.m_maxAccel;
             this.m_prefSpeed = Simulator.Instance.m_agentDefault.m_prefSpeed;
             this.m_radius = Simulator.Instance.m_agentDefault.m_radius;
+            m_sim = Simulator.Instance;
         }
 
         public Agent(Vector2 pos)
@@ -53,6 +56,7 @@ namespace RVO
             this.m_maxAccel = Simulator.Instance.m_agentDefault.m_maxAccel;
             this.m_prefSpeed = Simulator.Instance.m_agentDefault.m_prefSpeed;
             this.m_radius = Simulator.Instance.m_agentDefault.m_radius;
+            m_sim = Simulator.Instance;
         }
 
         public void SetGoalPos(Vector2 pos)
@@ -60,39 +64,57 @@ namespace RVO
             m_goalPosition = pos;
         }
 
+        private void DoInsertAgentNeighbor(Agent agent, float distSq, ref float rangeSq)
+        {
+            if (m_agentNeighbors.Count < m_maxNeighbors)
+            {
+                m_agentNeighbors.Add(new KeyValuePair<float, Agent>(distSq, agent));
+            }
+
+            int i = m_agentNeighbors.Count - 1;
+            //插入排序，距离近的排前面
+            while (i != 0 && distSq < m_agentNeighbors[i - 1].Key)
+            {
+                m_agentNeighbors[i] = m_agentNeighbors[i - 1];
+                --i;
+            }
+
+            m_agentNeighbors[i] = new KeyValuePair<float, Agent>(distSq, agent);
+
+            if (m_agentNeighbors.Count == m_maxNeighbors)
+            {
+                //邻居数量已到达最大数量，更新邻居的最远距离
+                //这种情况下，只有更近的单位才能加入到邻居集合中
+                rangeSq = m_agentNeighbors[m_agentNeighbors.Count - 1].Key;
+            }
+        }
+
         internal void insertAgentNeighbor(Agent agent, ref float rangeSq)
         {
             if (this != agent)
             {
-                float distSq = (m_position - agent.m_position).magnitude;
-                distSq *= distSq;
-
-                if (distSq < rangeSq)
-                {
-                    if (m_agentNeighbors.Count < m_maxNeighbors)
+                var v = m_position - agent.m_position;
+                float distSq = v.x * v.x + v.y * v.y;
+                if (distSq < (this.m_radius + agent.m_radius) * (this.m_radius + agent.m_radius) && distSq < rangeSq)
+                {//发生碰撞
+                    if (m_isCollide == false)
                     {
-                        m_agentNeighbors.Add(new KeyValuePair<float, Agent>(distSq, agent));
+                        m_isCollide = true;
+                        m_agentNeighbors.Clear();
                     }
-
-                    int i = m_agentNeighbors.Count - 1;
-
-                    while (i != 0 && distSq < m_agentNeighbors[i - 1].Key)
-                    {
-                        m_agentNeighbors[i] = m_agentNeighbors[i - 1];
-                        --i;
-                    }
-
-                    m_agentNeighbors[i] = new KeyValuePair<float, Agent>(distSq, agent);
-
-                    if (m_agentNeighbors.Count == m_maxNeighbors)
-                    {
-                        rangeSq = m_agentNeighbors[m_agentNeighbors.Count - 1].Key;
-                    }
+                    //发生碰撞时，邻居集合中只记录了与之碰撞的单位
+                    DoInsertAgentNeighbor(agent, distSq, ref rangeSq);
                 }
+                else if (!m_isCollide && distSq < rangeSq)
+                {
+                    DoInsertAgentNeighbor(agent, distSq, ref rangeSq);
+                }
+
             }
         }
 
-        internal void computePreferredVelocity() {
+        internal void computePreferredVelocity()
+        {
             var dist = (m_position - m_goalPosition).magnitude;
             if (m_prefSpeed * Simulator.Instance.m_timeStep > dist)
             {
@@ -102,14 +124,20 @@ namespace RVO
             {
                 m_velPref = (m_goalPosition - m_position).normalized * m_prefSpeed;
             }
-
         }
 
         internal void computeNeighbors()
         {
+            m_isCollide = false;
+            m_priority = 1;
             m_agentNeighbors.Clear();
             float rangeSq = m_neighborDist * m_neighborDist;
             Simulator.Instance.m_kdTree.computeAgentNeighbors(this, ref rangeSq);
+            //if (m_isCollide)
+            //{
+            //    Debug.LogError(string.Format("agent isCollide"));
+            //    m_priority = 99;
+            //}
         }
 
         /// <summary>
@@ -140,18 +168,19 @@ namespace RVO
             {
                 if (collision)
                 {
-                    time = (Vector2.Dot(v, ba) + Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);
+                    time = (Vector2.Dot(v, ba) + Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);//脱落碰撞需要的时间
                     if (time < 0)
                     {
-                        time = -float.MaxValue;
+                        time = -float.MaxValue;//
+                        Debug.LogError("isCollide time < 0 ");//?
                     }
                 }
                 else
                 {
-                    time = (Vector2.Dot(v, ba) - Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);//正确
+                    time = (Vector2.Dot(v, ba) - Mathf.Sqrt(discr)) / RVOMath.AbsSq(v);//将要发生碰撞的时间
                     if (time < 0)
                     {
-                        time = float.MaxValue;
+                        time = float.MaxValue;//永远不会发生碰撞
                     }
                 }
             }
@@ -172,30 +201,40 @@ namespace RVO
         internal void computeNewVelocity()
         {
             float minPenalty = float.MaxValue;
-            Vector2 velCand; 
-            for (int i = 0; i < m_angleSampleCount; i++) {
+            Vector2 velCand;
+            for (int i = 0; i < m_angleSampleCount; i++)
+            {
                 float angle = m_orient + i / (float)m_angleSampleCount * 2 * Mathf.PI;
                 for (int j = 0; j < m_velSampleCount; j++)
-                {    
-                    if (i==0 && j == 0)
+                {
+                    if (i == 0 && j == 0)
                     {
                         velCand = m_velPref;
                     }
                     else
                     {
-                        float radius = (j+1) / (float)m_velSampleCount;
+                        float radius = (j + 1) / (float)m_velSampleCount;
                         velCand = new Vector2(radius * m_maxSpeed * Mathf.Cos(angle), radius * m_maxSpeed * Mathf.Sin(angle));
                     }
-                    float dv = (velCand - m_velPref).magnitude;
-
+                    float dv = 0;
+                    dv = (velCand - m_velPref).magnitude;
+                    if (m_isCollide)
+                        dv = 0;
                     float collisionTime = float.MaxValue;
                     foreach (var pair in m_agentNeighbors)
                     {
                         var distSq = pair.Key;
                         var other = pair.Value;
                         //Vector2 vab = velCand - other.m_vel; //VO
-                        Vector2 vab = 2 * velCand - m_vel - other.m_vel;//RVO
-                        float time = time2Collision(m_position, vab, other.m_position, m_radius + other.m_radius, false);
+                        float effort = 1 - this.m_priority / (float)(this.m_priority + other.m_priority);
+                        float effortInv = 1 / effort;
+                        Vector2 vab = effortInv * velCand + (1 - effortInv) * m_vel - other.m_vel;//RVO
+                        float time = time2Collision(m_position, vab, other.m_position, m_radius + other.m_radius, m_isCollide);
+                        if (m_isCollide)
+                        {
+                            time = -Mathf.Ceil(time / m_sim.m_timeStep);
+                            time -= RVOMath.Sqr(velCand.magnitude / m_maxSpeed);
+                        }
                         if (time < collisionTime)
                         {
                             collisionTime = time;
@@ -204,7 +243,7 @@ namespace RVO
                         }
                     }
                     float penalty = m_safetyFactor / collisionTime + dv;
-                    if (penalty <= minPenalty-0.001f)
+                    if (penalty <= minPenalty - 0.001f)
                     {
                         minPenalty = penalty;
                         m_velNew = velCand;
@@ -212,7 +251,7 @@ namespace RVO
 
                 }
             }
-            
+
         }
 
         internal void update()

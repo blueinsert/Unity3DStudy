@@ -330,6 +330,8 @@ namespace RVO
             timeStep_ = 0.1f;
 
             SetNumWorkers(0);
+
+            s_totalID = 0;
         }
 
         /**

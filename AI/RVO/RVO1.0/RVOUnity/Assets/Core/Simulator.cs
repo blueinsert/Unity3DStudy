@@ -30,9 +30,9 @@ namespace RVO
                 return;
             m_kdTree.buildAgentTree();
             for (int i = 0; i < m_agents.Count; i++)
-            {
-                m_agents[i].computePreferredVelocity();
+            {  
                 m_agents[i].computeNeighbors();
+                m_agents[i].computePreferredVelocity();
                 m_agents[i].computeNewVelocity();
             }
             for (int i = 0; i < m_agents.Count; i++)
