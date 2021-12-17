@@ -213,14 +213,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 205810002}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalRotation: {x: 0, y: 0.08715578, z: 0, w: 0.9961947}
   m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 10, z: 0}
 --- !u!1 &260689126
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,7 +666,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 933115963}
   m_LocalRotation: {x: 0.16973394, y: -0.7236844, z: 0.1916623, w: 0.6408876}
-  m_LocalPosition: {x: -0.5, y: 0.5, z: 5}
+  m_LocalPosition: {x: 0.4126616, y: 0.5, z: -5.0079646}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -787,7 +787,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  m_CustomBlends: {fileID: 0}
+  m_CustomBlends: {fileID: 11400000, guid: 8cef87c6b90444e4082b8866d2bd1a20, type: 2}
   m_CameraCutEvent:
     m_PersistentCalls:
       m_Calls: []

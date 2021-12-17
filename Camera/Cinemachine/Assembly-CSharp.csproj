@@ -61,10 +61,10 @@
   <ItemGroup>
     <Compile Include="Assets\CloseupShot\TestPlayCloseupShot.cs" />
     <Compile Include="Assets\CloseupShot\CopyTransform.cs" />
-    <Compile Include="Assets\CloseupShot\CloseupShotDesc.cs" />
-    <Compile Include="Assets\Shake\GenerateShake.cs" />
     <Compile Include="Assets\Transit\CameraSwitcher.cs" />
+    <Compile Include="Assets\CloseupShot\CloseupShotDesc.cs" />
     <Compile Include="Assets\CustomTransit\CustomTransit.cs" />
+    <Compile Include="Assets\Shake\GenerateShake.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

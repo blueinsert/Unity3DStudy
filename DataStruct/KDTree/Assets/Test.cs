@@ -165,12 +165,12 @@ public class Test : MonoBehaviour
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             WildSearch(new Vector2(m_mousePosition.x, m_mousePosition.z), m_searchRadius, out nearestGos);
-            UnityEngine.Debug.Log(string.Format("frame:{0} WildSearch consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+            //UnityEngine.Debug.Log(string.Format("frame:{0} WildSearch consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
 
             stopwatch.Reset();
             stopwatch.Start();
             KDTree.SearchNearest(m_kdTree, new KDTree.Data() { x = m_mousePosition.x, y = m_mousePosition.z }, m_searchRadius, out nearests);
-            UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+            //UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
             Gizmos.color = new Color(1, 0, 0, 1f);
             foreach (var p in nearests)
             {

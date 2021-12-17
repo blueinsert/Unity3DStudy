@@ -312,7 +312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d7032afb0c579d4d8562237f2309ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_count: 100
+  m_count: 500
   m_rangeXMin: -50
   m_rangeXMax: 50
   m_rangeYMin: -50

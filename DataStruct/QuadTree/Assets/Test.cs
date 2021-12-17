@@ -49,12 +49,16 @@ public class Test : MonoBehaviour
 
     void ReBuildTree()
     {
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
         m_quadTree.Clear();
         m_quadTree.LeafSize = this.LeafSize;
         foreach(var go in m_points)
         {
             m_quadTree.Insert(new Vector2(go.transform.position.x, go.transform.position.z), go);
         }
+        UnityEngine.Debug.Log(string.Format("frame:{0} BuildTree {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+
     }
 
     private void UpdateMousePosition()
@@ -129,13 +133,13 @@ public class Test : MonoBehaviour
             stopwatch.Start();
             List<GameObject> nearestGos = null;
             WildSearch(new Vector2(m_mousePosition.x, m_mousePosition.z), m_searchRadius, out nearestGos);
-            UnityEngine.Debug.Log(string.Format("frame:{0} WildSearch consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+            //UnityEngine.Debug.Log(string.Format("frame:{0} WildSearch consume {1}ms {2}tick", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
 
             stopwatch.Reset();
             stopwatch.Start();
             List<Object> nearests = new List<Object>();
             m_quadTree.Query(new Vector2(m_mousePosition.x, m_mousePosition.z), m_searchRadius, m_quadTree.GetBounds(), out nearests);
-            UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms {2}ticks", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
+            //UnityEngine.Debug.Log(string.Format("frame:{0} SearchNearest consume {1}ms {2}ticks", Time.frameCount, stopwatch.ElapsedMilliseconds, stopwatch.ElapsedTicks));
             foreach (var p in nearests)
             {
                 var go = p as GameObject;
