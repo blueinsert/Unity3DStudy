@@ -126,6 +126,14 @@ namespace RVO
             }
         }
 
+        /**
+        * <summary>Constructs and initializes a simulation.</summary>
+        */
+        private Simulator()
+        {
+            Clear();
+        }
+
         public void delAgent(int agentNo)
         {
             agents_[agentNo2indexDict_[agentNo]].needDelete_ = true;
@@ -388,6 +396,8 @@ namespace RVO
 
             return globalTime_;
         }
+
+        #region Get or Set Methods
 
         /**
          * <summary>Returns the specified agent neighbor of the specified agent.
@@ -944,12 +954,7 @@ namespace RVO
             timeStep_ = timeStep;
         }
 
-        /**
-         * <summary>Constructs and initializes a simulation.</summary>
-         */
-        private Simulator()
-        {
-            Clear();
-        }
+        #endregion
+
     }
 }

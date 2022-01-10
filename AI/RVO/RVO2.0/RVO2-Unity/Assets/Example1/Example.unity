@@ -212,7 +212,7 @@ GameObject:
   - component: {fileID: 947792915}
   - component: {fileID: 947792910}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Example
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -237,10 +237,12 @@ MonoBehaviour:
   m_maxSpeed: 10
   m_maxAccel: 20
   m_maxNeighbours: 10
+  m_neighbourDist: 15
   m_velSampleCount: 10
   m_angleSampleCount: 360
   renderingOffset: {x: 0, y: 0.1, z: 0}
   exampleScale: 50
+  m_agentIds: 
   m_timeSum: 0
 --- !u!33 &947792911
 MeshFilter:
