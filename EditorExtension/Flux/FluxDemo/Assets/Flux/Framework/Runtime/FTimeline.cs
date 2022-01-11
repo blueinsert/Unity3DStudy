@@ -11,7 +11,7 @@ namespace Flux
 	 * run events which most of the times will directly affect the Owner.
 	 * @sa FSquence, FTrack, FEvent
 	 */
-	public class FTimeline : FObject//, ISerializationCallbackReceiver
+	public class FTimeline : FObject
 	{
 
 		// To which Sequence this timeline belongs to
@@ -30,14 +30,6 @@ namespace Flux
 		private string _ownerPath = null;
 		public string OwnerPath { get { return _ownerPath; } }
 
-//		[SerializeField]
-//		[HideInInspector]
-//		private bool _isGlobal = false;
-//		/// @brief IsGlobal defines if this is the global timeline of the sequence. 
-//		/// There can only be one of these, and they aren't processed at runtime! It
-//		/// is used for things like the comment track.
-//		public bool IsGlobal { get { return _isGlobal; } set { _isGlobal = true; } }
-
 		public override FSequence Sequence { get { return _container.Sequence; } }
 
 		public override Transform Owner { get { return _owner; } }
@@ -54,22 +46,7 @@ namespace Flux
 			if( _owner != null ) 
 				name = _owner.name;
 			OnValidate();
-			if( Container != null && Sequence.IsInit )
-				Init();
 		}
-
-        public void UpdateOwner()
-        {
-            if (_owner != null)
-            {
-                
-            }
-            else
-            {
-                _owner = transform.Find(_ownerPath);
-            }
-            enabled = _owner != null;
-        }
 
 		internal void SetContainer( FContainer container )
 		{
@@ -100,53 +77,6 @@ namespace Flux
 			return timeline;
 		}
 
-		/**
-		 * @brief Initializes the timeline.
-		 * @sa FSequence.Init
-		 */
-		public override void Init()
-		{
-			if( _owner == null )
-				Awake();
-            //
-			enabled = Owner != null;
-
-			if( !enabled )
-				return;
-
-			for( int i = 0; i != _tracks.Count; ++i )
-				_tracks[i].Init();
-		}
-
-		/**
-		 * @brief Pauses the timeline.
-		 * @sa FSequence.Pause
-		 */
-		public void Pause()
-		{
-			for( int i = 0; i != _tracks.Count; ++i )
-				_tracks[i].Pause();
-		}
-
-		/**
-		 * @brief Resumes the timeline after it has been paused.
-		 * @sa FSequence.Play, FSequence.Pause
-		 */
-		public void Resume()
-		{
-			for( int i = 0; i != _tracks.Count; ++i )
-				_tracks[i].Resume();
-		}
-
-		/**
-		 * @brief Stops the timeline, i.e. brings it back to the start.
-		 * @sa FSequence.Stop
-		 */
-		public override void Stop()
-		{
-			for( int i = 0; i != _tracks.Count; ++i )
-				_tracks[i].Stop();
-		}
 
 		/// @brief Returns if the timeline doesn't have any events.
 		public bool IsEmpty()
@@ -197,8 +127,6 @@ namespace Flux
 			track.SetTimeline( this );
 			track.SetId( id );
 
-			if( !Sequence.IsStopped )
-				track.Init();
 		}
 
 		/**
@@ -216,34 +144,6 @@ namespace Flux
 			}
 		}
 
-		/**
-		 * @brief Updates the tracks of this timeline
-		 * @param frame Current frame of the sequence
-		 * @param time Current time of the sequence
-		 */
-         //更新時間綫下的軌道
-		public void UpdateTracks( int frame, float time )
-		{
-			for( int i = 0; i != _tracks.Count; ++i )
-			{
-				if( !_tracks[i].enabled ) continue;
-				_tracks[i].UpdateEvents( frame, time );
-			}
-		}
-        //更新時間綫下的軌道 （Editor模式下）
-        public void UpdateTracksEditor( int frame, float time )
-		{
-			for( int i = 0; i != _tracks.Count; ++i )
-			{
-                //string track = _tracks[i].ToString();
-                FTrack track = _tracks[i];
-                //Debug.Log("track.Name" + track.ToString());
-                //Debug.Log("track.Owner" + track.Owner == null);
-
-                if ( !_tracks[i].enabled ) continue;
-				_tracks[i].UpdateEventsEditor( frame, time );
-			}
-		}
 		/**
 		 * @brief Rebuilds a timeline. To be called when the hierarchy changes,
 		 * ie tracks get added / deleted.

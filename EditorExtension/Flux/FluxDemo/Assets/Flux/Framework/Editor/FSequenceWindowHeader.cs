@@ -10,53 +10,38 @@ namespace FluxEditor
 	public class FSequenceWindowHeader
 	{
 		// padding on top, bottom, left and right
-		public const float PADDING = 5;
-
+		private const float PADDING = 5;
 		// space between labels and the fields
-		public const float LABEL_SPACE = 5;
-
+		private const float LABEL_SPACE = 5;
 		// space between elements (i.e. label+field pairs)
-		public const float ELEMENT_SPACE = 20;
-
+		private const float ELEMENT_SPACE = 20;
 		// height of the header
 		public const float HEIGHT = 20 + PADDING + PADDING;
-
 		private const float MAX_SEQUENCE_POPUP_WIDTH = 250;
-		private const float UPDATE_MODE_FIELD_WIDTH = 100;
 		private const float FRAMERATE_FIELD_WIDTH = 40;
 		private const float LENGTH_FIELD_WIDTH = 100;
 
-		// window this header belongs to
 		private FSequenceEditorWindow _sequenceWindow;
-
 		private SerializedObject _sequenceSO;
-
-		private SerializedProperty _sequenceUpdateMode;
 		private SerializedProperty _sequenceLength;
 
+		// sequence selection
 		// sequence selection popup variables
 		private GUIContent _sequenceLabel = new GUIContent( "Sequence", "Select Sequence..." );
-
 		// rect of the sequence label
 		private Rect _sequenceLabelRect;
-
 		// rect of the sequence name
 		private Rect _sequencePopupRect;
-
 		// rect for the button to create a new sequence
 		private Rect _sequenceAddButtonRect;
-
 		private FSequence[] _sequences;
-
 		private GUIContent[] _sequenceNames;
-
 		private int _selectedSequenceIndex;
 
-		// update mode UI variables
-		private GUIContent _updateModeLabel = new GUIContent( "Update Mode", "How does the sequence update:\n\tNormal: uses Time.time in Update()\n\tAnimatePhysics: uses Time.fixedTime in FixedUpdate()\n\tUnscaledTime: uses Time.unscaledTime in Update()" );
-		private Rect _updateModeLabelRect;
-		private Rect _updateModeFieldRect;
-		private bool _showUpdadeMode;
+		//add Container
+		private GUIContent _addContainerLabel = new GUIContent(string.Empty, "Add Container To Sequence");
+		private Rect _addContainerRect;
+		private bool _showAddContainer;
 
 		// framerate UI variables
 		private GUIContent _framerateLabel = new GUIContent( "Frame Rate", "How many frames does the sequence have per second" );
@@ -70,11 +55,7 @@ namespace FluxEditor
 		private Rect _lengthFieldRect;
 		private bool _showLength;
 
-
-		private GUIContent _addContainerLabel = new GUIContent( string.Empty, "Add Container To Sequence" );
-		private Rect _addContainerRect;
-		private bool _showAddContainer;
-
+		// open inspector
 		private GUIContent _openInspectorLabel = new GUIContent( string.Empty, "Open Flux Inspector" );
 		private Rect _openInspectorRect;
 
@@ -88,6 +69,7 @@ namespace FluxEditor
 			RebuildSequenceList();
 
 			EditorApplication.hierarchyWindowChanged += OnHierarchyChanged;
+			//EditorApplication.hierarchyChanged += OnHierarchyChanged;
 
 			_addContainerLabel.image = FUtility.GetFluxTexture("AddFolder.png");
 			_openInspectorLabel.image = FUtility.GetFluxTexture("Inspector.png");
@@ -124,12 +106,8 @@ namespace FluxEditor
 
 			_openInspectorRect = rect;
 
-			_updateModeLabelRect = _updateModeFieldRect = rect;
 			_framerateLabelRect = _framerateFieldRect = rect;
 			_lengthLabelRect = _lengthFieldRect = rect;
-
-			_updateModeLabelRect.width = EditorStyles.label.CalcSize( _updateModeLabel ).x + LABEL_SPACE;
-			_updateModeFieldRect.width = UPDATE_MODE_FIELD_WIDTH;
 
 			_framerateLabelRect.width = EditorStyles.label.CalcSize( _framerateLabel ).x + LABEL_SPACE;
 			_framerateFieldRect.width = FRAMERATE_FIELD_WIDTH;
@@ -144,7 +122,6 @@ namespace FluxEditor
 			_sequencePopupRect = rect;
 			_sequencePopupRect.xMin = _sequenceLabelRect.xMax;
 			_sequencePopupRect.width = Mathf.Min( width - _sequenceLabelRect.width, MAX_SEQUENCE_POPUP_WIDTH );
-//			Debug.Log( _sequenceNameRect.width );
 
 			_sequenceAddButtonRect = rect;
 			_sequenceAddButtonRect.xMin = _sequencePopupRect.xMax + LABEL_SPACE;
@@ -177,13 +154,6 @@ namespace FluxEditor
 
 			_showFramerate = reminderWidth >= 0;
 
-			_updateModeFieldRect.x = _framerateLabelRect.xMin - ELEMENT_SPACE - _updateModeFieldRect.width;
-			_updateModeLabelRect.x = _updateModeFieldRect.xMin - _updateModeLabelRect.width;
-
-			reminderWidth -= (_updateModeLabelRect.width + _updateModeFieldRect.width + ELEMENT_SPACE);
-
-			_showUpdadeMode = reminderWidth >= 0;
-
 			_numberFieldStyle = new GUIStyle( EditorStyles.numberField );
 			_numberFieldStyle.alignment = TextAnchor.MiddleCenter;
 		}
@@ -202,13 +172,6 @@ namespace FluxEditor
 						break;
 					}
 				}
-			}
-
-
-			if( Event.current.type == EventType.MouseDown && Event.current.alt && _sequencePopupRect.Contains(Event.current.mousePosition) )
-			{
-				Selection.activeObject = sequence;
-				Event.current.Use();
 			}
 
 			EditorGUI.BeginChangeCheck();
@@ -232,27 +195,15 @@ namespace FluxEditor
 				EditorGUIUtility.ExitGUI();
 			}
 
-			// if we're in play mode, can't change anything
-			if( Application.isPlaying )
-				GUI.enabled = false;
-
 			if( sequence == null )
 				return;
 
 			if( _sequenceSO == null || _sequenceSO.targetObject != sequence )
 			{
 				_sequenceSO = new SerializedObject( sequence );
-				_sequenceUpdateMode = _sequenceSO.FindProperty( "_updateMode" );
 				_sequenceLength = _sequenceSO.FindProperty( "_length" );
 			}
-
 			_sequenceSO.Update();
-
-			if( _showUpdadeMode )
-			{
-				EditorGUI.PrefixLabel( _updateModeLabelRect, _updateModeLabel );
-				EditorGUI.PropertyField( _updateModeFieldRect, _sequenceUpdateMode, GUIContent.none );
-			}
 
 			if( _showFramerate )
 			{

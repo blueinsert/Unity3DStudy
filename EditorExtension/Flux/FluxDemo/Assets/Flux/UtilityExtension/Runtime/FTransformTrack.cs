@@ -31,20 +31,6 @@ namespace Flux
 		protected TransformSnapshot _snapshot = null;
 		public TransformSnapshot Snapshot { get { return _snapshot; } }
 
-		public override void Init()
-		{
-			base.Init();
-            //Fish：获取每帧快照(用于播放后复位)
-			_snapshot = GetSnapshot(Sequence, Owner);
-		}
-
-		public override void Stop()
-		{
-			base.Stop();
-
-			if( _snapshot != null )
-				_snapshot.Restore();
-		}
 	}
 
 	public class TransformSnapshot

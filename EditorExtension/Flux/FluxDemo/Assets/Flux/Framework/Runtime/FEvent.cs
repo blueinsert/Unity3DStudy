@@ -6,10 +6,7 @@ using UnityEngine.Events;
 namespace Flux
 {
 	[Serializable]
-	/**
-	 * @brief Range of frames.
-	 * @note Start is _not_ guaranteed to be smaller or equal to End, it is up to the user to make sure.
-	 */
+
 	public struct FrameRange
 	{
 		// start frame
@@ -20,7 +17,6 @@ namespace Flux
 		[SerializeField]
 		private int _end;
 
-		/// @brief Returns the start frame.
 		public int Start
 		{ 
 			get { return _start; } 
@@ -30,7 +26,6 @@ namespace Flux
 			}
 		}
 
-		/// @brief Returns the end frame.
 		public int End
 		{ 
 			get { return _end; } 
@@ -40,57 +35,41 @@ namespace Flux
 			}
 		}
 
-		/// @brief Sets / Gets the length.
-		/// @note It doesn't cache the value.
+
 		public int Length { set{ End = _start + value; } get{ return _end - _start; } }
 
-		/**
-		 * @brief Create a frame range
-		 * @param start Start frame
-		 * @param end End frame
-		 * @note It is up to you to make sure start is smaller than end.
-		 */
 		public FrameRange( int start, int end )
 		{
 			this._start = start;
 			this._end = end;
 		}
 
-		/// @brief Returns \e i clamped to the range.
 		public int Cull( int i )
 		{
 			return Mathf.Clamp( i, _start, _end );
 		}
 
-		/// @brief Returns if \e i is inside [start, end], i.e. including borders
 		public bool Contains( int i )
 		{
 			return i >= _start && i <= _end;
 		}
 
-		/// @brief Returns if \e i is inside ]start, end[, i.e. excluding borders
 		public bool ContainsExclusive( int i )
 		{
 			return i > _start && i < _end;
 		}
 
-		/// @brief Returns if the ranges intersect, i.e. touching returns false
-		/// @note Assumes They are both valid
 		public bool Collides( FrameRange range )
 		{
 			return _start < range._end && _end > range._start;
-//			return (range.start > start && range.start < end) || (range.end > start && range.end < end );
 		}
 
-		/// @brief Returns if the ranges overlap, i.e. touching return true
-		/// @note Assumes They are both valid
 		public bool Overlaps( FrameRange range )
 		{
 			return range.End >= _start && range.Start <= _end;
 		}
 
-		/// @brief Returns what kind of overlap it has with \e range.
-		/// @note Assumes They are both valid
+
 		public FrameRangeOverlap GetOverlap( FrameRange range )
 		{
 			if( range._start >= _start )
@@ -168,10 +147,6 @@ namespace Flux
 		ContainsEnd			/// @brief overlaps and contains the end of the range passed
 	}
 
-	/**
-	 * @brief Base class for Events
-	 * @sa FSequence, FTimeline, FTrack.
-	 */
 	public class FEvent : FObject
 	{
 		public override Transform Owner { get { return _track.Owner; } }
@@ -182,7 +157,7 @@ namespace Flux
 		[SerializeField]
 		[HideInInspector]
 		protected FTrack _track = null;
-		/// @brief Returns the track it belongs to
+
 		public FTrack Track { get { return _track; } }
 
 		[SerializeField]
@@ -271,193 +246,6 @@ namespace Flux
 		/// @param oldFrameRange Previous FrameRange, the current one is set on the event.
 		protected virtual void OnFrameRangeChanged( FrameRange oldFrameRange )
 		{
-		}
-
-		/**
-		 * @brief Called when the event gets reached.
-		 * The reason we pass the time is because they may have been frames skipped
-		 * or simply we may have jumped into the middle of an event, and that allows you 
-		 * to skip to the right point. E.g. useful when you want to play an animation, 
-		 * if you jumped to the middle of it you want to tell mecanim to start in the middle,
-		 * not at the start.
-		 * @param frameSinceTrigger Frames that passed since the actual TriggerFrame
-		 * @param timeSinceTrigger Time passed since the actual TriggerFrame
-		 * @sa TriggerFrame, TriggerTime, Finish
-		 */
-		public void Trigger( float timeSinceTrigger )
-		{
-			_hasTriggered = true;
-
-			OnTrigger( timeSinceTrigger );
-		}
-
-		/// @brief At which frame will the event trigger, basically the start of it's range.
-		public int TriggerFrame { get { return _frameRange.Start; } }
-		/// @brief At which time the event triggers.
-		/// @note Value isn't cached.
-		public float TriggerTime { get { return _frameRange.Start * Sequence.InverseFrameRate; } }
-
-		/**
-		 * @brief Used to setup your own code when Trigger is called.
-		 * @param framesSinceTrigger Frames passed since TriggerFrame
-		 * @param timeSinceTrigger Time passed since timeSinceTrigger
-		 */
-		protected virtual void OnTrigger( float timeSinceTrigger ){ }
-
-		/**
-		 * @brief Called when the event ends, i.e. we pass the end of it's range.
-		 * @sa Trigger
-		 */
-		public void Finish()
-		{
-			_hasFinished = true;
-
-#if UNITY_EDITOR
-			PreEvent();
-#endif
-			if( Sequence.IsPlayingForward )
-				OnFinish(); // only do this code if we're moving forward, otherwise it doesn't really matter
-
-#if UNITY_EDITOR
-			PostEvent();
-#endif
-		}
-
-		/// @brief Used to setup your own code when Finish is called.
-		protected virtual void OnFinish()
-        {
-            //onFinishCallBack?.Invoke();
-        }
-
-		public sealed override void Init()
-		{
-			_hasTriggered = false;
-			_hasFinished = false;
-
-			// init doesn't get wrapped between Pre/PostEvent because 
-			// it is here that vars will be initialized
-			OnInit();
-		}
-
-		/// @brief Used to setup your own code for when the sequence is initialized
-		protected virtual void OnInit() { }
-
-		public void Pause()
-		{
-#if UNITY_EDITOR
-			PreEvent();
-#endif
-
-			OnPause();
-
-#if UNITY_EDITOR
-			PostEvent();
-#endif
-		}
-
-		/// @brief Used to setup your own code for when the sequence is paused
-		protected virtual void OnPause() { }
-
-		public void Resume()
-		{
-#if UNITY_EDITOR
-			PreEvent();
-#endif
-			
-			OnResume();
-
-#if UNITY_EDITOR
-			PostEvent();
-#endif
-		}
-
-		/// @brief Used to setup your own code for when the sequence is resumed
-		protected virtual void OnResume() { }
-
-		public sealed override void Stop()
-		{
-			_hasTriggered = false;
-			_hasFinished = false;
-
-#if UNITY_EDITOR
-			PreEvent();
-#endif
-
-			OnStop();
-
-#if UNITY_EDITOR
-			PostEvent();
-#endif
-		}
-
-		/// @brief Used to setup your own code for when the sequence is stopped
-		protected virtual void OnStop()
-        {
-            //onStopCallBack?.Invoke();
-        }
-	
-		/**
-		 * @brief Called each time the sequence gets updated, if the current frame is in this event's range.
-		 * @param framesSinceTrigger How many frames have passed since TriggerFrame
-		 * @param timeSinceTrigger How much time passed since TriggerFrame
-		 */
-        public void UpdateEvent( int framesSinceTrigger, float timeSinceTrigger )
-		{
-#if UNITY_EDITOR
-			PreEvent();
-#endif
-
-			if( !_hasTriggered )
-			{
-				Trigger( timeSinceTrigger );
-			}
-
-			OnUpdateEvent( timeSinceTrigger );
-
-			if( framesSinceTrigger == Length ) 
-			{
-				Finish();
-			}
-
-#if UNITY_EDITOR
-			PostEvent();
-#endif
-		}
-
-
-		/**
-		 * @brief Used to setup your code that gets called when the event updates.
-		 * @param framesSinceTrigger How many frames passed since TriggerFrame
-		 * @param timeSinceTrigger How much time passed since TriggerFrame
-		 */
-		protected virtual void OnUpdateEvent( float timeSinceTrigger )
-		{
-
-		}
-			
-		/**
-		 * @brief Used to mark objects used as not to be saved, in order to not make the scene dirty when 
-		 * scrubbing the editor.
-		 * @note This is called before every call to FEvent, i.e. Trigger, UpdateEvent, Stop, etc.
-		 */
-		protected virtual void PreEvent()
-		{
-#if UNITY_EDITOR
-			if( !Application.isPlaying )
-				Owner.gameObject.hideFlags = HideFlags.DontSave;
-#endif
-		}
-
-		/**
-		 * @brief Used to mark objects used as to be saved again.
-		 * @note This is called after every call to FEvent, i.e. Trigger, UpdateEvent, Stop, etc.
-		 */
-		protected virtual void PostEvent()
-		{
-#if UNITY_EDITOR
-			if( !Application.isPlaying )
-				Owner.gameObject.hideFlags = HideFlags.None;
-#endif
 		}
 
 		/// @brief Returns \e true if it is the first event of the track it belongs to.
@@ -564,14 +352,6 @@ namespace Flux
 		}
 	}
 
-    public class OnStopCallBack : UnityEvent
-    {
-
-    }
-    public class OnFinishCallBack : UnityEvent
-    {
-
-    }
 
     /**
 	 * @brief Attribute that adds an Event to the add event menu.
@@ -598,10 +378,5 @@ namespace Flux
 			this.trackType = trackType;
 		}
 
-//		public FEventAttribute( string menu, Color color )
-//			:this( menu )
-//		{
-//			_color = color;
-//		}
 	}
 }

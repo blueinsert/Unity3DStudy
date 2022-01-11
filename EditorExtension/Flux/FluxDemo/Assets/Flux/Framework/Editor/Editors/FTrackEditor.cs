@@ -244,35 +244,12 @@ namespace FluxEditor
 			Track.enabled = on;
 			EditorUtility.SetDirty(Track);
 
-			if( Track.RequiresEditorCache )
-			{
-				if( on )
-				{
-					Track.CreateCache();
-				}
-				else
-				{
-					Track.ClearCache();
-				}
-			}
-
-			if( !SequenceEditor.Sequence.IsStopped )
-			{
-				int currentFrame = SequenceEditor.Sequence.CurrentFrame;
-				SequenceEditor.Stop();
-				SequenceEditor.SetCurrentFrame(currentFrame);
-			}
-
 			SequenceEditor.SetDirty(this);
-			SequenceEditor.NotifyDirtyTracks();
 		}
 
 		public override void OnDelete()
 		{
 			base.OnDelete();
-
-			if( Track.HasCache )
-				Track.ClearCache();
 		}
 
 		protected virtual Color GetPreviewIconColor()
@@ -395,8 +372,6 @@ namespace FluxEditor
 			Undo.SetTransformParent( duplicateTrack.transform, Track.Timeline.transform, string.Empty );
 			Undo.RegisterCreatedObjectUndo( duplicateTrack, "duplicate Track" );
 
-			if( !SequenceEditor.Sequence.IsStopped )
-				duplicateTrack.GetComponent<FTrack>().Init();
 		}
 
 		private void Delete()

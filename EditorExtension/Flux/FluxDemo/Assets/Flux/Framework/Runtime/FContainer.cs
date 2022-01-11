@@ -39,38 +39,6 @@ namespace Flux
 				transform.parent = null;
 		}
 
-		public override void Init()
-		{
-			foreach( FTimeline timeline in _timelines )
-			{
-				timeline.Init();
-			}
-		}
-
-		public override void Stop()
-		{
-			foreach( FTimeline timeline in _timelines )
-			{
-				timeline.Stop();
-			}
-		}
-
-		public void Resume()
-		{
-			foreach( FTimeline timeline in _timelines )
-			{
-				timeline.Resume();
-			}
-		}
-
-		public void Pause()
-		{
-			foreach( FTimeline timeline in _timelines )
-			{
-				timeline.Pause();
-			}
-		}
-
 		public bool IsEmpty()
 		{
 			foreach( FTimeline timeline in _timelines )
@@ -83,27 +51,7 @@ namespace Flux
 
 			return true;
 		}
-        //Fish:更新每個container下的所有可以執行時間綫
-		public void UpdateTimelines( int frame, float time )
-		{
-			for( int i = 0; i != _timelines.Count; ++i )
-			{
-				if( !_timelines[i].enabled ) continue;
-				_timelines[i].UpdateTracks( frame, time );
-			}
-		}
-
-		public void UpdateTimelinesEditor( int frame, float time )
-		{
-			for( int i = 0; i != _timelines.Count; ++i )
-			{
-				if( !_timelines[i].enabled ) continue;
-				_timelines[i].UpdateTracksEditor( frame, time );
-			}
-		}
 			
-		/// @brief Adds new timeline at the end of the list.
-		/// @param timeline New timeline.
 		public void Add( FTimeline timeline )
 		{
 			int id = _timelines.Count;
@@ -111,14 +59,9 @@ namespace Flux
 			_timelines.Add( timeline );
 			timeline.SetId( id );
 			
-//			timeline.SetSequence( this );
 			timeline.SetContainer( this );
 		}
-		
-		/// @brief Removes timeline and updates their ids.
-		/// @param timeline CTimeline to remove.
-		/// @note After calling this function, the ids of the timelines after this
-		/// one in the list will have an id smaller by 1.
+
 		public void Remove( FTimeline timeline )
 		{
 			for( int i = 0; i != _timelines.Count; ++i )
@@ -131,11 +74,6 @@ namespace Flux
 			}
 		}
 		
-		/// @brief Removes timeline with id.
-		/// @oaram id Id of the CTimeline to remove.
-		/// @note After calling this function, the ids of the timelines after this
-		/// one in the list will have an id smaller by 1.
-		/// @warning Does not check if id is valid (i.e. between -1 & GetTimelines().Count)
 		public void Remove( int id )
 		{
 			FTimeline timeline = _timelines[id];

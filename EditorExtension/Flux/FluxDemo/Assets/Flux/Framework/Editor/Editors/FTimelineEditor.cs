@@ -206,9 +206,6 @@ namespace FluxEditor
 
 			track.gameObject.name = ObjectNames.NicifyVariableName( evtName );
 
-			if( !Timeline.Sequence.IsStopped )
-				track.Init();
-
 			SequenceEditor.Refresh();
 
 			Undo.RegisterCreatedObjectUndo( track.gameObject, string.Empty );
@@ -221,9 +218,6 @@ namespace FluxEditor
 			Transform newOwner = (Transform)newOwnerTransform;
 			Undo.RecordObject( Timeline, "Change Timeline Owner" );
 			Timeline.SetOwner( newOwner );
-
-			if( !SequenceEditor.Sequence.IsStopped )
-				Timeline.Init();
 		}
 
 		public override FSequenceEditor SequenceEditor { get { return ContainerEditor != null ? ContainerEditor.SequenceEditor : null; } }

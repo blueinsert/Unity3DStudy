@@ -141,7 +141,6 @@ namespace FluxEditor
         {
             if (_sequenceEditor != null)
             {
-                _sequenceEditor.Stop();
                 DestroyImmediate(_sequenceEditor);
             }
         }
@@ -159,8 +158,6 @@ namespace FluxEditor
 
         #endregion
 
-
-        public bool IsPlaying { get { return _sequenceEditor.IsPlaying; } }
 
         void Update()
         {
@@ -180,33 +177,9 @@ namespace FluxEditor
                 Repaint();
             }
 
-            _sequenceEditor.Update();
-
 #if FLUX_PROFILE
 			Profiler.EndSample();
 #endif
-        }
-
-        public void Play(bool restart)
-        {
-            _sequenceEditor.IsPlayingForward = true;
-            _sequenceEditor.Play(restart);
-        }
-
-        public void PlayBackwards(bool restart)
-        {
-            _sequenceEditor.IsPlayingForward = false;
-            _sequenceEditor.Play(restart);
-        }
-
-        public void Pause()
-        {
-            _sequenceEditor.Pause();
-        }
-
-        public void Stop()
-        {
-            _sequenceEditor.Stop();
         }
 
         private void RebuildLayout()
@@ -280,26 +253,6 @@ namespace FluxEditor
                 ShowNotification(new GUIContent("Select Or Create Sequence"));
             else if (Event.current.isKey)
             {
-                if (Event.current.keyCode == KeyCode.Space)
-                {
-                    if (Event.current.type == EventType.KeyUp)
-                    {
-                        if (_sequenceEditor.IsPlaying)
-                        {
-                            if (Event.current.shift)
-                                Stop();
-                            else
-                                Pause();
-                        }
-                        else
-                            Play(Event.current.shift);
-
-
-                        Repaint();
-                    }
-                    Event.current.Use();
-                }
-
                 if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return)
                 {
                     EditorGUIUtility.keyboardControl = 0;
@@ -307,7 +260,6 @@ namespace FluxEditor
                     Repaint();
                 }
             }
-
 
             // header
             _windowHeader.OnGUI();
@@ -324,11 +276,6 @@ namespace FluxEditor
                     if (Event.current.keyCode == KeyCode.Backspace || Event.current.keyCode == KeyCode.Delete)
                     {
                         _sequenceEditor.DestroyEvents(_sequenceEditor.EventSelection.Editors);
-                        Event.current.Use();
-                    }
-                    else if (Event.current.keyCode == KeyCode.K && _sequenceEditor.Sequence.CurrentFrame >= 0)
-                    {
-                        _sequenceEditor.AddEvent(_sequenceEditor.Sequence.CurrentFrame);
                         Event.current.Use();
                     }
                     break;

@@ -267,8 +267,8 @@ MonoBehaviour:
   _track: {fileID: 832796745}
   _triggerOnSkip: 1
   _frameRange:
-    _start: 78
-    _end: 125
+    _start: 74
+    _end: 121
   _tween:
     _easingType: 5
     _from: {x: 0, y: 0, z: 0}
@@ -507,16 +507,8 @@ MonoBehaviour:
   _containers:
   - {fileID: 1720863879}
   _version: 210
-  _actionOnStart: 0
   _loop: 0
-  _defaultSpeed: 1
-  _updateMode: 0
   _length: 600
-  _onFinishedCallback:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Flux.SequenceFinishedEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   _frameRate: 60
   _inverseFrameRate: 0.016666668
 --- !u!4 &1482648475
