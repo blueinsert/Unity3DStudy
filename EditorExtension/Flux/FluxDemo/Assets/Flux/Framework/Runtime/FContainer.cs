@@ -15,15 +15,14 @@ namespace Flux
 		public Color Color { get { return _color; } set { _color = value; } }
 
 		[SerializeField]
-		private List<FTimeline> _timelines = new List<FTimeline>();
-		public List<FTimeline> Timelines { get { return _timelines; } }
+		private List<FTrack> _tracks = new List<FTrack>();
+		public List<FTrack> Tracks { get { return _tracks; } }
 
 		public override FSequence Sequence { get { return _sequence; } }
-		public override Transform Owner { get { return null; } }
 
-		public static FContainer Create( Color color )
+		public static FContainer Create( Color color, string name)
 		{
-			GameObject go = new GameObject("Default");
+			GameObject go = new GameObject(name);
 			FContainer container = go.AddComponent<FContainer>();
 			container.Color = color;
 
@@ -41,9 +40,9 @@ namespace Flux
 
 		public bool IsEmpty()
 		{
-			foreach( FTimeline timeline in _timelines )
+			foreach( FTrack track in _tracks)
 			{
-				if( !timeline.IsEmpty() )
+				if( !track.IsEmpty() )
 				{
 					return false;
 				}
@@ -51,64 +50,65 @@ namespace Flux
 
 			return true;
 		}
-			
-		public void Add( FTimeline timeline )
+
+		//被反射调用
+		public FTrack Add<T>(FrameRange range) where T : FEvent
 		{
-			int id = _timelines.Count;
-			
-			_timelines.Add( timeline );
-			timeline.SetId( id );
-			
-			timeline.SetContainer( this );
+			FTrack track = FTrack.Create<T>();
+
+			Add(track);
+
+			FEvent evt = FEvent.Create<T>(range);
+
+			track.Add(evt);
+
+			return track;
 		}
 
-		public void Remove( FTimeline timeline )
+		public void Add(FTrack track)
 		{
-			for( int i = 0; i != _timelines.Count; ++i )
-			{
-				if( _timelines[i] == timeline )
-				{
-					Remove( i );
-					break;
-				}
-			}
+			int id = _tracks.Count;
+
+			_tracks.Add(track);
+
+			track.SetContainer(this);
+			track.SetId(id);
+
 		}
-		
-		public void Remove( int id )
+
+		public void Remove(FTrack track)
 		{
-			FTimeline timeline = _timelines[id];
-			_timelines.RemoveAt( id );
-			timeline.SetContainer( null );
-			
-			UpdateTimelineIds();
+			if (_tracks.Remove(track))
+			{
+				track.SetContainer(null);
+
+				UpdateTrackIds();
+			}
 		}
 
 		public void Rebuild()
 		{
-			_timelines.Clear();
 			Transform t = transform;
-			for( int i = 0; i != t.childCount; ++i )
-			{
-				FTimeline timeline = t.GetChild(i).GetComponent<FTimeline>();
-				if( timeline != null )
-				{
-					_timelines.Add( timeline );
+			_tracks.Clear();
 
-					timeline.SetContainer( this );
-					timeline.Rebuild();
+			for (int i = 0; i != t.childCount; ++i)
+			{
+				FTrack track = t.GetChild(i).GetComponent<FTrack>();
+				if (track)
+				{
+					_tracks.Add(track);
+					track.SetContainer(this);
+					track.Rebuild();
 				}
 			}
 
-			UpdateTimelineIds();
+			UpdateTrackIds();
 		}
 
-		// Updates the ids of the timelines
-		private void UpdateTimelineIds()
+		private void UpdateTrackIds()
 		{
-			for( int i = 0; i != _timelines.Count; ++i )
-			{
-				_timelines[i].SetId( i );
-			}
+			for (int i = 0; i != _tracks.Count; ++i)
+				_tracks[i].SetId(i);
 		}
 	}
 }

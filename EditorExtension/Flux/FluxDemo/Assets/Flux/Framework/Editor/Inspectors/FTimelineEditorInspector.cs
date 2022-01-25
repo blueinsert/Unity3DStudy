@@ -3,6 +3,7 @@ using UnityEditor;
 
 using Flux;
 
+/*
 namespace FluxEditor
 {
 	[System.Serializable]
@@ -17,3 +18,4 @@ namespace FluxEditor
 		}
 	}
 }
+*/

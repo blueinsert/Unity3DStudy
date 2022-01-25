@@ -16,8 +16,5 @@ namespace Flux
 
 		public abstract FSequence Sequence { get; }
 
-		public abstract Transform Owner { get; }
-
-
 	}
 }

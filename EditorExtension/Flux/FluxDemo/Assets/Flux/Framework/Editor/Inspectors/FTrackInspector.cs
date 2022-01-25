@@ -69,18 +69,6 @@ namespace FluxEditor
 				EditorUtility.SetDirty( target );
 			}
 
-			if( track.AllowedCacheMode != track.RequiredCacheMode )
-			{
-				EditorGUI.BeginChangeCheck();
-				CacheMode cacheMode = (CacheMode)EditorGUILayout.EnumMaskField( "Cache Mode", track.CacheMode );
-				if( EditorGUI.EndChangeCheck() )
-				{
-					Undo.RecordObject( track, "change Cache Mode" );
-					track.CacheMode = (cacheMode | track.RequiredCacheMode) & track.AllowedCacheMode;
-					EditorUtility.SetDirty( target );
-				}
-			}
-
 			if( _showEvents && _events != null )
 			{
 				serializedObject.Update();

@@ -5,27 +5,13 @@ using System.Collections.Generic;
 
 namespace Flux
 {
-    [System.Flags]
-    public enum CacheMode
-    {
-        //		None 				= 0,
-        Editor = 1,
-        RuntimeForward = 2,
-        RuntimeBackwards = 4
-    }
-
-    /**
-	 * @brief FTrack holds events of a specific type. You cannot have a track with multiple types of events.
-	 * You can only have 2 events on the same frame per track, i.e. overlapping start and end.
-	 * @sa FSequence, FTimeline, FEvent
-	 */
     public class FTrack : FObject
     {
-        // timeline it belongs to
         [SerializeField]
         [HideInInspector]
-        private FTimeline _timeline;
+        private FContainer _container;
 
+        public FContainer Container { get { return _container; } }
         // string of the type of events it holds
         [SerializeField]
         [HideInInspector]
@@ -40,19 +26,6 @@ namespace Flux
         private List<FEvent> _events = new List<FEvent>();
         /// @brief List of events it holds
         public List<FEvent> Events { get { return _events; } }
-
-        public bool RequiresNoCache { get { return CacheMode == 0; } }
-        public bool RequiresEditorCache { get { return (CacheMode & CacheMode.Editor) != 0; } }
-        public bool RequiresForwardCache { get { return (CacheMode & CacheMode.RuntimeForward) != 0; } }
-        public bool RequiresBackwardsCache { get { return (CacheMode & CacheMode.RuntimeBackwards) != 0; } }
-
-        [SerializeField]
-        [HideInInspector]
-        private CacheMode _cacheMode = 0;
-        public CacheMode CacheMode { get { return _cacheMode; } set { _cacheMode = value; } }
-
-        public virtual CacheMode RequiredCacheMode { get { return 0; } }
-        public virtual CacheMode AllowedCacheMode { get { return 0; } }
 
         // keep track of the current event we're updating
         private int _currentEvent = 0;
@@ -80,29 +53,18 @@ namespace Flux
             }
 
             FTrack track = (FTrack)trackGO.AddComponent(trackType);
-            //track._evtType = evtType;
-            //track._evtTypeStr = evtType.ToString();
-            track.SetEventType(evtType);
-            track.CacheMode = track.RequiredCacheMode;
 
-            //			track.CacheType = track.DefaultCacheType();
-            //			CEvent evt = CEvent.Create<T>( range );
-            //
-            //			track.Add( evt );
-            //
-            //			track._timeline = timeline;
-            //			track.SetId( id );
+            track.SetEventType(evtType);
 
             return track;
         }
 
-        // sets the timeline it belongs to, only to be called by FTimeline to avoid errors
-        internal void SetTimeline(FTimeline timeline)
+        internal void SetContainer(FContainer container)
         {
-            _timeline = timeline;
-            if (_timeline)
+            _container = container;
+            if (container)
             {
-                transform.parent = _timeline.transform;
+                transform.parent = container.transform;
             }
             else
             {
@@ -110,20 +72,13 @@ namespace Flux
             }
         }
 
-        public override FSequence Sequence { get { return _timeline.Sequence; } }
-        public override Transform Owner { get { return _timeline.Owner; } }
+        public override FSequence Sequence { get { return _container.Sequence; } }
 
-
-        /// @brief Returns true if the track has no events
         public bool IsEmpty()
         {
             return _events.Count == 0;
         }
 
-        /// @brief Returns to which timeline this track belongs
-        public FTimeline Timeline { get { return _timeline; } }
-
-        /// @brief Returns which type of event this track holds
         public Type GetEventType()
         {
             if (_evtType == null)

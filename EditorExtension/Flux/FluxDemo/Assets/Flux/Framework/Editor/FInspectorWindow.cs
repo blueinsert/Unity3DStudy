@@ -6,111 +6,107 @@ using Flux;
 
 namespace FluxEditor
 {
-	public class FInspectorWindow : EditorWindow {
+    public class FInspectorWindow : EditorWindow
+    {
 
-		public static FInspectorWindow _instance = null;
+        public static FInspectorWindow _instance = null;
 
-		[MenuItem(FSequenceEditorWindow.MENU_PATH+FSequenceEditorWindow.PRODUCT_NAME+"/Open Inspector", false, 1)]
-		public static void Open()
-		{
-			_instance = GetWindow<FInspectorWindow>();
+        [MenuItem(FSettings.MenuPath + FSettings.ProductName + "/Open Inspector", false, 1)]
+        public static void Open()
+        {
+            _instance = GetWindow<FInspectorWindow>();
 
-			_instance.Show();
-			_instance.titleContent = new GUIContent("Flux Inspector");
+            _instance.Show();
+            _instance.titleContent = new GUIContent("Flux Inspector");
 
-		}
+        }
 
-		private Vector2 _scroll = Vector2.zero;
+        private Vector2 _scroll = Vector2.zero;
 
-		private FSequenceEditor _sequenceEditor = null;
-		public void SetSequenceEditor( FSequenceEditor sequenceEditor ){ _sequenceEditor = sequenceEditor; }
+        private FSequenceEditor _sequenceEditor = null;
 
-		private Rect _viewRect;
-		
-		void OnEnable()
-		{
-			_instance = this;
+        private Rect _viewRect;
 
-			hideFlags = HideFlags.DontSave;
+        void OnEnable()
+        {
+            _instance = this;
 
-			wantsMouseMove = true;
+            hideFlags = HideFlags.DontSave;
 
-			autoRepaintOnSceneChange = true;
-		}
-		
-		void OnDestroy()
-		{
-		}
-		
+            wantsMouseMove = true;
 
-		public void Render( Rect rect )
-		{
-			float contentWidth = rect.width;
-			
-			contentWidth -= rect.height < _viewRect.height ? 20 : 8;
-			
-			_scroll = GUI.BeginScrollView( rect, _scroll, _viewRect );
+            autoRepaintOnSceneChange = true;
+        }
 
-			EditorGUI.BeginChangeCheck();
-
-			GUI.skin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+        void OnDestroy()
+        {
+        }
 
 
-			_sequenceEditor.EventSelection.OnInspectorGUI( contentWidth );
+        public void Render(Rect rect)
+        {
+            float contentWidth = rect.width;
 
-			if( _sequenceEditor.EventSelection.Editors.Count > 0 )
-				GUILayout.Space(10);
+            contentWidth -= rect.height < _viewRect.height ? 20 : 8;
 
-			_sequenceEditor.TrackSelection.OnInspectorGUI( contentWidth );
+            _scroll = GUI.BeginScrollView(rect, _scroll, _viewRect);
 
-			_sequenceEditor.TimelineSelection.OnInspectorGUI( contentWidth );
+            EditorGUI.BeginChangeCheck();
 
-			_sequenceEditor.ContainerSelection.OnInspectorGUI( contentWidth );
+            GUI.skin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
 
-			if( EditorGUI.EndChangeCheck() )
-			{
-				_sequenceEditor.Repaint();
-			}
+            _sequenceEditor.EventSelection.OnInspectorGUI(contentWidth);
 
-			GUILayout.Space(1);
+            if (_sequenceEditor.EventSelection.Editors.Count > 0)
+                GUILayout.Space(10);
 
-			if( Event.current.type == EventType.Repaint )
-			{
-				Rect lastElementRect = GUILayoutUtility.GetLastRect();
-				
-				_viewRect = rect;
-				
-				_viewRect.height = Mathf.Max( _viewRect.height, lastElementRect.y + lastElementRect.height );
-			}
+            _sequenceEditor.TrackSelection.OnInspectorGUI(contentWidth);
+
+            _sequenceEditor.ContainerSelection.OnInspectorGUI(contentWidth);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                _sequenceEditor.Repaint();
+            }
+
+            GUILayout.Space(1);
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                Rect lastElementRect = GUILayoutUtility.GetLastRect();
+
+                _viewRect = rect;
+
+                _viewRect.height = Mathf.Max(_viewRect.height, lastElementRect.y + lastElementRect.height);
+            }
 
 
-			GUI.EndScrollView();
-		}
+            GUI.EndScrollView();
+        }
 
 
-		void OnGUI()
-		{
-			if( _sequenceEditor == null )
-				return;
-			Rect rect = position;
-			rect.x = 0; rect.y = 0;
-            Render( rect );
-		}
+        void OnGUI()
+        {
+            if (_sequenceEditor == null)
+                return;
+            Rect rect = position;
+            rect.x = 0; rect.y = 0;
+            Render(rect);
+        }
 
-		void Update()
-		{
-			if( _sequenceEditor == null && FSequenceEditorWindow.instance != null )
-			{
-				_sequenceEditor = FSequenceEditorWindow.instance.GetSequenceEditor();
-			}
+        void Update()
+        {
+            if (_sequenceEditor == null && FSequenceEditorWindow.instance != null)
+            {
+                _sequenceEditor = FSequenceEditorWindow.instance.GetSequenceEditor();
+            }
 
-			if( _sequenceEditor != null && (_sequenceEditor.EventSelection.IsDirty
-			   || _sequenceEditor.TrackSelection.IsDirty 
-			   || _sequenceEditor.TimelineSelection.IsDirty 
-			   || _sequenceEditor.ContainerSelection.IsDirty) )
-			{
-				Repaint();
-			}
-		}
-	}
+            if (_sequenceEditor != null && (_sequenceEditor.EventSelection.IsDirty
+               || _sequenceEditor.TrackSelection.IsDirty
+               || _sequenceEditor.ContainerSelection.IsDirty))
+            {
+                Repaint();
+            }
+        }
+    }
 }

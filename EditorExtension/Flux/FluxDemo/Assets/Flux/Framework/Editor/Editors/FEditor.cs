@@ -9,21 +9,20 @@ using Flux;
 namespace FluxEditor
 {
 	/**
-	 * @brief Base for all the editor classes used in the sequence window.
+	 * Base for all the editor classes used in the sequence window.
 	 */
 	public abstract class FEditor : ScriptableObject, ISelectableElement
 	{
-		/** @brief Reference to the sequence editor this editor belongs to */
+		/*Reference to the sequence editor this editor belongs to */
 		public abstract FSequenceEditor SequenceEditor{ get; }
 
-		/** @brief Is this element selected? */
+		/* Is this element selected? */
 		[SerializeField]
 		protected bool _isSelected;
-		/** @brief Is this element selected? */
+		/* Is this element selected? */
 		public bool IsSelected { get { return _isSelected; } }
 
-		/** @brief What's the rect used to draw this element? */
-//		protected Rect _rect;
+		/* What's the rect used to draw this element? */
 		public Rect Rect { 
 			get
 			{
@@ -59,28 +58,27 @@ namespace FluxEditor
 			GuiId = EditorGUIUtility.GetControlID( FocusType.Passive );
 		}
 
-		/** @brief Called on selection. */
+		/* Called on selection. */
 		public virtual void OnSelect()
 		{
 			_isSelected = true;
 		}
 
-		/** @brief Called on deselection. */
+		/* Called on deselection. */
 		public virtual void OnDeselect()
 		{
 			_isSelected = false;
 		}
 
-		/** @brief Called when the editor is deleted, e.g. deleting an event
+		/* Called when the editor is deleted, e.g. deleting an event
 		 * from the track.
-		 * @note it is different from OnDestroy because it is called while
+		 * it is different from OnDestroy because it is called while
 		 * the object is still "proper" (e.g. event still belongs to track).
 		 */
 		public virtual void OnDelete()
 		{
 		}
 
-//		public virtual float ContentIndent { get { return 0; } }
 		protected Vector2 _contentOffset = Vector2.zero;
 		public Vector2 ContentOffset { get { return _contentOffset; } }
 
@@ -100,8 +98,8 @@ namespace FluxEditor
 			_obj = (FObject)EditorUtility.InstanceIDToObject( _obj.GetInstanceID() );
 		}
 
-		/** @brief Inits the editor object.
-		 * @param obj CObject the editor manages
+		/* Inits the editor object.
+		 * obj CObject the editor manages
 		 */
 		public virtual void Init( FObject obj, FEditor owner )
 		{
@@ -129,7 +127,7 @@ namespace FluxEditor
 	}
 
 	/**
-	 * @brief Attribute to specify which editor will handle the representation
+	 * Attribute to specify which editor will handle the representation
 	 * of a specific FObject class. It works in the same way as Unity's
 	 * CustomEditor, but here it is for specifying how that FObject will be 
 	 * represented inside sequence window.

@@ -12,12 +12,8 @@ namespace FluxEditor
 	public class FTransformEventInspector : FTweenEventInspector
 	{
 
-        protected SerializedProperty _relativeToSelf;
-        protected bool relativeToSelf;
-
         protected override void OnEnable()
         {
-            _relativeToSelf = serializedObject.FindProperty("_relativePositionToSelf");
             base.OnEnable();
         }
 
@@ -58,10 +54,6 @@ namespace FluxEditor
 
 		public Vector3 GetPropertyValue()
 		{
-			FTransformEvent transformEvt = (FTransformEvent)target;
-			if( transformEvt is FTweenPositionEvent )
-				return transformEvt.Owner.localPosition;
-			Debug.LogWarning( "Unexpected child of FTransformEvent, setting (0,0,0)" );
 			return Vector3.zero;
 		}
 	}

@@ -6,14 +6,11 @@ using UnityEngine.Events;
 namespace Flux
 {
 	[Serializable]
-
 	public struct FrameRange
 	{
-		// start frame
 		[SerializeField]
 		private int _start;
 
-		// end frame
 		[SerializeField]
 		private int _end;
 
@@ -68,7 +65,6 @@ namespace Flux
 		{
 			return range.End >= _start && range.Start <= _end;
 		}
-
 
 		public FrameRangeOverlap GetOverlap( FrameRange range )
 		{
@@ -136,21 +132,19 @@ namespace Flux
 		}
 	}
 
-	/// @brief Types of range overlap
+	/// Types of range overlap
 	public enum FrameRangeOverlap
 	{
-		MissOnLeft = -2,	/// @brief missed and is to the left of the range passed
-		MissOnRight,		/// @brief missed and is to the right of the range passed
-		IsContained,		/// @brief overlaps and is contained by the range passed
-		ContainsFull,		/// @brief overlaps and contains the range passed
-		ContainsStart,		/// @brief overlaps and contains the start of the range passed
-		ContainsEnd			/// @brief overlaps and contains the end of the range passed
+		MissOnLeft = -2,	/// missed and is to the left of the range passed
+		MissOnRight,		/// missed and is to the right of the range passed
+		IsContained,		/// overlaps and is contained by the range passed
+		ContainsFull,		/// overlaps and contains the range passed
+		ContainsStart,		/// overlaps and contains the start of the range passed
+		ContainsEnd			/// overlaps and contains the end of the range passed
 	}
 
 	public class FEvent : FObject
 	{
-		public override Transform Owner { get { return _track.Owner; } }
-
 		public override FSequence Sequence { get { return _track.Sequence; } }
 
 		// track that owns this event
@@ -161,39 +155,22 @@ namespace Flux
 		public FTrack Track { get { return _track; } }
 
 		[SerializeField]
-		[HideInInspector]
-		private bool _triggerOnSkip = true;
-		/// @brief Should this event trigger if you skip it?
-		public bool TriggerOnSkip { get { return _triggerOnSkip; } set { _triggerOnSkip = value; } }
-
-		[SerializeField]
-		[HideInInspector]
-		private FrameRange _frameRange;
-		/// @brief Range of the event.
+		[HideInInspector] 
+		private FrameRange _frameRange; 
+		///Range of the event.
 		public FrameRange FrameRange { get { return _frameRange; } 
 			set { 
 				FrameRange oldFrameRange = _frameRange;
-				_frameRange = value; OnFrameRangeChanged( oldFrameRange ); 
+				_frameRange = value; OnFrameRangeChanged( oldFrameRange );  
 			} 
 		}
 
-		// has this event called Trigger already?
-		private bool _hasTriggered = false;
-		/// @brief Has Trigger been called already?
-		public bool HasTriggered { get { return _hasTriggered; } }
-
-		// has this event called Finish already?
-		private bool _hasFinished = false;
-		/// @brief Has Finish been called already?
-		public bool HasFinished { get { return _hasFinished; } }
-
 		public virtual string Text { get { return null; } set { } }
 
-
 		/**
-		 * @brief Create an event. Should be used to create events since it also 
+		 * Create an event. Should be used to create events since it also 
 		 * calls SetDefaultValues.
-		 * @param range Range of the event.
+		 * range Range of the event.
 		 */
 		public static T Create<T>( FrameRange range ) where T : FEvent
 		{
@@ -208,7 +185,6 @@ namespace Flux
 			return evt;
 		}
 
-		/// @overload
 		public static FEvent Create( Type evtType, FrameRange range )
 		{
 			GameObject go = new GameObject( evtType.ToString() );
@@ -236,86 +212,66 @@ namespace Flux
 			}
 		}
 
-		/// @brief Use this function to setup default values for when events get created
+		/// Use this function to setup default values for when events get created
 		protected virtual void SetDefaultValues()
 		{
 		}
 
-		/// @brief Use this function if you want to do something to the event when the frame range
+		/// Use this function if you want to do something to the event when the frame range
 		/// changed, e.g. adjust some variables to the new event size.
-		/// @param oldFrameRange Previous FrameRange, the current one is set on the event.
+		/// oldFrameRange Previous FrameRange, the current one is set on the event.
 		protected virtual void OnFrameRangeChanged( FrameRange oldFrameRange )
 		{
 		}
 
-		/// @brief Returns \e true if it is the first event of the track it belongs to.
+		/// Returns \e true if it is the first event of the track it belongs to.
 		public bool IsFirstEvent { get { return GetId() == 0; } }
 
-		/// @brief Returns \e true if it is the last event of the track it belongs to.
+		/// Returns \e true if it is the last event of the track it belongs to.
 		public bool IsLastEvent { get { return GetId() == _track.Events.Count-1; } }
 
-		/// @brief Shortcut to FrameRange.Start
+		/// Shortcut to FrameRange.Start
 		public int Start
 		{
 			get{ return _frameRange.Start; }
 			set{ _frameRange.Start = value; }
 		}
 
-		/// @brief Shortcut to FrameRange.End
+		/// Shortcut to FrameRange.End
 		public int End
 		{
 			get { return _frameRange.End; }
 			set{ _frameRange.End = value; }
 		}
 
-		/// @brief Shortcut to FrameRange.Length
+		/// Shortcut to FrameRange.Length
 		public int Length
 		{
 			get{ return _frameRange.Length; } 
 			set{ _frameRange.Length = value; }
 		}
 
-		/// @brief What this the event starts.
-		/// @note This value isn't cached.
-        public float StartTime
-        {
-            get { return _frameRange.Start * Sequence.InverseFrameRate; }
-        }
 
-		/// @brief What this the event ends.
-		/// @note This value isn't cached.
-        public float EndTime
-        {
-            get { return _frameRange.End * Sequence.InverseFrameRate; }
-        }
-
-		/// @brief Length of the event in seconds.
-		/// @note This value isn't cached.
-        public float LengthTime
-        {
-            get { return _frameRange.Length * Sequence.InverseFrameRate; }
-        }
-
-		/// @brief What's the minimum length this event can have?
-		/// @warning Events cannot be smaller than 1 frame.
+		/// What's the minimum length this event can have?
+		/// Events cannot be smaller than 1 frame.
 		public virtual int GetMinLength()
 		{
 			return 1;
 		}
 
-		/// @brief What's the maximum length this event can have?
+		/// What's the maximum length this event can have?
 		public virtual int GetMaxLength()
 		{
 			return int.MaxValue;
 		}
 
-		/// @brief Does the Event collides the \e e?
+		/// Does the Event collides the \e e?
 		public bool Collides( FEvent e )
 		{
 			return _frameRange.Collides( e.FrameRange );
 		}
 
-		/// @brief Returns the biggest frame range this event can have
+		/// Returns the biggest frame range this event can have
 		public FrameRange GetMaxFrameRange()
 		{
 			FrameRange range = new FrameRange(0, 0);
@@ -333,7 +289,7 @@ namespace Flux
 
 			if( id == _track.Events.Count-1 ) // last one?
 			{
-				range.End = _track.Timeline.Sequence.Length;
+				range.End = _track.Sequence.Length;
 			}
 			else
 			{
@@ -343,9 +299,9 @@ namespace Flux
 			return range;
 		}
 
-		/// @brief Compares events based on their start frame, basically used to order them.
-		/// @param e1 Event
-		/// @param e2 Event
+		/// Compares events based on their start frame, basically used to order them.
+		/// e1 Event
+		/// e2 Event
 		public static int Compare( FEvent e1, FEvent e2 )
 		{
 			return e1.Start.CompareTo( e2.Start );
@@ -354,7 +310,7 @@ namespace Flux
 
 
     /**
-	 * @brief Attribute that adds an Event to the add event menu.
+	 * Attribute that adds an Event to the add event menu.
 	 */
     public class FEventAttribute : System.Attribute
 	{
@@ -363,9 +319,6 @@ namespace Flux
 
 		// type of track to be used
 		public Type trackType;
-
-//		public object _color = null;
-
 
 		public FEventAttribute( string menu )
 			:this( menu, typeof(FTrack) )

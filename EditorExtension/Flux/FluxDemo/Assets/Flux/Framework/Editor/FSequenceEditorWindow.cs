@@ -16,17 +16,15 @@ namespace FluxEditor
 
     public class FSequenceEditorWindow : EditorWindow
     {
-        public const string MENU_PATH = "Window/";
-        public const string PRODUCT_NAME = "Flux";
-
+       
         #region Menus		
-        [MenuItem(MENU_PATH + PRODUCT_NAME + "/Open Editor %&c", false, 0)]
+        [MenuItem(FSettings.MenuPath + FSettings.ProductName + "/Open Editor %&c", false, 0)]
         public static void Open()
         {
             FSequenceEditorWindow window = GetWindow<FSequenceEditorWindow>();
             window.Show();
 
-            window.titleContent = new GUIContent(PRODUCT_NAME);
+            window.titleContent = new GUIContent(FSettings.WindownName);
 
             window.Update();
         }
@@ -38,11 +36,10 @@ namespace FluxEditor
             instance._sequenceEditor.OpenSequence(sequence);
         }
 
-        [MenuItem(MENU_PATH + PRODUCT_NAME + "/Create Sequence", false, 100)]
         public static FSequence CreateSequence()
         {
             // find new name & priority for sequence
-            string sequenceNameFormat = "Sequence_{0}";
+            string sequenceNameFormat = FSettings.SequenceName + "_{0}";
 
             int sequenceId = 0;
 
@@ -60,27 +57,15 @@ namespace FluxEditor
                 }
             }
 
-            FSequence sequence = FSequence.CreateSequence();
+            FSequence sequence = FSequence.CreateSequence(sequenceName);
             sequence.name = sequenceName;
-            sequence.FrameRate = FUtility.FrameRate;
-            sequence.Length = sequence.FrameRate * FSequence.DEFAULT_LENGTH;
+            sequence.Length = FSettings.DefaultLength;
 
             Undo.RegisterCreatedObjectUndo(sequence.gameObject, "Create Sequence");
 
             return sequence;
         }
 
-        [MenuItem(MENU_PATH + PRODUCT_NAME + "/Website", false, 200)]
-        public static void OpenWebsite()
-        {
-            Application.OpenURL("http://www.fluxeditor.com");
-        }
-
-        [MenuItem(MENU_PATH + PRODUCT_NAME + "/Contact Support", false, 201)]
-        public static void ContactSupport()
-        {
-            Application.OpenURL("mailto:support@fluxeditor.com");
-        }
         #endregion
 
         public static FSequenceEditorWindow instance = null;

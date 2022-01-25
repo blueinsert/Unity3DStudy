@@ -87,7 +87,7 @@ namespace FluxEditor
 			return _timelineHeaderStyle;
 		}
 
-		public static int TimeScrubber( Rect rect, int t, int frameRate, FrameRange range )
+		public static int TimeScrubber( Rect rect, int t, FrameRange range )
 		{	
 	//		Rect actualRect = rect;
 	//		actualRect.xMax -= 20; // buffer on the right
@@ -176,7 +176,7 @@ namespace FluxEditor
 						{
 							Handles.DrawLine( pt, pt - new Vector3( 0, rect.height-TIMELINE_SCRUBBER_TEXT_HEIGHT, 0 ) );
 
-							GUI.Label( new Rect( pt.x-30, pt.y, 60, TIMELINE_SCRUBBER_TEXT_HEIGHT ), FUtility.GetTime( frames, frameRate ), labelStyle );
+							GUI.Label( new Rect( pt.x-30, pt.y, 60, TIMELINE_SCRUBBER_TEXT_HEIGHT ), FUtility.GetTime( frames), labelStyle );
 						}
 						else
 						{
@@ -199,7 +199,7 @@ namespace FluxEditor
 					Handles.DrawLine( tStart, tEnd );
 
 					GUI.contentColor = Color.red;
-					GUI.Label( new Rect( tEnd.x-30, tEnd.y, 60, TIMELINE_SCRUBBER_TEXT_HEIGHT ), FUtility.GetTime(t, frameRate), labelStyle );
+					GUI.Label( new Rect( tEnd.x-30, tEnd.y, 60, TIMELINE_SCRUBBER_TEXT_HEIGHT ), FUtility.GetTime(t), labelStyle );
 					GUI.contentColor = FGUI.GetTextColor();
 				}
 
@@ -441,70 +441,6 @@ namespace FluxEditor
 			return viewRange;
 		}
 
-
-		private static readonly int[] DEFAULT_FRAME_RATE_VALUES = new int[]{ 15, 30, 60 };
-		private const string CUSTOM_FRAME_RATE_STR = "Other..";
-
-		private static int[] FRAME_RATE_VALUES = null;
-		private static string[] FRAME_RATE_OPTIONS = null;
-
-		public static int FrameRatePopup( Rect rect, int frameRate )
-		{
-			int i = 0;
-
-			if( FRAME_RATE_VALUES == null )
-			{
-				FRAME_RATE_VALUES = new int[DEFAULT_FRAME_RATE_VALUES.Length+1];
-				FRAME_RATE_OPTIONS = new string[FRAME_RATE_VALUES.Length];
-
-				for( ; i != DEFAULT_FRAME_RATE_VALUES.Length; ++i )
-				{
-					FRAME_RATE_VALUES[i] = DEFAULT_FRAME_RATE_VALUES[i];
-					FRAME_RATE_OPTIONS[i] = FRAME_RATE_VALUES[i].ToString();
-				}
-				FRAME_RATE_VALUES[i] = -1;
-				FRAME_RATE_OPTIONS[i] = CUSTOM_FRAME_RATE_STR;
-
-				i = 0; // clear i for the next cycle
-			}
-
-			for( ; i != DEFAULT_FRAME_RATE_VALUES.Length; ++i )
-			{
-				if( frameRate == DEFAULT_FRAME_RATE_VALUES[i] )
-					break;
-			}
-
-			// didn't find it, add it to the one before last
-			if( i == DEFAULT_FRAME_RATE_VALUES.Length )
-			{
-				if( FRAME_RATE_VALUES.Length == DEFAULT_FRAME_RATE_VALUES.Length+1 ) // doesn't contain a custom value
-				{
-					ArrayUtility.Insert<int>( ref FRAME_RATE_VALUES, FRAME_RATE_VALUES.Length-1, frameRate );
-					ArrayUtility.Insert<string>( ref FRAME_RATE_OPTIONS, FRAME_RATE_OPTIONS.Length-1, frameRate.ToString() );
-				}
-				else if( FRAME_RATE_VALUES[FRAME_RATE_VALUES.Length-2] != frameRate ) // already contains, lets see if different
-				{
-					FRAME_RATE_VALUES[FRAME_RATE_VALUES.Length-2] = frameRate;
-					FRAME_RATE_OPTIONS[FRAME_RATE_OPTIONS.Length-2] = frameRate.ToString();
-				}
-			}
-
-	//		if( GUI.Button( rect, frameRate.ToString(), EditorStyles.popup ) )
-	//		{
-	//			GenericMenu frameRateMenu = new GenericMenu();
-	//			for( i = 0; i != FRAME_RATE_VALUES.Length; ++i )
-	//				frameRateMenu.AddItem( new GUIContent(FRAME_RATE_OPTIONS[i]), false, ChangeFrameRateFunc, FRAME_RATE_VALUES[i] );
-	////			frameRateMenu.ShowAsContext();
-	//			frameRateMenu.DropDown( rect );
-	//		}
-			return EditorGUI.IntPopup( rect, frameRate, FRAME_RATE_OPTIONS, FRAME_RATE_VALUES );
-		}
-
-		private static void ChangeFrameRateFunc( object obj )
-		{
-			Debug.Log( (int)obj + " chosen"  );
-		}
-
 		public static Color GetAnimationBlendingColor()
 		{
 			return EditorGUIUtility.isProSkin ? ANIMATION_BLEND_COLOR_PRO : ANIMATION_BLEND_COLOR;
@@ -622,28 +558,5 @@ namespace FluxEditor
 			return result;
 		}
 
-
-//		private static string _smartFieldText = "";
-
-//		public static int SmartIntField( Rect rect, int value )
-//		{
-//			
-////			int id = EditorGUIUtility.GetControlID(FocusType.Keyboard);
-////
-////			string text = EditorGUIUtility.keyboardControl == id ? _smartFieldText : (value == int.MinValue ? "--" : value.ToString());
-//
-//			GUIStyle textFieldStyle = EditorStyles.textField;
-//
-//			EditorGUI.BeginChangeCheck();
-//
-//			TextEditor editor = GUIUtility.GetStateObject( typeof(TextEditor), EditorGUIUtility.keyboardControl );
-//
-//			if( editor.con
-//
-//			if( EditorGUI.EndChangeCheck() )
-//			{
-//
-//			}
-//		}
 	}
 }

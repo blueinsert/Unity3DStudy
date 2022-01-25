@@ -84,9 +84,19 @@ namespace FluxEditor
                     evtStyle.Draw(_eventRect, _isSelected, _isSelected, false, false);
 
                     string text = Evt.Text;
-                    if (text != null)
-                        GUI.Label(_eventRect, text, GetTextStyle());
-
+                    if (text != null) {
+                        var style = GetTextStyle();
+                        //style.alignment = TextAnchor.MiddleCenter;
+                        GUI.Label(_eventRect, text, style);
+                    }
+                    /* 
+                    var leftRect = _eventRect;
+                    leftRect.xMax = leftRect.xMin + 16;
+                    GUI.Label(leftRect, Evt.Start.ToString(), GetTextStyle());
+                    var rightRect = _eventRect;
+                    rightRect.xMin = rightRect.xMax - 16;
+                    GUI.Label(rightRect, Evt.End.ToString(), GetTextStyle());
+                    */
                     break;
 
                 case EventType.MouseDown:

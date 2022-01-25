@@ -9,23 +9,20 @@ namespace Flux
 
 	public class FSequence : FObject
 	{
-		public const int DEFAULT_FRAMES_PER_SECOND = 60;
-		public const int DEFAULT_LENGTH = 10;
-
-		public static FSequence CreateSequence()
+		public static FSequence CreateSequence(string name)
 		{
-			return CreateSequence(new GameObject("FSequence"));
+			return CreateSequence(new GameObject(name));
 		}
 
 		public static FSequence CreateSequence(GameObject gameObject)
 		{
 			FSequence sequence = gameObject.AddComponent<FSequence>();
 
-			sequence._content = new GameObject("SequenceContent").transform;
+			sequence._content = new GameObject("Content").transform;
 
 			sequence._content.parent = sequence.transform;
 
-			sequence.Add(FContainer.Create(FContainer.DEFAULT_COLOR));
+			sequence.Add(FContainer.Create(FContainer.DEFAULT_COLOR, "Group 0"));
 
 			sequence.Version = FUtility.FLUX_VERSION;
 
@@ -52,35 +49,9 @@ namespace Flux
 		public int Version { get { return _version; } set { _version = value; } }
 
 		[SerializeField]
-		private bool _loop = false;
-
-		public bool Loop { get { return _loop; } set { _loop = value; } }
-
-		[SerializeField]
-		private int _length = DEFAULT_LENGTH * DEFAULT_FRAMES_PER_SECOND;
+		private int _length = 1000;
 		public int Length { get { return _length; } set { _length = value; } }
 
-		public float LengthTime { get { return (float)_length * _inverseFrameRate; } }
-
-		[SerializeField]
-		[HideInInspector]
-		private int _frameRate = DEFAULT_FRAMES_PER_SECOND; // frame rate
-
-		public int FrameRate { get { return _frameRate; } set { _frameRate = value; _inverseFrameRate = 1f / _frameRate; } }
-
-		[SerializeField]
-		[HideInInspector]
-		private float _inverseFrameRate = 1f / DEFAULT_FRAMES_PER_SECOND;
-
-		public float InverseFrameRate { get { return _inverseFrameRate; } }
-
-		public override Transform Owner
-		{
-			get
-			{
-				return transform;
-			}
-		}
 
 		public override FSequence Sequence
 		{
@@ -108,7 +79,7 @@ namespace Flux
 			}
 		}
 
-		/// @brief Does the sequence have no events?
+		/// Does the sequence have no events?
 		public bool IsEmpty()
 		{
 			foreach (FContainer container in _containers)
@@ -118,18 +89,6 @@ namespace Flux
 			}
 
 			return true;
-		}
-
-		/// @brief Determines wether it has any timelines.
-		public bool HasTimelines()
-		{
-			foreach (FContainer container in _containers)
-			{
-				if (container.Timelines.Count > 0)
-					return true;
-			}
-
-			return false;
 		}
 
 		protected virtual void Awake()
@@ -142,9 +101,6 @@ namespace Flux
 
 		public void Rebuild()
 		{
-#if FLUX_DEBUG
-			Debug.Log("Rebuilding");
-#endif
 			_containers.Clear();
 
 			Transform t = Content;
@@ -162,12 +118,6 @@ namespace Flux
 			}
 
 			UpdateContainerIds();
-		}
-
-		public FSequence Clone()
-		{
-			GameObject origin = this.gameObject;
-			return GameObject.Instantiate<GameObject>(origin).GetComponent<FSequence>();
 		}
 
 		private void UpdateContainerIds()

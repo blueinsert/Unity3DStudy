@@ -17,7 +17,8 @@ namespace Flux
 
         private Vector3 _cacheTo;
 
-	}
+        public override string Text { get => "position"; set => base.Text = value; }
+    }
   
 
 }

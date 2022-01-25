@@ -64,10 +64,6 @@ namespace FluxEditor
         public FEventEditorInspector EventSelection { get { return _eventSelection; } }
 
         [SerializeField]
-        private FTimelineEditorInspector _timelineSelection = new FTimelineEditorInspector();
-        public FTimelineEditorInspector TimelineSelection { get { return _timelineSelection; } }
-
-        [SerializeField]
         private FContainerEditorInspector _containerSelection = new FContainerEditorInspector();
         public FContainerEditorInspector ContainerSelection { get { return _containerSelection; } }
 
@@ -168,7 +164,6 @@ namespace FluxEditor
             base.OnDestroy();
             EventSelection.Clear();
             TrackSelection.Clear();
-            TimelineSelection.Clear();
             ContainerSelection.Clear();
 
             if (_editorCache != null)
@@ -256,7 +251,6 @@ namespace FluxEditor
             {
                 EventSelection.Refresh();
                 TrackSelection.Refresh();
-                TimelineSelection.Refresh();
                 ContainerSelection.Refresh();
                 FInspectorWindow._instance.Repaint();
             }
@@ -412,7 +406,6 @@ namespace FluxEditor
                 _editorCache.Clear();
                 EventSelection.Clear();
                 TrackSelection.Clear();
-                TimelineSelection.Clear();
                 ContainerSelection.Clear();
                 Editors.Clear();
 
@@ -422,7 +415,6 @@ namespace FluxEditor
                 _editorCache.Refresh();
                 EventSelection.Refresh();
                 TrackSelection.Refresh();
-                TimelineSelection.Refresh();
                 ContainerSelection.Refresh();
             }
 
@@ -458,12 +450,12 @@ namespace FluxEditor
                 FInspectorWindow._instance.Repaint();
         }
 
-        public void CreateContainer(FColorSetting containerInfo)
+        public void CreateContainer()
         {
             Undo.RecordObject(Sequence, null);
 
-            FContainer container = FContainer.Create(containerInfo._color);
-            container.gameObject.name = GetUniqueContainerName(containerInfo._str);
+            FContainer container = FContainer.Create(FGUI.DefaultContainerColor(), FSettings.ContainerName);
+            container.gameObject.name = GetUniqueContainerName(FSettings.ContainerName);
             Sequence.Add(container);
             Undo.RegisterCreatedObjectUndo(container.gameObject, "create Container");
         }
@@ -505,10 +497,6 @@ namespace FluxEditor
             else if (editor is FTrackEditor)
             {
                 DestroyEditor((FTrackEditor)editor);
-            }
-            else if (editor is FTimelineEditor)
-            {
-                DestroyEditor((FTimelineEditor)editor);
             }
             else if (editor is FContainerEditor)
             {
@@ -553,17 +541,17 @@ namespace FluxEditor
             int undoGroup = Undo.GetCurrentGroup();
             Undo.SetCurrentGroupName("delete Track");
 
-            Undo.RecordObjects(new UnityEngine.Object[] { track.Timeline, editor.TimelineEditor, track, editor, _editorCache, this }, "delete Track");
+            Undo.RecordObjects(new UnityEngine.Object[] { track.Container, editor.ContainerEditor, track, editor, _editorCache, this }, "delete Track");
 
             editor.OnDelete();
 
-            editor.TimelineEditor.Editors.Remove(editor);
+            editor.ContainerEditor.Editors.Remove(editor);
 
             _editorCache.Remove(editor);
             TrackSelection.Remove(editor);
             Undo.SetTransformParent(track.transform, null, null);
 
-            track.Timeline.Remove(track);
+            track.Container.Remove(track);
 
             DestroyEvents(editor._eventEditors);
 
@@ -573,6 +561,7 @@ namespace FluxEditor
             Undo.CollapseUndoOperations(undoGroup);
         }
 
+        /*
         public void DestroyEditor(FTimelineEditor editor)
         {
             FTimeline timeline = editor.Timeline;
@@ -601,6 +590,7 @@ namespace FluxEditor
 
             Undo.CollapseUndoOperations(undoGroup);
         }
+        */
 
         protected override void Delete()
         {
@@ -716,23 +706,6 @@ namespace FluxEditor
 
         public void OnGUI()
         {
-            if (Application.isPlaying)
-            {
-                GUI.color = new Color(1, 1, 1, 0.5f);
-                GUI.enabled = false;
-            }
-
-            if (!Sequence.HasTimelines())
-            {
-                if (_renderingOnEditorWindow)
-                    _renderingOnEditorWindow.ShowNotification(new GUIContent("Drag GameObjects Here"));
-            }
-
-            if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.F && EditorGUIUtility.keyboardControl == 0)
-            {
-                FocusOnSelection();
-                Event.current.Use();
-            }
 
             _pixelsPerFrame = (_sequenceRect.width - _headerWidth) / _viewRange.Length;
 
@@ -801,9 +774,7 @@ namespace FluxEditor
                 {
                     System.Type typeOfOwner = null;
                     if (EditorDragged is FTrackEditor)
-                        typeOfOwner = typeof(FTimelineEditor);
-                    else if (EditorDragged is FTimelineEditor)
-                        typeOfOwner = typeof(FContainerEditor);
+                        typeOfOwner = typeof(FContainer);
 
                     FEditor editorBelowMouse = null;
                     foreach (FContainerEditor containerEditor in Editors)
@@ -816,24 +787,6 @@ namespace FluxEditor
                                 break;
                             }
 
-                        }
-                        else
-                        {
-                            foreach (FTimelineEditor timelineEditor in containerEditor.Editors)
-                            {
-                                if (typeOfOwner == typeof(FTimelineEditor))
-                                {
-                                    if (timelineEditor.GetGlobalRect().Contains(Event.current.mousePosition))
-                                    {
-                                        editorBelowMouse = timelineEditor;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    // handle events
-                                }
-                            }
                         }
                     }
                     if (editorBelowMouse != null)
@@ -882,11 +835,12 @@ namespace FluxEditor
                             containerEditor = Editors[Editors.Count - 1];
                         else
                         {
-                            CreateContainer(new FColorSetting("Default", FGUI.DefaultContainerColor()));
+                            CreateContainer();
                             containerEditor = GetEditor<FContainerEditor>(Sequence.Containers[0]);
                         }
                     }
 
+                    /*
                     foreach (UnityEngine.Object obj in DragAndDrop.objectReferences)
                     {
                         if (!(obj is GameObject))
@@ -903,13 +857,14 @@ namespace FluxEditor
 
                         Undo.RecordObjects(objsToSave, string.Empty);
 
-                        FTimeline timeline = FTimeline.Create(((GameObject)obj).transform);
+                        FTimeline timeline = FTimeline.Create();
 
                         containerEditor.Container.Add(timeline);
 
                         Undo.RegisterCreatedObjectUndo(timeline.gameObject, "create Timeline");
                         Undo.CollapseUndoOperations(Undo.GetCurrentGroup());
                     }
+                    */
                     if (_renderingOnEditorWindow != null)
                         _renderingOnEditorWindow.RemoveNotification();
                     Event.current.Use();
@@ -938,7 +893,7 @@ namespace FluxEditor
 
             GUI.enabled = true;
             GUI.backgroundColor = Color.white;
-            int newT = FGUI.TimeScrubber(_timeScrubberRect, 0, Sequence.FrameRate, _viewRange);
+            int newT = FGUI.TimeScrubber(_timeScrubberRect, 0, _viewRange);
             _viewRange = FGUI.ViewRangeBar(_viewRangeRect, _viewRange, Sequence.Length);
 
             if (_timelineHeaderResizerRect.Contains(Event.current.mousePosition))
@@ -1010,6 +965,7 @@ namespace FluxEditor
                             Event.current.Use();
                         else if (TrackSelection.Editors.Count == 0)
                         {
+                            /*
                             if (TimelineSelection.Editors.Count == 1)
                                 Event.current.Use();
                             else if (TimelineSelection.Editors.Count == 0)
@@ -1017,6 +973,7 @@ namespace FluxEditor
                                 if (ContainerSelection.Editors.Count == 1)
                                     Event.current.Use();
                             }
+                            */
                         }
                     }
                     break;
@@ -1031,6 +988,7 @@ namespace FluxEditor
                                 CopyEditor(TrackSelection.Editors[0]);
                             else if (TrackSelection.Editors.Count == 0)
                             {
+                                /*
                                 if (TimelineSelection.Editors.Count == 1)
                                     CopyEditor(TimelineSelection.Editors[0]);
                                 else if (TimelineSelection.Editors.Count == 0)
@@ -1038,6 +996,7 @@ namespace FluxEditor
                                     if (ContainerSelection.Editors.Count == 1)
                                         CopyEditor(ContainerSelection.Editors[0]);
                                 }
+                                */
                             }
                         }
                     }
@@ -1070,30 +1029,12 @@ namespace FluxEditor
             {
                 foreach (FContainerEditor containerEditor in Editors)
                 {
-                    if (EditorDragged is FTimelineEditor)
+                    if (EditorDragged is FTrackEditor)
                     {
                         if (containerEditor.GetGlobalRect().Contains(Event.current.mousePosition))
                         {
                             editorBelowMouse = containerEditor;
                             break;
-                        }
-                    }
-                    else
-                    {
-                        foreach (FTimelineEditor timelineEditor in containerEditor.Editors)
-                        {
-                            if (EditorDragged is FTrackEditor)
-                            {
-                                if (timelineEditor.GetGlobalRect().Contains(Event.current.mousePosition))
-                                {
-                                    editorBelowMouse = timelineEditor;
-                                    break;
-                                }
-                            }
-                            else // handle events?
-                            {
-
-                            }
                         }
                     }
                 }
@@ -1107,8 +1048,6 @@ namespace FluxEditor
                         ((FSequenceEditor)EditorDragged.Owner).UpdateListFromOffsets();
                     if (EditorDragged.Owner is FContainerEditor)
                         ((FContainerEditor)EditorDragged.Owner).UpdateListFromOffsets();
-                    if (EditorDragged.Owner is FTimelineEditor)
-                        ((FTimelineEditor)EditorDragged.Owner).UpdateListFromOffsets();
                 }
                 else
                 {
@@ -1172,24 +1111,22 @@ namespace FluxEditor
                 if (selectionRect.yMax < containerRect.yMin)
                     break;
 
-                for (int j = 0; j != Editors[i].Editors.Count; ++j)
+                List<FTrackEditor> tracks = Editors[i].Editors;
+                for (int k = 0; k != tracks.Count; ++k)
                 {
-                    List<FTrackEditor> tracks = Editors[i].Editors[j].Editors;
-                    for (int k = 0; k != tracks.Count; ++k)
-                    {
-                        Rect trackRect = tracks[k].GetGlobalRect();
-                        if (selectionRect.yMin >= trackRect.yMax)
-                            continue;
+                    Rect trackRect = tracks[k].GetGlobalRect();
+                    if (selectionRect.yMin >= trackRect.yMax)
+                        continue;
 
-                        if (selectionRect.yMax <= trackRect.yMin)
-                            break;
+                    if (selectionRect.yMax <= trackRect.yMin)
+                        break;
 
-                        if (select)
-                            tracks[k].SelectEvents(selectRange);
-                        else
-                            tracks[k].DeselectEvents(selectRange);
-                    }
+                    if (select)
+                        tracks[k].SelectEvents(selectRange);
+                    else
+                        tracks[k].DeselectEvents(selectRange);
                 }
+
             }
 
             _isDragSelecting = false;
@@ -1242,30 +1179,7 @@ namespace FluxEditor
                 r.xMin -= 0.5f;
                 r.xMax += 0.5f;
             }
-
             return r;
-        }
-
-        public void FocusOnSelection()
-        {
-            int start = 0;
-            int end = Sequence.Length;
-
-            if (_eventSelection.Editors.Count > 0)
-            {
-                start = end;
-                end = 0;
-                for (int i = 0; i != _eventSelection.Editors.Count; ++i)
-                {
-                    FEvent evt = (FEvent)_eventSelection.Editors[i].Obj;
-                    if (evt.Start < start)
-                        start = evt.Start;
-                    if (evt.End > end)
-                        end = evt.End;
-                }
-            }
-
-            _viewRange = new FrameRange(start, end);
         }
 
         public void MoveEvents(int deltaFrames)
@@ -1512,18 +1426,10 @@ namespace FluxEditor
             {
                 undoStr += "Track";
             }
-            else if (e is FTimelineEditor)
-            {
-                Deselect(EventSelection.Editors.ToArray());
-                Deselect(TrackSelection.Editors.ToArray());
-                Deselect(ContainerSelection.Editors.ToArray());
-                undoStr += "Timeline";
-            }
             else if (e is FContainerEditor)
             {
                 Deselect(EventSelection.Editors.ToArray());
                 Deselect(TrackSelection.Editors.ToArray());
-                Deselect(TimelineSelection.Editors.ToArray());
                 undoStr += "Container";
             }
 
@@ -1533,8 +1439,6 @@ namespace FluxEditor
                 EventSelection.Add((FEventEditor)e);
             else if (e is FTrackEditor)
                 TrackSelection.Add((FTrackEditor)e);
-            else if (e is FTimelineEditor)
-                TimelineSelection.Add((FTimelineEditor)e);
             else if (e is FContainerEditor)
                 ContainerSelection.Add((FContainerEditor)e);
 
@@ -1555,8 +1459,6 @@ namespace FluxEditor
                 undoStr += "Event";
             else if (e is FTrackEditor)
                 undoStr += "Track";
-            else if (e is FTimelineEditor)
-                undoStr += "Timeline";
             else if (e is FContainerEditor)
                 undoStr += "Container";
 
@@ -1566,8 +1468,6 @@ namespace FluxEditor
                 EventSelection.Remove((FEventEditor)e);
             else if (e is FTrackEditor)
                 TrackSelection.Remove((FTrackEditor)e);
-            else if (e is FTimelineEditor)
-                TimelineSelection.Remove((FTimelineEditor)e);
             else if (e is FContainerEditor)
                 ContainerSelection.Remove((FContainerEditor)e);
 
@@ -1580,10 +1480,9 @@ namespace FluxEditor
         {
             int numEvents = EventSelection.Editors.Count;
             int numTracks = TrackSelection.Editors.Count;
-            int numTimelines = TimelineSelection.Editors.Count;
             int numContainers = ContainerSelection.Editors.Count;
 
-            int totalSelected = numEvents + numTracks + numTimelines + numContainers;
+            int totalSelected = numEvents + numTracks + numContainers;
 
             if (totalSelected == 0)
                 return;
@@ -1599,9 +1498,6 @@ namespace FluxEditor
             for (int j = 0; j != numTracks; ++i, ++j)
                 objsToSave[i] = TrackSelection.Editors[j];
 
-            for (int j = 0; j != numTimelines; ++i, ++j)
-                objsToSave[i] = TimelineSelection.Editors[j];
-
             for (int j = 0; j != numContainers; ++i, ++j)
                 objsToSave[i] = ContainerSelection.Editors[j];
 
@@ -1615,15 +1511,11 @@ namespace FluxEditor
             for (int j = 0; j != numTracks; ++j)
                 TrackSelection.Editors[j].OnDeselect();
 
-            for (int j = 0; j != numTimelines; ++j)
-                TimelineSelection.Editors[j].OnDeselect();
-
             for (int j = 0; j != numContainers; ++j)
                 ContainerSelection.Editors[j].OnDeselect();
 
             EventSelection.Clear();
             TrackSelection.Clear();
-            TimelineSelection.Clear();
             ContainerSelection.Clear();
 
             Repaint();
@@ -1638,14 +1530,11 @@ namespace FluxEditor
         {
             foreach (FContainerEditor containerEditor in Editors)
             {
-                foreach (FTimelineEditor timelineEditor in containerEditor.Editors)
+                foreach (FTrackEditor trackEditor in containerEditor.Editors)
                 {
-                    foreach (FTrackEditor trackEditor in timelineEditor.Editors)
+                    if (trackEditor.Track.enabled != enable)
                     {
-                        if (trackEditor.Track.enabled != enable)
-                        {
-                            trackEditor.OnToggle(enable);
-                        }
+                        trackEditor.OnToggle(enable);
                     }
                 }
             }
@@ -1664,12 +1553,9 @@ namespace FluxEditor
         {
             foreach (FContainerEditor containerEditor in Editors)
             {
-                foreach (FTimelineEditor timelineEditor in containerEditor.Editors)
+                foreach (FTrackEditor trackEditor in containerEditor.Editors)
                 {
-                    foreach (FTrackEditor trackEditor in timelineEditor.Editors)
-                    {
-                        SetDirty(trackEditor);
-                    }
+                    SetDirty(trackEditor);
                 }
             }
         }

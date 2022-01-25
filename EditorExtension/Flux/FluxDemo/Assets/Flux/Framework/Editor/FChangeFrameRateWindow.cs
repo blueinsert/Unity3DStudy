@@ -4,6 +4,7 @@ using UnityEditor;
 
 using Flux;
 
+/*
 namespace FluxEditor
 {
 	public class FChangeFrameRateWindow : EditorWindow {
@@ -61,3 +62,4 @@ namespace FluxEditor
 
 	}
 }
+*/

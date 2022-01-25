@@ -10,8 +10,7 @@ namespace FluxEditor
 
 		public override void OnTrackChanged()
 		{
-			if( Track.Timeline == null ) // for copy paste reasons, the track may not have timeline
-				return;
+
 		}
 	}
 }

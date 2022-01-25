@@ -18,8 +18,6 @@ namespace FluxEditor
 
 		private bool _allEventsSameType = true;
 
-	    protected SerializedProperty _triggerOnSkip;
-
 
 	    protected virtual void OnEnable()
 	    {
@@ -43,45 +41,10 @@ namespace FluxEditor
 				}
 			}
 
-			if( _allEventsSameType )
-			{
-				_triggerOnSkip = serializedObject.FindProperty( "_triggerOnSkip");
-			}
 	    }
 
 	    public override void OnInspectorGUI()
 	    {
-
-			if( _allEventsSameType )
-			{
-				serializedObject.Update();
-				EditorGUILayout.PropertyField( _triggerOnSkip );
-			}
-			else
-			{
-				bool triggerOnSkipMatch = true;
-
-				for( int i = 0; i != targets.Length; ++i )
-				{
-					if( ((FEvent)targets[i]).TriggerOnSkip != _evt.TriggerOnSkip )
-					{
-						triggerOnSkipMatch = false;
-						break;
-					}
-				}
-				
-				EditorGUI.BeginChangeCheck();
-				bool triggerOnSkip = EditorGUILayout.Toggle( "Trigger On Skip", _evt.TriggerOnSkip, triggerOnSkipMatch ? EditorStyles.toggle : "ToggleMixed" );
-				if( EditorGUI.EndChangeCheck() )
-				{
-					Undo.RecordObjects( targets, " Inspector" );
-					for( int i = 0; i != targets.Length; ++i )
-					{
-						FEvent evt = (FEvent)targets[i];
-						evt.TriggerOnSkip = triggerOnSkip;
-					}
-				}
-			}
 
 	        float startFrame = _evt.Start;
 	        float endFrame = _evt.End;
@@ -162,8 +125,6 @@ namespace FluxEditor
 			if( evts.Count == 0 )
 				return;
 
-			bool triggerOnSkipMatch = true;
-
 			int startFrame = evts[0].Start;
 			int endFrame = evts[0].End;
 
@@ -172,10 +133,6 @@ namespace FluxEditor
 
 			for( int i = 1; i < evts.Count; ++i )
 			{
-				if( evts[i].TriggerOnSkip != evts[0].TriggerOnSkip )
-				{
-					triggerOnSkipMatch = false;
-				}
 				if( evts[i].Start != startFrame )
 				{
 					startFrameMatch = false;
@@ -183,18 +140,6 @@ namespace FluxEditor
 				if( evts[i].End != endFrame )
 				{
 					endFrameMatch = false;
-				}
-			}
-
-			EditorGUI.BeginChangeCheck();
-			bool triggerOnSkip = EditorGUILayout.Toggle( "Trigger On Skip", evts[0].TriggerOnSkip, triggerOnSkipMatch ? EditorStyles.toggle : "ToggleMixed" );
-			if( EditorGUI.EndChangeCheck() )
-			{
-				Undo.RecordObjects( evts.ToArray(), "Inspector" );
-				for( int i = 0; i < evts.Count; ++i )
-				{
-					evts[i].TriggerOnSkip = triggerOnSkip;
-					EditorUtility.SetDirty( evts[i] );
 				}
 			}
 						
