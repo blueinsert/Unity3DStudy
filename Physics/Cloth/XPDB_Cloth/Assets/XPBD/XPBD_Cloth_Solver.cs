@@ -1,14 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public struct CollideConstrain
 {
     public int m_index;//顶点索引
     public Vector3 m_normal;
     public Vector3 m_entryPosition;
+    public Collider m_collider;
+    public Vector3 m_deltaColliderPos;
+
+    public bool m_isDynamic;
 }
 
-public class XPBD_model : MonoBehaviour
+public struct AttachConstrain
+{
+    public GameObject m_owner;
+    public Vector3 m_offset;
+    public int m_index;
+}
+
+public class XPBD_Cloth_Solver : MonoBehaviour
 {
 
     float t = 0.0333f;
@@ -19,13 +31,26 @@ public class XPBD_model : MonoBehaviour
 
     public GameObject sphere;
 
-    Vector3[] X_last = new Vector3[21*21];
+    Vector3[] X_last = new Vector3[21 * 21];
 
-    public CollideConstrain[] m_collideConstrain = new CollideConstrain[100];
+    public CollideConstrain[] m_collideConstrain = new CollideConstrain[CollideConstrainCountMax];
     public int m_collideConstrainCount = 0;
+    const int CollideConstrainCountMax = 40 * 40;
+
+    public AttachConstrain[] m_attachConstrain = new AttachConstrain[AttachConstrainCountMax];
+    public int m_attachConstrainCount = 0;
+    const int AttachConstrainCountMax = 50;
+
+    const int IterCount = 128;
 
     // Use this for initialization
     void Start()
+    {
+        InitMesh();
+        InitAttachConstain();
+    }
+
+    void InitMesh()
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
 
@@ -142,6 +167,33 @@ public class XPBD_model : MonoBehaviour
         b = temp;
     }
 
+    void InitAttachConstain()
+    {
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
+        Vector3[] vertices = mesh.vertices;
+        m_attachConstrainCount = 0;
+        var attachDescs = GetComponentsInChildren<AttachConstrainDesc>();
+        foreach (var attachDesc in attachDescs)
+        {
+            var c = attachDesc.gameObject.transform.position;
+            var r = attachDesc.m_collider.radius;
+
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                var p = vertices[i];
+                var x = p - c;
+                var d = x.magnitude;
+                if (d < r && m_attachConstrainCount < AttachConstrainCountMax - 1)
+                {
+                    m_attachConstrain[m_attachConstrainCount].m_index = i;
+                    m_attachConstrain[m_attachConstrainCount].m_owner = attachDesc.gameObject;
+                    m_attachConstrain[m_attachConstrainCount].m_offset = p - attachDesc.gameObject.transform.position;
+                    m_attachConstrainCount++;
+                }
+            }
+        }
+    }
+
     void Strain_Limiting()
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
@@ -204,13 +256,42 @@ public class XPBD_model : MonoBehaviour
             var constrain = m_collideConstrain[i];
             var pos = vertices[constrain.m_index];
             float C = Vector3.Dot((pos - constrain.m_entryPosition), constrain.m_normal);
-            if(C < 0)
+            if (C < 0)
             {
-                Vector3 dp = -constrain.m_normal * C;
-                pos += dp;
-                vertices[constrain.m_index] = pos;
+                if (!constrain.m_isDynamic)
+                {
+                    Vector3 dp = -constrain.m_normal * C;
+                    pos += dp;
+                    vertices[constrain.m_index] = pos;
+                }
+                else
+                {
+                    Vector3 dp = -constrain.m_normal * C * 0.5f;
+                    Vector3 dp2 = constrain.m_normal * C * 0.5f;
+
+                    pos += dp;
+                    vertices[constrain.m_index] = pos;
+
+                    constrain.m_deltaColliderPos += dp2;
+
+                }
             }
-            
+
+        }
+
+        mesh.vertices = vertices;
+    }
+
+    void Solve_AttachConstrain()
+    {
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
+        Vector3[] vertices = mesh.vertices;
+
+        for (int i = 0; i < m_attachConstrainCount; i++)
+        {
+            var constrain = m_attachConstrain[i];
+            var newPos = constrain.m_owner.transform.position + constrain.m_offset;
+            vertices[constrain.m_index] = newPos;
         }
 
         mesh.vertices = vertices;
@@ -220,6 +301,7 @@ public class XPBD_model : MonoBehaviour
     {
         Strain_Limiting();
         Solve_CollideConstrain();
+        Solve_AttachConstrain();
     }
 
     void GenerateCollideConstrains()
@@ -229,61 +311,48 @@ public class XPBD_model : MonoBehaviour
 
         m_collideConstrainCount = 0;
 
-        if (sphere != null)
+        var collideDescs = GetComponentsInChildren<CollideConstrainDesc>();
+        foreach (var collideDesc in collideDescs)
         {
-            var c = sphere.transform.position;
-            //var sphereCollider = sphere.GetComponent<SphereCollider>();
-            var r = 2.6f;
+            if (collideDesc.m_collider == null) continue;
             for (int i = 0; i < X.Length; i++)
             {
                 var p = X[i];
-                var x = p - c;
-                var d = x.magnitude;
-                var dir = x.normalized;
-                if (d < r && m_collideConstrainCount<100-1)
+                Vector3 normal, nearestP;
+                if (PhysicUtil.IsOverlap(p, collideDesc.m_collider, out nearestP, out normal))
                 {
-                    //X[i] = c + dir * r;
-
-                    m_collideConstrain[m_collideConstrainCount].m_index = i;
-                    m_collideConstrain[m_collideConstrainCount].m_normal = dir;
-                    m_collideConstrain[m_collideConstrainCount].m_entryPosition = c + dir * r;
-                    m_collideConstrainCount++;
+                    if (m_collideConstrainCount < CollideConstrainCountMax - 1)
+                    {
+                        m_collideConstrain[m_collideConstrainCount].m_index = i;
+                        m_collideConstrain[m_collideConstrainCount].m_normal = normal;
+                        m_collideConstrain[m_collideConstrainCount].m_entryPosition = nearestP;
+                        m_collideConstrain[m_collideConstrainCount].m_collider = collideDesc.m_collider;
+                        m_collideConstrain[m_collideConstrainCount].m_isDynamic = collideDesc.m_isDynamic;
+                        m_collideConstrain[m_collideConstrainCount].m_deltaColliderPos = Vector3.zero;
+                        m_collideConstrainCount++;
+                    }
                 }
             }
         }
 
+
         for (int i = 0; i < X.Length; i++)
         {
             var p = X[i];
-            if (p.y < -10 + 0.1f)
+            float planeY = -10 + 0.2f;
+            if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
             {
                 m_collideConstrain[m_collideConstrainCount].m_index = i;
-                m_collideConstrain[m_collideConstrainCount].m_normal = new Vector3(0,1,0);
-                m_collideConstrain[m_collideConstrainCount].m_entryPosition = new Vector3(p.x,0,p.z);
+                m_collideConstrain[m_collideConstrainCount].m_normal = new Vector3(0, 1, 0);
+                m_collideConstrain[m_collideConstrainCount].m_entryPosition = new Vector3(p.x, planeY, p.z);
                 m_collideConstrainCount++;
             }
         }
     }
 
-    void Collision_Handling()
-    {
-        //Mesh mesh = GetComponent<MeshFilter>().mesh;
-        //Vector3[] X = mesh.vertices;
-        //for (int i = 0; i < X.Length; i++)
-        //{
-        //    var p = X[i];
-        //    if (p.y < -10 + 0.1f)
-        //    {
-        //        p.y = -10 + 0.1f;
-        //    }
-        //    X[i] = p;
-        //}
-        //mesh.vertices = X;
-    }
-
     void CopyToXLast(Vector3[] X)
     {
-        for(int i = 0; i < X.Length; i++)
+        for (int i = 0; i < X.Length; i++)
         {
             X_last[i] = X[i];
         }
@@ -305,10 +374,25 @@ public class XPBD_model : MonoBehaviour
 
         GenerateCollideConstrains();
 
-        for (int l = 0; l < 64; l++)
+        for (int l = 0; l < IterCount; l++)
             Solve();
 
-        Collision_Handling();
+        for (int i = 0; i < m_collideConstrainCount; i++)
+        {
+            var constrain = m_collideConstrain[i];
+            if (constrain.m_isDynamic)
+            {
+                var rigibody = constrain.m_collider.GetComponent<Rigidbody>();
+                if (rigibody != null)
+                {
+                    Debug.Log(string.Format("vel:{0}", rigibody.velocity.y.ToString("F5")));
+                    rigibody.velocity = constrain.m_deltaColliderPos / Time.deltaTime;
+                    //rigibody.isKinematic = true;
+                    //rigibody.MovePosition(rigibody.transform.position + constrain.m_deltaColliderPos);
+                    //rigibody.isKinematic = false;
+                }
+            }
+        }
 
         for (int i = 0; i < X.Length; i++)
         {

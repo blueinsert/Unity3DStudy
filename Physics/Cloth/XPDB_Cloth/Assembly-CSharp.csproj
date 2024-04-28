@@ -60,7 +60,10 @@
     <Analyzer Include="C:\Program Files\Unity 2019.2.0b10\Editor\2022.3.17f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\XPBD\XPBD_model.cs" />
+    <Compile Include="Assets\XPBD\AttachConstrainDesc.cs" />
+    <Compile Include="Assets\XPBD\XPBD_Cloth_Solver.cs" />
+    <Compile Include="Assets\XPBD\CollideConstrainDesc.cs" />
+    <Compile Include="Assets\XPBD\PhysicUtil.cs" />
     <Compile Include="Assets\XPBD\FPS.cs" />
     <Compile Include="Assets\XPBD\sphere_motion.cs" />
   </ItemGroup>
