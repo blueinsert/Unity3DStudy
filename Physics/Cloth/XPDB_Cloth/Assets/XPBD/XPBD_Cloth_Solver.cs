@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using static UnityEditor.Searcher.SearcherWindow.Alignment;
 
 public struct CollideConstrain
 {
@@ -8,7 +9,6 @@ public struct CollideConstrain
     public Vector3 m_normal;
     public Vector3 m_entryPosition;
     public Collider m_collider;
-    public Vector3 m_deltaColliderPos;
 
     public bool m_isDynamic;
 }
@@ -25,13 +25,15 @@ public class XPBD_Cloth_Solver : MonoBehaviour
 
     float t = 0.0333f;
     float damping = 0.99f;
+    float damping_subStep = 0.99f;
     int[] E;
     float[] L;
     Vector3[] V;
 
-    public GameObject sphere;
+    Mesh m_mesh;
 
     Vector3[] X_last = new Vector3[21 * 21];
+    Vector3[] X = new Vector3[21 * 21];
 
     public CollideConstrain[] m_collideConstrain = new CollideConstrain[CollideConstrainCountMax];
     public int m_collideConstrainCount = 0;
@@ -41,19 +43,26 @@ public class XPBD_Cloth_Solver : MonoBehaviour
     public int m_attachConstrainCount = 0;
     const int AttachConstrainCountMax = 50;
 
-    const int IterCount = 128;
+    public List<SimpleMove> m_simpleMoveList = new List<SimpleMove>();
+
+    [Range(7,55)]
+    public int SubStep = 22;
 
     // Use this for initialization
     void Start()
     {
         InitMesh();
         InitAttachConstain();
+
+        var simpleMoves = GetComponentsInChildren<SimpleMove>();
+        m_simpleMoveList.AddRange(simpleMoves);
+        damping_subStep = Mathf.Pow(damping, 1.0f / SubStep);
     }
 
     void InitMesh()
     {
         Mesh mesh = GetComponent<MeshFilter>().mesh;
-
+        m_mesh = mesh;
         //Resize the mesh.
         int n = 21;
         Vector3[] X = new Vector3[n * n];
@@ -82,7 +91,8 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         mesh.uv = UV;
         mesh.RecalculateNormals();
 
-        X_last = X;
+        this.X = X;
+        CopyX2Y(this.X, this.X_last);
 
         //Construct the original edge list
         int[] _E = new int[T.Length * 2];
@@ -196,9 +206,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
 
     void Strain_Limiting()
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        Vector3[] vertices = mesh.vertices;
-
+        var vertices = this.X;
         //Apply PBD here.
         //jacobi approach
         Vector3[] x_new = new Vector3[vertices.Length];
@@ -242,15 +250,11 @@ public class XPBD_Cloth_Solver : MonoBehaviour
                 vertices[i] = x;
             }
         }
-
-        mesh.vertices = vertices;
     }
 
     void Solve_CollideConstrain()
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        Vector3[] vertices = mesh.vertices;
-
+        var vertices = this.X;
         for (int i = 0; i < m_collideConstrainCount; i++)
         {
             var constrain = m_collideConstrain[i];
@@ -272,29 +276,27 @@ public class XPBD_Cloth_Solver : MonoBehaviour
                     pos += dp;
                     vertices[constrain.m_index] = pos;
 
-                    constrain.m_deltaColliderPos += dp2;
+                    var simpleMove= constrain.m_collider.GetComponent<SimpleMove>();
+                    if (simpleMove != null)
+                    {
+                        simpleMove.MoveDelta(dp2);
+                    }
 
                 }
             }
 
         }
-
-        mesh.vertices = vertices;
     }
 
     void Solve_AttachConstrain()
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        Vector3[] vertices = mesh.vertices;
-
+        var vertices = this.X;
         for (int i = 0; i < m_attachConstrainCount; i++)
         {
             var constrain = m_attachConstrain[i];
             var newPos = constrain.m_owner.transform.position + constrain.m_offset;
             vertices[constrain.m_index] = newPos;
         }
-
-        mesh.vertices = vertices;
     }
 
     void Solve()
@@ -306,9 +308,6 @@ public class XPBD_Cloth_Solver : MonoBehaviour
 
     void GenerateCollideConstrains()
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        Vector3[] X = mesh.vertices;
-
         m_collideConstrainCount = 0;
 
         var collideDescs = GetComponentsInChildren<CollideConstrainDesc>();
@@ -328,7 +327,6 @@ public class XPBD_Cloth_Solver : MonoBehaviour
                         m_collideConstrain[m_collideConstrainCount].m_entryPosition = nearestP;
                         m_collideConstrain[m_collideConstrainCount].m_collider = collideDesc.m_collider;
                         m_collideConstrain[m_collideConstrainCount].m_isDynamic = collideDesc.m_isDynamic;
-                        m_collideConstrain[m_collideConstrainCount].m_deltaColliderPos = Vector3.zero;
                         m_collideConstrainCount++;
                     }
                 }
@@ -350,59 +348,60 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         }
     }
 
-    void CopyToXLast(Vector3[] X)
+    void CopyX2Y(Vector3[] xarray,Vector3[] yarray)
+    {
+        for (int i = 0; i < xarray.Length; i++)
+        {
+            yarray[i] = xarray[i];
+        }
+    }
+
+    void PreUpdate(float dt)
     {
         for (int i = 0; i < X.Length; i++)
         {
-            X_last[i] = X[i];
+            //if (i == 0 || i == 20) continue;
+            V[i] += new Vector3(0, -9.8f, 0) * dt;
+            X[i] += V[i] * dt;
         }
+
+        foreach(var simpleMove in m_simpleMoveList)
+        {
+            simpleMove.PreUpdate(dt);
+        }
+    }
+
+    void Step(float dt)
+    {
+        PreUpdate(dt);
+
+        CopyX2Y(this.X, this.X_last);
+
+        GenerateCollideConstrains();
+
+        Solve();
+
+        for (int i = 0; i < X.Length; i++)
+        {
+            V[i] += (X[i] - X_last[i]) / dt;
+            V[i] *= damping_subStep;
+        }
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        Vector3[] X = mesh.vertices;
-
-        for (int i = 0; i < X.Length; i++)
+        float dt = t / SubStep;
+        for(int i = 0; i < SubStep; i++)
         {
-            //if (i == 0 || i == 20) continue;
-            V[i] += new Vector3(0, -9.8f, 0) * t;
-            X[i] += V[i] * t;
-        }
-        mesh.vertices = X;
-
-        GenerateCollideConstrains();
-
-        for (int l = 0; l < IterCount; l++)
-            Solve();
-
-        for (int i = 0; i < m_collideConstrainCount; i++)
-        {
-            var constrain = m_collideConstrain[i];
-            if (constrain.m_isDynamic)
-            {
-                var rigibody = constrain.m_collider.GetComponent<Rigidbody>();
-                if (rigibody != null)
-                {
-                    Debug.Log(string.Format("vel:{0}", rigibody.velocity.y.ToString("F5")));
-                    rigibody.velocity = constrain.m_deltaColliderPos / Time.deltaTime;
-                    //rigibody.isKinematic = true;
-                    //rigibody.MovePosition(rigibody.transform.position + constrain.m_deltaColliderPos);
-                    //rigibody.isKinematic = false;
-                }
-            }
+            Step(dt);
         }
 
-        for (int i = 0; i < X.Length; i++)
-        {
-            V[i] += (mesh.vertices[i] - X[i]) / t;
-            V[i] *= damping;
-        }
-
-        mesh.RecalculateNormals();
-
-        CopyToXLast(X);
+        m_mesh.vertices = this.X;
+        m_mesh.RecalculateNormals();
+        //CopyToXLast(X);
     }
 
 

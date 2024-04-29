@@ -415,7 +415,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 2.5
+  m_Radius: 2.6
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &652273098
 GameObject:
@@ -690,6 +690,8 @@ MonoBehaviour:
   sphere: {fileID: 190408664}
   m_collideConstrainCount: 0
   m_attachConstrainCount: 0
+  m_simpleMoveList: []
+  SubStep: 22
 --- !u!1 &748656297
 GameObject:
   m_ObjectHideFlags: 0
@@ -1103,6 +1105,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_collider: {fileID: 190408670}
+  m_isDynamic: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
