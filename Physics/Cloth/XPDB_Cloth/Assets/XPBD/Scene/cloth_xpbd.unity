@@ -687,7 +687,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3019e017b60b74b97b4df868a0e692f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphere: {fileID: 190408664}
+  m_mass: 1
+  m_edgeCompliance: 0.1
+  m_collideCompliance: 0.5
+  m_attachCompliance: 0.1
+  m_planeY: -15
   m_collideConstrainCount: 0
   m_attachConstrainCount: 0
   m_simpleMoveList: []
@@ -988,7 +992,7 @@ Transform:
   m_GameObject: {fileID: 1488884262}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -22.235, y: -9.668236, z: -1.3512416}
+  m_LocalPosition: {x: 0, y: -15, z: 0}
   m_LocalScale: {x: 10, y: 5, z: 10}
   m_ConstrainProportionsScale: 0
   m_Children: []

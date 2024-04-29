@@ -21,16 +21,16 @@ public class SimpleMove : MonoBehaviour
 
     public void PreUpdate(float dt)
     {
-        m_velocity += Physics.gravity * dt;
-        var pos = this.transform.position;
-        pos += m_velocity * dt;
-        this.transform.position = pos;
+        //m_velocity += Physics.gravity * dt;
+        //var pos = this.transform.position;
+        //pos += m_velocity * dt;
+        //this.transform.position = pos;
     }
 
     public void MoveDelta(Vector3 delta)
     {
-        var pos = this.transform.position;
-        pos += delta;
-        this.transform.position = pos;
+        //var pos = this.transform.position;
+        //pos += delta;
+        //this.transform.position = pos;
     }
 }

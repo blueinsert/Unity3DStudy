@@ -22,15 +22,31 @@ public struct AttachConstrain
 
 public class XPBD_Cloth_Solver : MonoBehaviour
 {
-
+    public float m_mass = 1.0f;
     float t = 0.0333f;
     float damping = 0.99f;
     float damping_subStep = 0.99f;
+    [Range(0f,1f)]
+    public float m_edgeCompliance = 0.0f;
+    [Range(0f, 1f)]
+    public float m_collideCompliance = 0.0f;
+    [Range(0f, 1f)]
+    public float m_attachCompliance = 0.0f;
+    float[] InvMass;
     int[] E;
     float[] L;
     Vector3[] V;
+    public float m_planeY;
 
     Mesh m_mesh;
+
+    float DtSubstep
+    {
+        get
+        {
+            return t / SubStep;
+        }
+    }
 
     Vector3[] X_last = new Vector3[21 * 21];
     Vector3[] X = new Vector3[21 * 21];
@@ -45,7 +61,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
 
     public List<SimpleMove> m_simpleMoveList = new List<SimpleMove>();
 
-    [Range(7,55)]
+    [Range(7, 55)]
     public int SubStep = 22;
 
     // Use this for initialization
@@ -65,12 +81,14 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         m_mesh = mesh;
         //Resize the mesh.
         int n = 21;
+        InvMass = new float[n * n];
         Vector3[] X = new Vector3[n * n];
         Vector2[] UV = new Vector2[n * n];
         int[] T = new int[(n - 1) * (n - 1) * 6];
         for (int j = 0; j < n; j++)
             for (int i = 0; i < n; i++)
             {
+                InvMass[j * n + i] = 1.0f/(m_mass/(n * n));
                 X[j * n + i] = new Vector3(5 - 10.0f * i / (n - 1), 0, 5 - 10.0f * j / (n - 1));
                 UV[j * n + i] = new Vector3(i / (n - 1.0f), j / (n - 1.0f));
             }
@@ -212,6 +230,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         Vector3[] x_new = new Vector3[vertices.Length];
         int[] n = new int[vertices.Length];
 
+        float alpha = m_edgeCompliance / (DtSubstep * DtSubstep);
         for (int e = 0; e < E.Length / 2; e++)
         {
             var l_e = L[e];
@@ -221,33 +240,36 @@ public class XPBD_Cloth_Solver : MonoBehaviour
             var x_j = vertices[j];
             var x_ij = x_j - x_i;
             var dir = x_ij.normalized;
+            var grads = dir;
             var len = x_ij.magnitude;
-            var k1 = 0.5f;
-            var k2 = 0.5f;
-            //if (i == 0 || i == 20)
-            //{
-            //    k1 = 0;
-            //    k2 = 1.0f;
-            //}
-            //else if (j == 0 || j == 20)
-            //{
-            //    k1 = 1.0f;
-            //    k2 = 0;
-            //}
-            x_new[i] += x_i - k1 * (len - l_e) * (-dir);
-            x_new[j] += x_j + k2 * (len - l_e) * (-dir);
-            n[i] += 1;
-            n[j] += 1;
-        }
-
-        for (int i = 0; i < x_new.Length; i++)
-        {
-            //if (i == 0 || i == 20) continue;
-
-            if (n[i] != 0)
+            {//xpdb
+                var inv_mass_i = InvMass[i];
+                var inv_mass_j = InvMass[j];
+                float C = len - l_e;
+                float w = inv_mass_i + inv_mass_j;
+                var s = -C / (w + alpha);
+                vertices[i] -= grads * s * inv_mass_i;
+                vertices[j] += grads * s * inv_mass_j;
+            }
+            if (false)//pdb
             {
-                var x = (x_new[i] + 0.2f * vertices[i]) / (n[i] + 0.2f);
-                vertices[i] = x;
+                var k1 = 0.5f;
+                var k2 = 0.5f;
+                x_new[i] += x_i - k1 * (len - l_e) * (-dir);
+                x_new[j] += x_j + k2 * (len - l_e) * (-dir);
+                n[i] += 1;
+                n[j] += 1;
+            }
+        }
+        if (false)//
+        {
+            for (int i = 0; i < x_new.Length; i++)
+            {
+                if (n[i] != 0)
+                {
+                    var x = (x_new[i] + 0.2f * vertices[i]) / (n[i] + 0.2f);
+                    vertices[i] = x;
+                }
             }
         }
     }
@@ -255,6 +277,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
     void Solve_CollideConstrain()
     {
         var vertices = this.X;
+        var alpha = m_collideCompliance / (DtSubstep * DtSubstep);
         for (int i = 0; i < m_collideConstrainCount; i++)
         {
             var constrain = m_collideConstrain[i];
@@ -262,26 +285,19 @@ public class XPBD_Cloth_Solver : MonoBehaviour
             float C = Vector3.Dot((pos - constrain.m_entryPosition), constrain.m_normal);
             if (C < 0)
             {
+                Vector3 grads = constrain.m_normal;
+                float invMass = InvMass[constrain.m_index];
+                float w = invMass;
+                float s = -C / (w + alpha);
                 if (!constrain.m_isDynamic)
                 {
-                    Vector3 dp = -constrain.m_normal * C;
-                    pos += dp;
-                    vertices[constrain.m_index] = pos;
+                    Vector3 dp = invMass * s * grads;
+                    vertices[constrain.m_index] += dp;
                 }
                 else
                 {
-                    Vector3 dp = -constrain.m_normal * C * 0.5f;
-                    Vector3 dp2 = constrain.m_normal * C * 0.5f;
-
-                    pos += dp;
-                    vertices[constrain.m_index] = pos;
-
-                    var simpleMove= constrain.m_collider.GetComponent<SimpleMove>();
-                    if (simpleMove != null)
-                    {
-                        simpleMove.MoveDelta(dp2);
-                    }
-
+                    Vector3 dp = invMass * s * grads;
+                    vertices[constrain.m_index] += dp;
                 }
             }
 
@@ -291,11 +307,18 @@ public class XPBD_Cloth_Solver : MonoBehaviour
     void Solve_AttachConstrain()
     {
         var vertices = this.X;
+        float alpha = m_attachCompliance / (DtSubstep * DtSubstep);
         for (int i = 0; i < m_attachConstrainCount; i++)
         {
             var constrain = m_attachConstrain[i];
-            var newPos = constrain.m_owner.transform.position + constrain.m_offset;
-            vertices[constrain.m_index] = newPos;
+            var p = vertices[constrain.m_index];
+            float C = (p - (constrain.m_owner.transform.position + constrain.m_offset)).magnitude;
+            Vector3 grads = (p - (constrain.m_owner.transform.position + constrain.m_offset)).normalized;
+            float invMass = InvMass[constrain.m_index];
+            float w = invMass;
+            float s = -C / (w + alpha);
+            Vector3 dp = invMass * s * grads;
+            vertices[constrain.m_index] += dp;
         }
     }
 
@@ -337,7 +360,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         for (int i = 0; i < X.Length; i++)
         {
             var p = X[i];
-            float planeY = -10 + 0.2f;
+            float planeY = m_planeY;
             if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
             {
                 m_collideConstrain[m_collideConstrainCount].m_index = i;
@@ -348,7 +371,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
         }
     }
 
-    void CopyX2Y(Vector3[] xarray,Vector3[] yarray)
+    void CopyX2Y(Vector3[] xarray, Vector3[] yarray)
     {
         for (int i = 0; i < xarray.Length; i++)
         {
@@ -365,7 +388,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
             X[i] += V[i] * dt;
         }
 
-        foreach(var simpleMove in m_simpleMoveList)
+        foreach (var simpleMove in m_simpleMoveList)
         {
             simpleMove.PreUpdate(dt);
         }
@@ -394,7 +417,7 @@ public class XPBD_Cloth_Solver : MonoBehaviour
     void Update()
     {
         float dt = t / SubStep;
-        for(int i = 0; i < SubStep; i++)
+        for (int i = 0; i < SubStep; i++)
         {
             Step(dt);
         }

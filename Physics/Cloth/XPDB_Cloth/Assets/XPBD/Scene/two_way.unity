@@ -425,7 +425,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -832,10 +832,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3019e017b60b74b97b4df868a0e692f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sphere: {fileID: 190408664}
+  m_mass: 1
+  m_edgeCompliance: 0.1
+  m_collideCompliance: 0.3
+  m_attachCompliance: 0.1
+  m_planeY: -10
   m_collideConstrainCount: 0
   m_attachConstrainCount: 0
   m_simpleMoveList: []
+  SubStep: 22
 --- !u!1 &1109625512
 GameObject:
   m_ObjectHideFlags: 0
@@ -1237,7 +1242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ae11d0b52b2a9346973034136353932, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_collider: {fileID: 1790496359}
+  m_collider: {fileID: 190408670}
   m_isDynamic: 1
 --- !u!1 &1707172717
 GameObject:
