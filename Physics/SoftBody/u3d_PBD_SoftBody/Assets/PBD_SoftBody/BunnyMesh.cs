@@ -682,7 +682,7 @@ public class BunnyMesh
         var temp = Vector3.Cross(p2 - p1, p3 - p1);
         float res = Vector3.Dot(p4 - p1, temp);
         res *= (1.0f / 6);
-        if(res< 0.0f)
+        if(res< -1E-06)
         {
             Debug.LogError(string.Format("volume < 0,{0}", res));
         }
