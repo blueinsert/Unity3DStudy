@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{5EAB87BB-D5BD-1878-F398-AF2896E1C7F7}</ProjectGuid>
+    <ProjectGuid>{C54A0A26-76C8-1472-000B-51900C999BF0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Obi</AssemblyName>
@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>UNITY_2022_3_17;UNITY_2022_3;UNITY_2022;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AR;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_VIRTUALTEXTURING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_NAVIGATION_PACKAGE_DEBUG_VISUALIZATION;ENABLE_NAVIGATION_HEIGHTMESH_RUNTIME_SUPPORT;ENABLE_NAVIGATION_UI_REQUIRES_PACKAGE;PLATFORM_STANDALONE;TEXTCORE_1_0_OR_NEWER;PLATFORM_STANDALONE_WIN;UNITY_STANDALONE_WIN;UNITY_STANDALONE;UNITY_UGP_API;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_NVIDIA;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;GFXDEVICE_WAITFOREVENT_MESSAGEPUMP;PLATFORM_INITIALIZES_MEMORY_MANAGER_EXPLICITLY;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD;NET_STANDARD_2_1;NETSTANDARD;NETSTANDARD2_1;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;OBI_ONI_SUPPORTED;SRP_UNIVERSAL;OBI_BURST;OBI_MATHEMATICS;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
+    <DefineConstants>UNITY_2022_3_17;UNITY_2022_3;UNITY_2022;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2017_4_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_2_OR_NEWER;UNITY_2018_3_OR_NEWER;UNITY_2018_4_OR_NEWER;UNITY_2019_1_OR_NEWER;UNITY_2019_2_OR_NEWER;UNITY_2019_3_OR_NEWER;UNITY_2019_4_OR_NEWER;UNITY_2020_1_OR_NEWER;UNITY_2020_2_OR_NEWER;UNITY_2020_3_OR_NEWER;UNITY_2021_1_OR_NEWER;UNITY_2021_2_OR_NEWER;UNITY_2021_3_OR_NEWER;UNITY_2022_1_OR_NEWER;UNITY_2022_2_OR_NEWER;UNITY_2022_3_OR_NEWER;PLATFORM_ARCH_64;UNITY_64;UNITY_INCLUDE_TESTS;ENABLE_AR;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_EVENT_QUEUE;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_TEXTURE_STREAMING;ENABLE_VIRTUALTEXTURING;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_UNITYWEBREQUEST;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_EDITOR_GAME_SERVICES;ENABLE_UNITY_GAME_SERVICES_ANALYTICS_SUPPORT;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;ENABLE_MANAGED_ANIMATION_JOBS;ENABLE_MANAGED_AUDIO_JOBS;ENABLE_MANAGED_UNITYTLS;INCLUDE_DYNAMIC_GI;ENABLE_SCRIPTING_GC_WBARRIERS;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_VIDEO;ENABLE_ACCELERATOR_CLIENT_DEBUGGING;ENABLE_NAVIGATION_PACKAGE_DEBUG_VISUALIZATION;ENABLE_NAVIGATION_HEIGHTMESH_RUNTIME_SUPPORT;ENABLE_NAVIGATION_UI_REQUIRES_PACKAGE;PLATFORM_STANDALONE;TEXTCORE_1_0_OR_NEWER;PLATFORM_STANDALONE_WIN;UNITY_STANDALONE_WIN;UNITY_STANDALONE;UNITY_UGP_API;ENABLE_RUNTIME_GI;ENABLE_MOVIES;ENABLE_NETWORK;ENABLE_NVIDIA;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_OUT_OF_PROCESS_CRASH_HANDLER;ENABLE_CLUSTER_SYNC;ENABLE_CLUSTERINPUT;PLATFORM_UPDATES_TIME_OUTSIDE_OF_PLAYER_LOOP;GFXDEVICE_WAITFOREVENT_MESSAGEPUMP;PLATFORM_INITIALIZES_MEMORY_MANAGER_EXPLICITLY;ENABLE_MONO;NET_STANDARD_2_0;NET_STANDARD;NET_STANDARD_2_1;NETSTANDARD;NETSTANDARD2_1;ENABLE_PROFILER;DEBUG;TRACE;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;ENABLE_BURST_AOT;UNITY_TEAM_LICENSE;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_DIRECTOR;ENABLE_LOCALIZATION;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_TILEMAP;ENABLE_TIMELINE;ENABLE_LEGACY_INPUT_MANAGER;TEXTCORE_FONT_ENGINE_1_5_OR_NEWER;OBI_ONI_SUPPORTED;SRP_UNIVERSAL;OBI_COLLECTIONS;OBI_BURST;OBI_MATHEMATICS;CSHARP_7_OR_LATER;CSHARP_7_3_OR_NEWER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
@@ -64,10 +64,10 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Chain\OniChainConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeByteList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Distance\BurstDistanceConstraintsBatch.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstAabb.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\BendTwist\OniBendTwistConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Queries\BurstSphereQuery.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ColliderCollision\BurstColliderFrictionConstraintsBatch.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstAabb.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\Interpolators\ObiConstantInterpolator.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiRigidbody2D.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiCollisionMaterial.cs" />
@@ -79,9 +79,9 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstColliderWorld.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiDistanceConstraintsData.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ObiList.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstCellSpan.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiDistanceFieldContainer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IDensityConstraintsBatchImpl.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstCellSpan.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\ObiPathSmoother.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\Interpolators\ObiColorInterpolator3D.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\BoundsReductionJob.cs" />
@@ -95,14 +95,14 @@
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeQueryResultList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ColliderShape.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Chain\BurstChainConstraints.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeTriangleList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\SerializeProperty.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeTriangleList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\UpdateNormalsJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\FluidInteraction.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiStretchShearConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiTetherConstraintsBatch.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstTriangleMesh.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Aerodynamics\BurstAerodynamicConstraints.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstTriangleMesh.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\OniBackend.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiVolumeConstraintsData.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\Queries\BurstContact.cs" />
@@ -110,8 +110,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Voxelization\PriorityQueue.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\ApplyInertialForcesJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\IStructuralConstraintBatch.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiShapeMatchingConstraintsData.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Pin\BurstPinConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeIntList.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\ObiRopeSection.cs" />
@@ -153,8 +153,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstCollisionMaterial.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Solver\OniSolverImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers3D\ObiTerrainShapeTracker.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\DataChannels\ObiPathDataChannelIdentity.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Distance\OniDistanceConstraintsImpl.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\DataChannels\ObiPathDataChannelIdentity.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Tether\BurstTetherConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Tether\BurstTetherConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Aerodynamics\OniAerodynamicConstraintsImpl.cs" />
@@ -164,8 +164,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IDistanceConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeColliderShapeList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiSkinConstraintsData.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeAabbList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Coroutines\CoroutineJob.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeAabbList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\StructuralConstraint.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IParticleFrictionConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IBendConstraintsBatchImpl.cs" />
@@ -175,8 +175,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeEdgeList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\FindFluidParticlesJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeBIHNodeList.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers3D\ObiShapeTracker.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Solver\ObiSolver.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers3D\ObiShapeTracker.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\Interpolators\ObiInterpolator.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\UpdateInertiaTensorsJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IPinConstraintsBatchImpl.cs" />
@@ -192,18 +192,18 @@
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiBone.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\OniConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiRigidbody.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\BendTwist\BurstBendTwistConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\ObiWingedPoint.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Pin\OniPinConstraintsBatchImpl.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\BendTwist\BurstBendTwistConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstColliderShape.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstDistanceField.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Skin\BurstSkinConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiParticleGridDebugger.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeVector2List.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Queries\BurstRay.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiRope.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Chain\BurstChainConstraintsBatch.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeVector2List.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiRope.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Queries\BurstRay.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\ConstraintBatcher.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstQueryShape.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\VisibleIf.cs" />
@@ -212,9 +212,9 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\BurstMath.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\VInt4.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IParticleCollisionConstraintsBatchImpl.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Utils\ObiRopeAttach.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\OniConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiContactGrabber.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Utils\ObiRopeAttach.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeFloatList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Rendering\ShadowmapExposer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\UpdatePositionsJob.cs" />
@@ -222,12 +222,12 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\IObiJobHandle.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ASDF\ASDF.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeContactShapeList.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\BatchLUT.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Tether\OniTetherConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IChainConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\IBurstCollider.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiCollider.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Aerodynamics\OniAerodynamicConstraintsBatchImpl.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\BatchLUT.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeMatrix4x4List.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiVolumeConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\ChildrenOnly.cs" />
@@ -235,12 +235,12 @@
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Coroutines\EditorCoroutine.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\ObiMeshBasedActorBlueprint.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Utils\ObiRopePrefabPlugger.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstRigidbody.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\BuildSimplexAabbs.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\SimplexCounts.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\ShapeMatching\OniShapeMatchingConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IStretchShearConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\InspectorButtonAttribute.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstRigidbody.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\ObiPath.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\SetCategory.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Queries\SpatialQueryJob.cs" />
@@ -254,10 +254,10 @@
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Rendering\ObiRopeMeshRenderer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\BurstConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Actors\ObiActor.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\OniColliderWorld.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeAffineTransformList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\GraphColoring.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiBendTwistConstraintsBatch.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\OniColliderWorld.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\BurstIntegration.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IStitchConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ParticleCollision\BurstParticleCollisionConstraints.cs" />
@@ -268,9 +268,9 @@
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiParticleAttachment.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiEdgeMeshContainer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Aerodynamics\BurstAerodynamicConstraintsBatch.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Queries\QueryShape.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiParticlePicker.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\Interpolators\ObiCatmullRomInterpolator3D.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Queries\QueryShape.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ShapeMatching\BurstShapeMatchingConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\BVH\IBounded.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Skin\OniSkinConstraintsImpl.cs" />
@@ -279,8 +279,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers3D\ObiCapsuleShapeTracker.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiAerodynamicConstraintsData.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\ConstraintSorter.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ParticlePair.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers2D\ObiEdgeShapeTracker2D.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ParticlePair.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\DisplayAs.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers3D\ObiMeshShapeTracker.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Pin\OniPinConstraintsImpl.cs" />
@@ -320,31 +320,31 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Skin\OniSkinConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IShapeMatchingConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers2D\ObiBoxShapeTracker2D.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Aabb.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers2D\ObiCircleShapeTracker2D.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Aabb.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeQueryShapeList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Batches\ObiAerodynamicConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Oni.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\IConstraint.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\MultiDelayed.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\DataChannels\ObiThicknessDataChannel.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\BVH\BIH.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Rendering\ObiParticleRenderer.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\ISkinConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\UpdateVelocitiesJob.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\DataChannels\ObiThicknessDataChannel.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Rendering\ObiParticleRenderer.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\BVH\BIH.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\ISkinConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Blueprints\ObiRopeBlueprintBase.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\DequeueIntoArrayJob.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Rendering\ObiRopeChainRenderer.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeVector4List.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Tether\OniTetherConstraintsBatchImpl.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeVector4List.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\Voxelization\MeshVoxelizer.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Blueprints\ObiRodBlueprint.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Queries\BurstBoxQuery.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstInertialFrame.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Updaters\ObiLateUpdater.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeDistanceFieldHeaderList.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Bend\OniBendConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiRopeCursor.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Bend\OniBendConstraintsImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\CollisionMaterial.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\Interpolators\ObiCatmullRomInterpolator.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\IColliderFrictionConstraintsBatchImpl.cs" />
@@ -361,13 +361,13 @@
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiTriangleMeshContainer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeRigidbodyList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Actors\IObiParticleCollection.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstCapsule.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ColliderCollision\BurstColliderCollisionConstraints.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstCapsule.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\DataChannels\ObiRotationalMassDataChannel.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\BurstConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\ObiConstraints.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiRod.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ParticleGrid.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\Actors\ObiRod.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Rendering\ObiDistanceFieldRenderer.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\OniJobHandle.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiChainConstraintsData.cs" />
@@ -384,8 +384,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\Constraints\ITetherConstraintsBatchImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiContactEventDispatcher.cs" />
     <Compile Include="Assets\Obi\Scripts\RopeAndRod\Rendering\ObiRopeExtrudedRenderer.cs" />
-    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\ObiPathFrame.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Chain\OniChainConstraintsBatchImpl.cs" />
+    <Compile Include="Assets\Obi\Scripts\RopeAndRod\DataStructures\Path\ObiPathFrame.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Interface\IObiBackend.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\StretchShear\BurstStretchShearConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Oni\Constraints\Volume\OniVolumeConstraintsBatchImpl.cs" />
@@ -769,6 +769,10 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
       <HintPath>Library\PackageCache\com.unity.visualscripting@1.9.1\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">
@@ -1293,6 +1297,10 @@
     </Reference>
     <Reference Include="Unity.Burst">
       <HintPath>Library\ScriptAssemblies\Unity.Burst.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

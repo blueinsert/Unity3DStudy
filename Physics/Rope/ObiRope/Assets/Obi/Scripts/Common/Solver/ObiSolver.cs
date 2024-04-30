@@ -819,6 +819,7 @@ namespace Obi
 #endif
                     break;
             }
+            Debug.Log(string.Format("m_SimulationBackend:{0}", m_SimulationBackend.GetType()));
         }
 
         public void Initialize()
