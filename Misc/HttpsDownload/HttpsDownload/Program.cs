@@ -20,7 +20,7 @@ namespace HttpsDownload
 
         static int ParseRange(string arg)
         {
-            if(!(arg.StartsWith("[") && arg.EndsWith("]")))
+            if (!(arg.StartsWith("[") && arg.EndsWith("]")))
             {
                 Console.WriteLine(string.Format("range string:{0} format error!", arg));
                 return 1;
@@ -60,12 +60,12 @@ namespace HttpsDownload
             }
             else
             {
-                if(rangeStart.Length == 1 && rangeEnd.Length == 1)
+                if (rangeStart.Length == 1 && rangeEnd.Length == 1)
                 {
                     List<string> range = new List<string>();
                     char cStart = rangeStart[0];
                     char cEnd = rangeEnd[0];
-                    for(char c = cStart; c <= cEnd; c = (char)((int)c + 1))
+                    for (char c = cStart; c <= cEnd; c = (char)((int)c + 1))
                     {
                         range.Add(c.ToString());
                     }
@@ -83,23 +83,28 @@ namespace HttpsDownload
         static int ParseArgs(string[] args)
         {
             int i = 0;
+            int res = 0;
             for (; i < args.Length;)
             {
                 var arg = args[i];
-                if(arg == "-r")
+                if (arg == "-r")
                 {
                     int count = int.Parse(args[i + 1]);
-                    for(int j = 0; j < count; j++)
+                    for (int j = 0; j < count; j++)
                     {
                         var rangeArg = args[i + 2 + j];
-                        ParseRange(rangeArg);
+                        if ((res = ParseRange(rangeArg)) != 0)
+                        if ((res = ParseRange(rangeArg)) != 0)
+                            return res;
                     }
                     i += count + 2;
-                }else if(arg == "-o")
+                }
+                else if (arg == "-o")
                 {
                     s_outputPath = args[i + 1];
                     i += 2;
-                }else if(arg == "-p")
+                }
+                else if (arg == "-p")
                 {
                     s_urlPath = args[i + 1];
                     i += 2;
@@ -111,21 +116,25 @@ namespace HttpsDownload
         static void DebugOutput(List<int> layIndexList)
         {
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < layIndexList.Count; i++)
+            for (int i = 0; i < layIndexList.Count; i++)
             {
                 sb.Append(layIndexList[i].ToString()).Append(" ");
             }
             Console.WriteLine(sb.ToString());
         }
 
-        static void Traverse_Recurse(List<int> layIndexList, int curLayer)
+        static void Traverse_Recurse(List<int> layIndexList, int curLayer, Action<List<int>> action)
         {
             if (curLayer == layIndexList.Count - 1)
             {
-                for(int i = 0; i < s_argRangeList[curLayer].Count; i++)
+                for (int i = 0; i < s_argRangeList[curLayer].Count; i++)
                 {
                     layIndexList[curLayer] = i;
-                    DebugOutput(layIndexList);
+                    if (action != null)
+                    {
+                        action(layIndexList);
+                    }
+                    //DebugOutput(layIndexList);
                 }
             }
             else
@@ -133,58 +142,48 @@ namespace HttpsDownload
                 for (int i = 0; i < s_argRangeList[curLayer].Count; i++)
                 {
                     layIndexList[curLayer] = i;
-                    Traverse_Recurse(layIndexList, curLayer + 1);
+                    Traverse_Recurse(layIndexList, curLayer + 1, action);
                 }
             }
         }
 
-        static void TraverseArgRange()
+        static void TraverseArgRange(Action<List<int>> action)
         {
             List<int> layIndexList = new List<int>();
             int count = s_argRangeList.Count;
-            for(int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 layIndexList.Add(0);
             }
-            Traverse_Recurse(layIndexList, 0);
+            Traverse_Recurse(layIndexList, 0, action);
         }
 
         static int Main(string[] args)
         {
             int res = 0;
-            if((res = ParseArgs(args)) != 0)
+            if ((res = ParseArgs(args)) != 0)
             {
                 return res;
             }
-            TraverseArgRange();
-            return 0;
-            var urlPath = "https://data.lhncbc.nlm.nih.gov/public/Visible-Human/Female-Images/70mm/2K_PNG-Images/";
-            var localPath = "./download/";
-            if (!Directory.Exists(localPath))
+            if (!Directory.Exists(s_outputPath))
             {
-                Directory.CreateDirectory(localPath);
+                Directory.CreateDirectory(s_outputPath);
             }
-            var fileNameT = "{0}{1}.png";
-            List<string> urlPathList = new List<string>();
-            List<string> localPathList = new List<string>();
-            List<string> array1 = new List<string> { "",};
-            for (int i = 3566; i <= 6189; i++)
+            TraverseArgRange((layIndexList) =>
             {
-                var s1 = i.ToString();
-                for(int j = 0; j < array1.Count; j++)
+                string s = "";
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < layIndexList.Count; i++)
                 {
-                    var s2 = array1[j];
-                    var fileName = string.Format(fileNameT, s1, s2);
-                    urlPathList.Add(urlPath + fileName);
-                    localPathList.Add(localPath + fileName);
+                    sb.Append(s_argRangeList[i][layIndexList[i]]);
                 }
-            }
-            for(int i = 0; i < urlPathList.Count; i++)
-            {
-                var url = urlPathList[i];
-                var savePath = localPathList[i];
-                DownloadAsset(url, savePath);
-            }
+                s = sb.ToString();
+                var url = string.Format(s_urlPath, s);
+                var index = url.LastIndexOf("/");
+                var fileName = url.Substring(index, url.Length - index);
+                var outputPath = s_outputPath + fileName;
+                DownloadAsset(url, outputPath);
+            });
             Console.WriteLine("all completed!");
             var exitEvent = new System.Threading.ManualResetEvent(false);
             Console.CancelKeyPress += (sender, eventArgs) =>
@@ -197,32 +196,47 @@ namespace HttpsDownload
             return 0;
         }
 
-        static void  DownloadAsset(string fileUrl, string savePath)
+        static void DownloadAsset(string fileUrl, string savePath)
         {
-            int retryMax = 3;
-            int retryCount = 0;
+            //int retryMax = 3;
+            //int retryCount = 0;
 
-            DownloadStart:
-            try {
-                Console.WriteLine(string.Format("start download {0} ...", fileUrl));
-                DownloadAsset_Async(fileUrl, savePath).Wait();
-                Console.Write("  ok \n");
-            }catch(Exception e)
+            //DownloadStart:
+            try
             {
-                retryCount++;
-                if (retryCount < retryMax)
-                {
-                    goto DownloadStart;
-                }
+            //    Console.WriteLine(string.Format("start download {0} ...", fileUrl));
+                DownloadAsset_Async(fileUrl, savePath).Wait();
+            //    Console.Write("  ok \n");
             }
+            catch (Exception e)
+            {
+            //    Console.WriteLine(e.GetType().ToString());
+            //    if (e.HResult != 404)
+            //    {
+            //        retryCount++;
+            //        if (retryCount < retryMax)
+            //        {
+            //            Console.WriteLine(string.Format("retry"));
+            //            goto DownloadStart;
+            //        }
+                }
+
+            //}
         }
 
         static async Task DownloadAsset_Async(string fileUrl, string savePath)
         {
-            string localFilePath = savePath; 
+            string localFilePath = savePath;
 
+
+            int retryMax = 3;
+            int retryCount = 0;
+
+            DownloadStart:
             try
             {
+                Console.WriteLine(string.Format("start download {0} ...", fileUrl));
+
                 HttpResponseMessage response = await client.GetAsync(fileUrl);
                 response.EnsureSuccessStatusCode(); // 确保HTTP响应状态码表示成功  
 
@@ -234,14 +248,25 @@ namespace HttpsDownload
                 {
                     await contentStream.CopyToAsync(fileStream);
                 }
-
+                Console.Write("  ok \n");
                 //Console.WriteLine("文件下载完成并已保存到: " + localFilePath);
             }
             catch (HttpRequestException e)
             {
                 Console.WriteLine("\n异常捕获: {0}", e.Message);
+                bool retry = e.Message.IndexOf("404") == -1;
+                if (retry)
+                {
+                    retryCount++;
+                    if (retryCount < retryMax)
+                    {
+                        Console.WriteLine(string.Format("retry"));
+                        goto DownloadStart;
+                    }
+                }
                 throw;
             }
+            
         }
     }
 }
