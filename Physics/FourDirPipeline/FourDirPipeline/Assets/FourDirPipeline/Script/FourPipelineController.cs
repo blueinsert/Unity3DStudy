@@ -10,6 +10,8 @@ public class FourPipelineController : MonoBehaviour
     public float m_horizontalValue = 0;
     public float m_verticalValue = 0;
 
+    public GameObject m_followTarget = null;
+
     public void Init()
     {
        foreach(var jointCtrl in GetComponentsInChildren<FourPipelineJointController>())
@@ -59,7 +61,14 @@ public class FourPipelineController : MonoBehaviour
 
     private void Update()
     {
-
+        if (m_followTarget != null)
+        {
+            var body = GetComponent<ArticulationBody>();
+            if (body.isRoot)
+            {
+                body.TeleportRoot(m_followTarget.transform.position, m_followTarget.transform.rotation);
+            }
+        }
     }
 
     public void OnGUI()

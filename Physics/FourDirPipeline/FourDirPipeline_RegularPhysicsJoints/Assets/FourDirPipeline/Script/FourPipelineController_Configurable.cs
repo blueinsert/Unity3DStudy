@@ -61,6 +61,11 @@ public class FourPipelineController_Configurable : MonoBehaviour
         }
     }
 
+    public void SetParams()
+    {
+
+    }
+
     private void Update()
     {
 

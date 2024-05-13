@@ -20,7 +20,9 @@ public class FourPipelineJointController : MonoBehaviour
     public FourPipelineJointType m_type;
 
     public float m_targetValue;
-    public float m_speed = 500;
+
+    public bool m_useProcessive = true;
+    public float m_speed = 50;
 
     public void SetLinkType(FourPipelineJointType type)
     {
@@ -54,9 +56,9 @@ public class FourPipelineJointController : MonoBehaviour
     public void SetDriveProperty(float stiffness, float damp)
     {
         var temp = m_articulationBody.xDrive;
-        //temp.driveType = ArticulationDriveType.Force;
-        temp.stiffness = stiffness;
-        temp.damping = damp;
+        temp.driveType = ArticulationDriveType.Target;
+        temp.stiffness = 3000000;
+        temp.damping = 30000;
         m_articulationBody.xDrive = temp;
     }
 
@@ -65,21 +67,28 @@ public class FourPipelineJointController : MonoBehaviour
         value = (value + 1.0f) / 2;
         value = Mathf.Clamp01(value);
         m_targetValue = Mathf.Lerp(m_rotateLimit.x, m_rotateLimit.y, value);
+        if (!m_useProcessive)
+        {
+            RotateTo(m_targetValue);
+        }
     }
 
 
     void FixedUpdate()
     {
-        var dist = m_targetValue - CurrentPrimaryAxisRotation();
-        if (Mathf.Abs(dist) < 0.01f)
+        if (m_useProcessive)
         {
-            RotateTo(m_targetValue);
-            return;
-        }
-        var sign = Mathf.Sign(m_targetValue - CurrentPrimaryAxisRotation());
-        float rotationChange = sign * Mathf.Abs(dist) * m_speed * Time.fixedDeltaTime;
-        float rotationGoal = CurrentPrimaryAxisRotation() + rotationChange;
-        RotateTo(rotationGoal);
+            var dist = m_targetValue - CurrentPrimaryAxisRotation();
+            if (Mathf.Abs(dist) < 0.01f)
+            {
+                RotateTo(m_targetValue);
+                return;
+            }
+            var sign = Mathf.Sign(m_targetValue - CurrentPrimaryAxisRotation());
+            float rotationChange = sign * m_speed * Time.fixedDeltaTime;
+            float rotationGoal = CurrentPrimaryAxisRotation() + rotationChange;
+            RotateTo(rotationGoal);
+        }   
     }
 
     float CurrentPrimaryAxisRotation()

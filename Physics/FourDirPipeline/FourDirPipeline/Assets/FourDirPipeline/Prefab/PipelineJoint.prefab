@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2745176240962528534}
   - component: {fileID: 8806979066795489261}
   - component: {fileID: 5944731677533450288}
-  - component: {fileID: 6558314587349467074}
+  - component: {fileID: 41588272618776386}
   m_Layer: 0
   m_Name: PipelineJoint
   m_TagString: Untagged
@@ -101,7 +101,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_CollisionDetectionMode: 0
 --- !u!114 &5944731677533450288
 MonoBehaviour:
@@ -121,8 +121,9 @@ MonoBehaviour:
   m_rotateLimit: {x: -15, y: 15}
   m_type: 0
   m_targetValue: 0
-  m_speed: 10
---- !u!65 &6558314587349467074
+  m_useProcessive: 1
+  m_speed: 3
+--- !u!65 &41588272618776386
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,7 +142,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 0.29, z: 1}
+  m_Size: {x: 7.69, y: 1.63, z: 8.25}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &543784520279414908
 GameObject:

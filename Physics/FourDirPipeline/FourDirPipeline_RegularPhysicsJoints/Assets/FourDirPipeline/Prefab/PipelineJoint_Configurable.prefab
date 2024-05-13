@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3268365468919007227}
   - component: {fileID: 7781922897415686244}
   - component: {fileID: 4986390344131875721}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PipelineJoint_Configurable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -254,3 +254,7 @@ MonoBehaviour:
   m_rotateLimit: {x: -15, y: 15}
   m_type: 0
   m_targetValue: 0
+  m_curValue: 0
+  m_curAngleAbs: 0
+  m_rotateSpeed: 10
+  m_useProgressive: 1

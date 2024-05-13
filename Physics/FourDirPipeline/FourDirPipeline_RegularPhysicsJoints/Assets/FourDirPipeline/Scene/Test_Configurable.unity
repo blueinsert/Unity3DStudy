@@ -797,7 +797,7 @@ GameObject:
   m_Component:
   - component: {fileID: 976650742}
   - component: {fileID: 976650743}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 'PipelineRoot '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -836,7 +836,7 @@ MonoBehaviour:
   m_jointCount: 10
   m_jointAxisDir: {x: 0, y: 1, z: 0}
   m_jointOffset: 0.28
-  m_jointRotateDegreeMax: 15
+  m_jointRotateDegreeMax: 40
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0
@@ -901,7 +901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1861078099
 Transform:
   m_ObjectHideFlags: 0
