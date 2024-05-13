@@ -92,13 +92,17 @@ public class FourPipelineJointController_Configurable : MonoBehaviour
         {
             var driver = joint.angularXDrive;
             driver.positionSpring = 3000000;
-            driver.positionDamper = 30000;
+            driver.positionDamper = 60000;
             //driver.maximumForce = 10000000;
             joint.angularXDrive = driver;
         }
 
         var collider = GetComponent<Collider>();
         collider.excludeLayers = LayerMask.NameToLayer("Pipeline");
+
+        var rigid = GetComponent<Rigidbody>();
+        rigid.drag = 0.2f;
+        rigid.angularDrag = 0.2f;
     }
 
     float ConvertAngle(float angle)
