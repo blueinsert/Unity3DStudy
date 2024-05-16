@@ -76,6 +76,8 @@ MonoBehaviour:
   m_rotateLimit: {x: -15, y: 15}
   m_type: 0
   m_targetValue: 0
+  m_speed: 5
+  m_useMotor: 0
 --- !u!54 &6087579856562864948
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -119,7 +121,7 @@ HingeJoint:
   serializedVersion: 2
   m_UseSpring: 1
   m_Spring:
-    spring: 100000000
+    spring: 1e+27
     damper: 1000000
     targetPosition: 0
   m_UseMotor: 0

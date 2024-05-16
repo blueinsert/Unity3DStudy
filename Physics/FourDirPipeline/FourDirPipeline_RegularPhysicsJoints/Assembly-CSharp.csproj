@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\FourDirPipeline\Script\FourPipelineJointController_Configurable.cs" />
+    <Compile Include="Assets\FourDirPipeline\Script\PID.cs" />
     <Compile Include="Assets\FourDirPipeline\Script\FourPipelineController.cs" />
     <Compile Include="Assets\FourDirPipeline\Script\FourPipelineController_Configurable.cs" />
     <Compile Include="Assets\FourDirPipeline\Script\FourPipelineCreater.cs" />

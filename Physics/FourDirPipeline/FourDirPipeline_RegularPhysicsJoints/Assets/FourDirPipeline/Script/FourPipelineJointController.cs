@@ -21,7 +21,17 @@ public class FourPipelineJointController : MonoBehaviour
 
     public float m_targetValue;
 
+    public float m_speed = 5.0f;
+    public bool m_useMotor = true;
+
     private HingeJoint m_hingeJoint = null;
+
+    PID m_pid = new PID();
+
+    private void Awake()
+    {
+        m_pid.Setup(0.5f, 0.5f, 0.7f);
+    }
 
     public void SetLinkType(FourPipelineJointType type)
     {
@@ -36,7 +46,7 @@ public class FourPipelineJointController : MonoBehaviour
         m_linkVNode.SetActive(false);
     }
 
-    public void InitPhysicsComps(FourPipelineJointController prev,int index, int all)
+    public void InitPhysicsComps(FourPipelineJointController prev, int index, int all)
     {
         var rigibody = this.gameObject.GetComponent<Rigidbody>();
         //rigibody.mass = 0.001f;
@@ -45,21 +55,10 @@ public class FourPipelineJointController : MonoBehaviour
         {
             var hingeJoint = this.gameObject.GetComponent<HingeJoint>();
             hingeJoint.connectedBody = prev.GetComponent<Rigidbody>();
-            if(prev.m_type == FourPipelineJointType.Horizonal)
+            if (prev.m_type == FourPipelineJointType.Horizonal)
             {
                 hingeJoint.axis = new Vector3(0, 0, 90);
             }
-            hingeJoint.useLimits = true;
-            hingeJoint.limits = new JointLimits() {
-                min = m_rotateLimit.x,
-                max = m_rotateLimit.y,
-            };
-            //hingeJoint.useSpring = true;
-            //hingeJoint.spring = new JointSpring() {
-            //    spring = 10000,
-            //    damper = 100,
-            //    targetPosition = 0,
-            //};
             m_hingeJoint = hingeJoint;
         }
         else
@@ -81,21 +80,61 @@ public class FourPipelineJointController : MonoBehaviour
 
         if (m_hingeJoint != null)
         {
-            var springSetting = m_hingeJoint.spring;
-            springSetting.targetPosition = m_targetValue;
-            m_hingeJoint.spring = springSetting;
+            var limit = m_hingeJoint.limits;
+            limit.min = -180;
+            limit.max = 180;
+            limit.bounciness = 9999999999;
+            m_hingeJoint.limits = limit;
+        }
 
-            //m_hingeJoint.limits = new JointLimits()
-            //{
-            //    min = m_targetValue,
-            //    max = m_targetValue,
-            //};
-        } 
+        if (!m_useMotor)
+        {
+            if (m_hingeJoint != null)
+            {
+                var springSetting = m_hingeJoint.spring;
+                springSetting.targetPosition = m_targetValue;
+                m_hingeJoint.spring = springSetting;
+                m_hingeJoint.useSpring = true;
+                m_hingeJoint.useMotor = false;
+                //m_hingeJoint.limits = new JointLimits()
+                //{
+                //    min = m_targetValue,
+                //    max = m_targetValue,
+                //};
+            }
+
+        }
+        else
+        {
+            if (m_hingeJoint != null)
+            {
+                m_hingeJoint.useSpring = false;
+                m_hingeJoint.useMotor = true;
+            }
+        }
+
     }
 
     public void FixedUpdate()
     {
+        if (m_useMotor)
+        {
+            if (m_hingeJoint != null)
+            {
+                var cur = m_hingeJoint.angle;
+                var bet = m_targetValue - cur;
+                m_pid.Update(Time.deltaTime, m_targetValue, cur);
+                var motor = m_hingeJoint.motor;
+                motor.force = 100000000.0f;
+                motor.targetVelocity = m_pid.GetOutput();
+
+                m_hingeJoint.motor = motor;
+                m_hingeJoint.useMotor = true;
+                m_hingeJoint.useSpring = false;
+            }
+        }
         
+
     }
 
 }

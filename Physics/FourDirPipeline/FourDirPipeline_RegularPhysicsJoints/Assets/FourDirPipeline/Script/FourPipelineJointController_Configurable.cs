@@ -61,11 +61,11 @@ public class FourPipelineJointController_Configurable : MonoBehaviour
         if(m_physicsJoint != null)
         {
             var low = m_physicsJoint.lowAngularXLimit;
-            low.limit = -max;
+            low.limit =-180;
             m_physicsJoint.lowAngularXLimit = low;
 
             var high = m_physicsJoint.highAngularXLimit;
-            high.limit = max;
+            high.limit = 180;
             m_physicsJoint.highAngularXLimit = high;
         }
     }

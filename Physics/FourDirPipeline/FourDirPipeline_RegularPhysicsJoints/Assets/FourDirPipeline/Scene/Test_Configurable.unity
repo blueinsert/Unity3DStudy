@@ -183,13 +183,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7781922897415686244, guid: 738367ab3618d8e44930062a6eff212b,
         type: 3}
+      propertyPath: m_Anchor.y
+      value: -1.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 7781922897415686244, guid: 738367ab3618d8e44930062a6eff212b,
+        type: 3}
       propertyPath: m_ConnectedBody
       value: 
       objectReference: {fileID: 449250763}
     - target: {fileID: 7781922897415686244, guid: 738367ab3618d8e44930062a6eff212b,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 1.1308335
+      value: 1.1108335
       objectReference: {fileID: 0}
     - target: {fileID: 8780808309399202766, guid: 738367ab3618d8e44930062a6eff212b,
         type: 3}
@@ -812,8 +817,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 976650740}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3.4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -833,10 +838,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jointPrefab: {fileID: 8780808309399202766, guid: 738367ab3618d8e44930062a6eff212b,
     type: 3}
-  m_jointCount: 10
+  m_jointCount: 20
   m_jointAxisDir: {x: 0, y: 1, z: 0}
-  m_jointOffset: 0.28
-  m_jointRotateDegreeMax: 40
+  m_jointOffset: 0.18
+  m_jointRotateDegreeMax: 45
 --- !u!1 &1160234425
 GameObject:
   m_ObjectHideFlags: 0

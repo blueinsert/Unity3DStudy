@@ -26,7 +26,7 @@ public class FourPipelineCreater_Configurable : MonoBehaviour
         FourPipelineJointType jointType = FourPipelineJointType.Horizonal;
         var parent = this.transform;
         var rootPosition = this.transform.position;
-        for(int i=0;i<m_jointCount;i++) {
+        for(int i=0;i < m_jointCount; i++) {
             var go = Instantiate(m_jointPrefab, parent);
             go.transform.position = rootPosition + m_jointAxisDir * m_jointOffset * i;// new Vector3(0, m_jointOffset, 0);
             FourPipelineJointController_Configurable ctrl = go.GetComponent<FourPipelineJointController_Configurable>();
@@ -36,7 +36,7 @@ public class FourPipelineCreater_Configurable : MonoBehaviour
                 jointType = FourPipelineJointType.Horizonal;
             else if (jointType == FourPipelineJointType.Horizonal)
                 jointType = FourPipelineJointType.Vertical;
-
+            ctrl.GetComponent<Rigidbody>().mass = (m_jointCount - i) * 1f;
             if(i == m_jointCount - 1)
             {
                 ctrl.HideLinks();

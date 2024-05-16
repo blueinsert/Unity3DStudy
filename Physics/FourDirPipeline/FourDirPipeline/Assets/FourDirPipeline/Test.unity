@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 75961497}
   - component: {fileID: 75961496}
   - component: {fileID: 75961495}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PipelineRoot2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -158,10 +158,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jointPrefab: {fileID: 70736057932148481, guid: cccaf6d5fa7eb794398e39ce7aac185d,
     type: 3}
-  m_jointCount: 30
+  m_jointCount: 9
   m_jointAxisDir: {x: 0, y: 1, z: 0}
   m_jointOffset: 2
-  m_jointRotateDegreeMax: 12
+  m_jointRotateDegreeMax: 45
   m_useGravity: 0
   m_driveStifness: 100000
   m_driveDamp: 1000
@@ -444,7 +444,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 576755531}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Pipeline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
