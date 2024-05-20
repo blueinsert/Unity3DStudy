@@ -55,6 +55,7 @@
     <UnityVersion>2022.3.17f1c1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\PushPullController.cs" />
     <Compile Include="Assets\RopeCreater.cs" />
   </ItemGroup>
   <ItemGroup>
