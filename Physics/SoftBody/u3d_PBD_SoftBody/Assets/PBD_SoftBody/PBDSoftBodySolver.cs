@@ -40,7 +40,9 @@ public class PBDSoftBodySolver : MonoBehaviour
 
     public float m_planeY = -10;
 
-    public float m_scale = 3.0f;
+    public float[] m_initRestVol = null;
+    public float[] m_restVol = null;
+    public float m_scale = 1.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -124,7 +126,7 @@ public class PBDSoftBodySolver : MonoBehaviour
                 w += m_bunnyData.m_invMass[ids[j]] * Mathf.Pow(grads[j].magnitude, 2.0f);
             }
             var vol = m_bunnyData.TetVolume(i);
-            float C = (vol - m_bunnyData.m_restVol[i]) * 6f;
+            float C = (vol - m_bunnyData.m_restVol[i] * m_scale) * 6f;
             float s = -C / (w + alpha);
             for(int j = 0;j< 4;j++) {
                 var id = ids[j];
@@ -224,7 +226,6 @@ public class PBDSoftBodySolver : MonoBehaviour
             m_V[i] *= m_damping_subStep;
         }
 
-
     }
 
     // Update is called once per frame
@@ -235,7 +236,16 @@ public class PBDSoftBodySolver : MonoBehaviour
         {
             Step();
         }
-
+        float speed = 3.0f;
+        if (Input.GetKey(KeyCode.O))
+        {
+            m_scale += speed * Time.deltaTime;
+        }
+        if (Input.GetKey(KeyCode.P))
+        {
+            m_scale -= speed * Time.deltaTime;
+        }
+        m_scale = Mathf.Clamp(m_scale, 1.0f, 20.0f);
         m_mesh.vertices = this.m_X;
         m_mesh.RecalculateNormals();
     }

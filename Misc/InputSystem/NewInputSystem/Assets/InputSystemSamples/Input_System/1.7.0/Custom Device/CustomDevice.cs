@@ -348,5 +348,6 @@ public class CustomDevice : InputDevice, IInputUpdateCallbackReceiver
         // NOTE: We are replacing the current device state wholesale here. An alternative
         //       would be to use QueueDeltaStateEvent to replace only select memory contents.
         InputSystem.QueueStateEvent(this, state);
+        new InputDeviceMatcher().WithInterface
     }
 }
