@@ -1,0 +1,1 @@
+This is a folder where you can store your favorite VertPaint template files. 
