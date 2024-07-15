@@ -12,11 +12,11 @@ public struct CollideConstrain
     public bool m_isDynamic;
 }
 
-
+[RequireComponent(typeof(TetMesh))]
 public class PBDSoftBodySolver : MonoBehaviour
 {
     public Mesh m_mesh = null;
-    private BunnyMesh m_bunnyData = null;
+    private TetMesh m_tetMesh = null;
 
     float m_dt = 0.0333f;
     float m_damping = 0.99f;
@@ -49,16 +49,16 @@ public class PBDSoftBodySolver : MonoBehaviour
     {
         var mesh = new Mesh();
         m_mesh = mesh;
-        m_bunnyData = BunnyMesh.Instance;
+        m_tetMesh = this.GetComponent<TetMesh>();
         //m_X = new Vector3[m_bunnyData.m_pos.Length];
         //CopyX2Y(m_bunnyData.m_pos, m_X);
-        m_X = m_bunnyData.m_pos;
+        m_X = m_tetMesh.m_pos;
         m_X_last = new Vector3[m_X.Length];
         CopyX2Y(m_X, m_X_last);
         m_V = new Vector3[m_X.Length];
 
-        m_mesh.vertices = m_bunnyData.m_pos;
-        m_mesh.triangles = BunnyMesh.TetSurfaceTriIds;
+        m_mesh.vertices = m_tetMesh.m_pos;
+        m_mesh.triangles = BunnyMeshData.TetSurfaceTriIds;
         m_mesh.RecalculateNormals();
 
         m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
@@ -75,10 +75,10 @@ public class PBDSoftBodySolver : MonoBehaviour
         int[] n = new int[vertices.Length];
 
         float alpha = m_edgeCompliance / (m_dt * m_dt);
-        for (int e = 0; e < m_bunnyData.m_numEdges; e++)
+        for (int e = 0; e < m_tetMesh.m_numEdges; e++)
         {
-            var l_e = m_bunnyData.m_restLen[e];
-            var edge = m_bunnyData.m_edge[e];
+            var l_e = m_tetMesh.m_restLen[e];
+            var edge = m_tetMesh.m_edge[e];
             var i = edge.x;
             var j = edge.y;
             var x_i = vertices[i];
@@ -88,8 +88,8 @@ public class PBDSoftBodySolver : MonoBehaviour
             var grads = dir;
             var len = x_ij.magnitude;
             {//xpdb
-                var inv_mass_i = m_bunnyData.m_invMass[i];
-                var inv_mass_j = m_bunnyData.m_invMass[j];
+                var inv_mass_i = m_tetMesh.m_invMass[i];
+                var inv_mass_j = m_tetMesh.m_invMass[j];
                 float C = len - l_e;
                 float w = inv_mass_i + inv_mass_j;
                 var s = -C / (w + alpha);
@@ -104,9 +104,9 @@ public class PBDSoftBodySolver : MonoBehaviour
         float alpha = m_volumeCompliance / (m_dt * m_dt);
         Vector3[] grads = new Vector3[4];
         int[] ids = new int[4];
-        for(int i = 0; i < m_bunnyData.m_numTets; i++)
+        for(int i = 0; i < m_tetMesh.m_numTets; i++)
         {
-            var tet = m_bunnyData.m_tet[i];
+            var tet = m_tetMesh.m_tet[i];
             ids[0] = (int)tet[0];
             ids[1] = (int)tet[1];
             ids[2] = (int)tet[2];
@@ -123,14 +123,14 @@ public class PBDSoftBodySolver : MonoBehaviour
             float w = 0;
             for(int j = 0; j < 4; j++)
             {
-                w += m_bunnyData.m_invMass[ids[j]] * Mathf.Pow(grads[j].magnitude, 2.0f);
+                w += m_tetMesh.m_invMass[ids[j]] * Mathf.Pow(grads[j].magnitude, 2.0f);
             }
-            var vol = m_bunnyData.TetVolume(i);
-            float C = (vol - m_bunnyData.m_restVol[i] * m_scale) * 6f;
+            var vol = m_tetMesh.TetVolume(i);
+            float C = (vol - m_tetMesh.m_restVol[i] * m_scale) * 6f;
             float s = -C / (w + alpha);
             for(int j = 0;j< 4;j++) {
                 var id = ids[j];
-                var dp = grads[j] * s * m_bunnyData.m_invMass[id];
+                var dp = grads[j] * s * m_tetMesh.m_invMass[id];
                 m_X[id] += dp;
             }
         }
@@ -148,7 +148,7 @@ public class PBDSoftBodySolver : MonoBehaviour
             if (C < 0)
             {
                 Vector3 grads = constrain.m_normal;
-                float invMass = m_bunnyData.m_invMass[constrain.m_index];
+                float invMass = m_tetMesh.m_invMass[constrain.m_index];
                 float w = invMass;
                 float s = -C / (w + alpha);
                 if (!constrain.m_isDynamic)

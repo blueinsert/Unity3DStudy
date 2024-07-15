@@ -72,6 +72,7 @@
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\Material Editors\VertexColorBlendingEditor_2Way_HeightBased.cs" />
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\GUI\VertPaintGUI.cs" />
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\Editor Windows\VertPaintWindow.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Editor\TetMeshInspector.cs" />
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\Material Editors\VertexColorBlendingEditor_2Way_HeightBasedSmooth.cs" />
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\Material Editors\VertexColorBlendingEditor_4Way_HeightBasedSmooth.cs" />
     <Compile Include="Assets\VertPaint\Scripts\Classes\Editor\Editor Windows\VertPaintWindow.TemplateSaver.cs" />

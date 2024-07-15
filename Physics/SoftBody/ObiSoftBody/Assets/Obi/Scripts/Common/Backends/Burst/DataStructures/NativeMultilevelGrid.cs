@@ -71,7 +71,7 @@ namespace Obi
             {
                 //int index = contents.IndexOf(entity);
                 int index = -1;
-                for (int i = 0; i < contents.length; ++i)
+                for (int i = 0; i < contents.Length; ++i)
                     if (contents[i].Equals(entity)) { index = i; break; }
 
                 if (index >= 0)
