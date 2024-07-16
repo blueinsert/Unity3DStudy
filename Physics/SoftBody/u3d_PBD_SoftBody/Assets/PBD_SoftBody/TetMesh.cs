@@ -43,6 +43,18 @@ public class TetMesh : MonoBehaviour
         return "NewMesh";
     }
 
+    public static float CalcTetVolume(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+    {
+        var temp = Vector3.Cross(p2 - p1, p3 - p1);
+        float res = Vector3.Dot(p4 - p1, temp);
+        res *= (1.0f / 6);
+        if (res < -1E-06)
+        {
+            Debug.LogError(string.Format("volume < 0,{0}", res));
+        }
+        return res;
+    }
+
     /// <summary>
     /// 获取四面体体积
     /// </summary>
@@ -59,17 +71,11 @@ public class TetMesh : MonoBehaviour
         var p2 = m_pos[id2];
         var p3 = m_pos[id3];
         var p4 = m_pos[id4];
-        var temp = Vector3.Cross(p2 - p1, p3 - p1);
-        float res = Vector3.Dot(p4 - p1, temp);
-        res *= (1.0f / 6);
-        if (res < -1E-06)
-        {
-            Debug.LogError(string.Format("volume < 0,{0}", res));
-        }
+        var res = CalcTetVolume(p1, p2, p3, p4);
         return res;
     }
 
-    public void Sync2Mesh()
+    public void Sync2Mesh4Editor()
     {
         if (!m_isInitialized) return;
         var meshFilter = this.GetComponent<MeshFilter>();
@@ -82,5 +88,32 @@ public class TetMesh : MonoBehaviour
             mesh.RecalculateNormals();
             meshFilter.sharedMesh = mesh;
         }
+    }
+
+    public float GetEdgeRestLen(int edgeIndex) {
+        return m_restLen[edgeIndex];
+    }
+
+
+    public float GetParticleInvMass(int particleIndex)
+    {
+        return m_invMass[particleIndex];
+    }
+
+    public float GetTetRestVolume(int tetIndex)
+    {
+        return m_restVol[tetIndex];
+    }
+
+    public int[] GetTetVertexIndex(int tetIndex)
+    {
+        var tet = m_tet[tetIndex];
+        int[] res = new int[4] { (int)tet.x, (int)tet.y, (int)tet.z, (int)tet.w };
+        return res;
+    }
+
+    public Vector2Int GetEdgeParticles(int edgeIndex)
+    {
+        return m_edge[edgeIndex];
     }
 }

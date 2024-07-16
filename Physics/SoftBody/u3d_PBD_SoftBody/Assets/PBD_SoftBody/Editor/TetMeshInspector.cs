@@ -24,7 +24,7 @@ public class TetMeshInspector : Editor
         }
         if (GUILayout.Button("Í¬²½Mesh"))
         {
-            m_tetMesh.Sync2Mesh();
+            m_tetMesh.Sync2Mesh4Editor();
         }
     }
 }

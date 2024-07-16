@@ -2,70 +2,100 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct CollideConstrain
-{
-    public int m_index;//¶¥µãË÷Òý
-    public Vector3 m_normal;
-    public Vector3 m_entryPosition;
-    public Collider m_collider;
-
-    public bool m_isDynamic;
-}
-
 [RequireComponent(typeof(TetMesh))]
-public class PBDSoftBodySolver : MonoBehaviour
+public class SoftBodyActor : PDBActor
 {
-    public Mesh m_mesh = null;
-    private TetMesh m_tetMesh = null;
+    const int CollideConstrainCountMax = 100;
+    CollideConstrain[] m_collideConstrains = new CollideConstrain[CollideConstrainCountMax];
+    int m_collideConstrainCount = 0;
 
-    float m_dt = 0.0333f;
-    float m_damping = 0.99f;
-    float m_damping_subStep = 0.99f;
-    [Range(0f, 0.1f)]
-    public float m_edgeCompliance = 0.0f;
-    [Range(0f, 1f)]
-    public float m_volumeCompliance = 0.0f;
-
-    Vector3[] m_X_last = null;
-    Vector3[] m_X = null;
-    Vector3[] m_V = null;
-    [Range(7, 55)]
-    public int m_subStep = 22;
-
-    [Range(0f, 1f)]
-    public float m_collideCompliance = 0.0f;
-    public CollideConstrain[] m_collideConstrain = new CollideConstrain[CollideConstrainCountMax];
-    public int m_collideConstrainCount = 0;
-    const int CollideConstrainCountMax = 40 * 40;
-
-    public float m_planeY = -10;
-
-    public float[] m_initRestVol = null;
-    public float[] m_restVol = null;
-    public float m_scale = 1.0f;
-
+    private PDBSolver m_solver = null;
     // Start is called before the first frame update
     void Start()
     {
-        var mesh = new Mesh();
-        m_mesh = mesh;
-        m_tetMesh = this.GetComponent<TetMesh>();
-        //m_X = new Vector3[m_bunnyData.m_pos.Length];
-        //CopyX2Y(m_bunnyData.m_pos, m_X);
-        m_X = m_tetMesh.m_pos;
-        m_X_last = new Vector3[m_X.Length];
-        CopyX2Y(m_X, m_X_last);
-        m_V = new Vector3[m_X.Length];
-
-        m_mesh.vertices = m_tetMesh.m_pos;
-        m_mesh.triangles = BunnyMeshData.TetSurfaceTriIds;
-        m_mesh.RecalculateNormals();
-
-        m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
-
-        this.GetComponent<MeshFilter>().mesh = m_mesh;
+        Initialize();
     }
 
+    public override void Initialize()
+    {
+        base.Initialize();
+        m_solver = GetComponentInParent<PDBSolver>();
+        m_solver.RegisterActor(this);
+        //PushStretchConstrains2Solver();
+        //PushVolumeConstrains2Solver();
+        for(int i=0;i< CollideConstrainCountMax; i++)
+        {
+            m_collideConstrains[i] = new CollideConstrain();
+        }
+    }
+
+    public override void PreSubStep(float dt)
+    {
+        base.PreSubStep(dt);
+        var solver = GetComponentInParent<PDBSolver>();
+        solver.ClearConstrain(ActorId, ConstrainType.Collide);
+        //GenerateCollideConstrains();
+        //PushCollideConstrains2Solver();
+    }
+
+    void GenerateCollideConstrains()
+    {
+        m_collideConstrainCount = 0;
+
+        for (int i = 0; i < m_X.Length; i++)
+        {
+            var p = m_X[i];
+            float planeY = -15;
+            if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
+            {
+                m_collideConstrains[m_collideConstrainCount].m_actorId = this.ActorId;
+                m_collideConstrains[m_collideConstrainCount].m_index = i;
+                m_collideConstrains[m_collideConstrainCount].m_normal = new Vector3(0, 1, 0);
+                m_collideConstrains[m_collideConstrainCount].m_entryPosition = new Vector3(p.x, planeY, p.z);
+                m_collideConstrainCount++;
+            }
+        }
+    }
+
+    void PushCollideConstrains2Solver()
+    {
+        var solver = GetComponentInParent<PDBSolver>();
+        for (int i = 0; i < m_collideConstrainCount; i++)
+        {
+            var constrain = m_collideConstrains[m_collideConstrainCount];
+            solver.RegisterConstrain(constrain);
+        }
+    }
+
+    void PushStretchConstrains2Solver()
+    {
+        for (int e = 0; e < m_tetMesh.m_numEdges; e++)
+        {
+            var edge = m_tetMesh.m_edge[e];
+            StretchConstrain constrain = new StretchConstrain()
+            {
+                m_actorId = this.ActorId,
+                m_edgeIndex = e,
+            };
+            m_solver.RegisterConstrain(constrain);
+        }
+    }
+
+    void PushVolumeConstrains2Solver()
+    {
+        for (int i = 0; i < m_tetMesh.m_numTets; i++)
+        {
+            var tet = m_tetMesh.m_tet[i];
+            VolumeConstrain constrain = new VolumeConstrain()
+            {
+                m_actorId = this.ActorId,
+                m_tetIndex = i,
+            };
+            m_solver.RegisterConstrain(constrain);
+        }
+    }
+
+    /*
     void SolveEdge()
     {
         var vertices = this.m_X;
@@ -166,14 +196,6 @@ public class PBDSoftBodySolver : MonoBehaviour
         }
     }
 
-    void Solve()
-    {
-        SolveEdge();
-        SolveVolume();
-        Solve_CollideConstrain();
-    }
-
-
     void CopyX2Y(Vector3[] xarray, Vector3[] yarray)
     {
         for (int i = 0; i < xarray.Length; i++)
@@ -182,73 +204,7 @@ public class PBDSoftBodySolver : MonoBehaviour
         }
     }
 
-    void PreUpdate()
-    {
-        for (int i = 0; i < m_X.Length; i++)
-        {
-            //if (i == 0 || i == 20) continue;
-            m_V[i] += new Vector3(0, -9.8f, 0) * m_dt;
-            m_X[i] += m_V[i] * m_dt;
-        }
-    }
-
-    void GenerateCollideConstrains()
-    {
-        m_collideConstrainCount = 0;
-
-        for (int i = 0; i < m_X.Length; i++)
-        {
-            var p = m_X[i];
-            float planeY = m_planeY;
-            if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
-            {
-                m_collideConstrain[m_collideConstrainCount].m_index = i;
-                m_collideConstrain[m_collideConstrainCount].m_normal = new Vector3(0, 1, 0);
-                m_collideConstrain[m_collideConstrainCount].m_entryPosition = new Vector3(p.x, planeY, p.z);
-                m_collideConstrainCount++;
-            }
-        }
-    }
-
-    void Step()
-    {
-        PreUpdate();
-
-        GenerateCollideConstrains();
-
-        CopyX2Y(this.m_X, this.m_X_last);
-
-        Solve();
-
-        for (int i = 0; i < m_X.Length; i++)
-        {
-            m_V[i] += (m_X[i] - m_X_last[i]) / m_dt;
-            m_V[i] *= m_damping_subStep;
-        }
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        m_dt = 1.0f / 60f / m_subStep;
-        for (int i = 0; i < m_subStep; i++)
-        {
-            Step();
-        }
-        float speed = 3.0f;
-        if (Input.GetKey(KeyCode.O))
-        {
-            m_scale += speed * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.P))
-        {
-            m_scale -= speed * Time.deltaTime;
-        }
-        m_scale = Mathf.Clamp(m_scale, 1.0f, 20.0f);
-        m_mesh.vertices = this.m_X;
-        m_mesh.RecalculateNormals();
-    }
+   */
 
 
 }
