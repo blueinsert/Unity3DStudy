@@ -35,14 +35,14 @@ public class BunnyTetMeshImpl : TetMesh
             m_pos[i] = new Vector3(x, y, z);
         }
 
-        m_tet = new Vector4[m_numTets];
+        m_tet = new Vector4Int[m_numTets];
         for (int i = 0; i < m_numTets; i++)
         {
             int p1 = BunnyMeshData.TetIds[i * 4];
             int p2 = BunnyMeshData.TetIds[i * 4 + 1];
             int p3 = BunnyMeshData.TetIds[i * 4 + 2];
             int p4 = BunnyMeshData.TetIds[i * 4 + 3];
-            m_tet[i] = new Vector4(p1, p2, p3, p4);
+            m_tet[i] = new Vector4Int(p1, p2, p3, p4);
         }
 
         m_edge = new Vector2Int[m_numEdges];
@@ -87,10 +87,10 @@ public class BunnyTetMeshImpl : TetMesh
         {
             var v = m_restVol[i];
             var pMass = v / 4.0f;
-            var id1 = (int)m_tet[i][0];
-            var id2 = (int)m_tet[i][1];
-            var id3 = (int)m_tet[i][2];
-            var id4 = (int)m_tet[i][3];
+            var id1 = m_tet[i].x;
+            var id2 = m_tet[i].y;
+            var id3 = m_tet[i].z;
+            var id4 = m_tet[i].w;
 
             m_mass[id1] += pMass;
             m_mass[id2] += pMass;

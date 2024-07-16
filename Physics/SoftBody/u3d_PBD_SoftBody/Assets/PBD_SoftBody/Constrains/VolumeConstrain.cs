@@ -23,12 +23,12 @@ public class VolumeConstrain : ConstrainBase
     {
         float alpha = m_volumeCompliance / (dt * dt);
         Vector3[] grads = new Vector3[4];
-        int[] ids = m_solveEnv.GetTetVertexIndex(m_actorId, m_tetIndex);
-
-        var p1 = m_solveEnv.GetParticlePosition(m_actorId, ids[0]);
-        var p2 = m_solveEnv.GetParticlePosition(m_actorId, ids[0]);
-        var p3 = m_solveEnv.GetParticlePosition(m_actorId, ids[0]);
-        var p4 = m_solveEnv.GetParticlePosition(m_actorId, ids[0]);
+        var ids = m_solveEnv.GetTetVertexIndex(m_actorId, m_tetIndex);
+        
+        var p1 = m_solveEnv.GetParticlePosition(m_actorId, ids.x);
+        var p2 = m_solveEnv.GetParticlePosition(m_actorId, ids.y);
+        var p3 = m_solveEnv.GetParticlePosition(m_actorId, ids.z);
+        var p4 = m_solveEnv.GetParticlePosition(m_actorId, ids.w);
         grads[0] = Vector3.Cross(p4 - p2, p3 - p2);
         grads[1] = Vector3.Cross(p3 - p1, p4 - p1);
         grads[2] = Vector3.Cross(p4 - p1, p2 - p1);

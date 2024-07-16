@@ -15,6 +15,9 @@ public class PDBActor : MonoBehaviour
 
     protected TetMesh m_tetMesh = null;
 
+    public MeshFilter m_meshFilter = null;
+    public Mesh m_mesh = null;
+
     public Vector3 GetParticlePosition(int index)
     {
         return m_X[index];
@@ -35,7 +38,7 @@ public class PDBActor : MonoBehaviour
         return m_tetMesh.GetParticleInvMass(particleId);
     }
 
-    public int[] GetTetVertexIndex(int tetIndex)
+    public Vector4Int GetTetVertexIndex(int tetIndex)
     {
         return m_tetMesh.GetTetVertexIndex(tetIndex);
     }
@@ -58,9 +61,13 @@ public class PDBActor : MonoBehaviour
         m_X_last = new Vector3[m_X.Length];
         Util.CopyArray(m_X, m_X_last);
         m_V = new Vector3[m_X.Length];
+
+        m_meshFilter = GetComponent<MeshFilter>();
+        m_mesh = m_meshFilter.mesh;
     }
 
     public virtual void PreSubStep(float dt) {
+        Util.CopyArray(m_X, m_X_last);
         for (int i = 0; i < m_X.Length; i++)
         {
             m_V[i] += new Vector3(0, -9.8f, 0) * dt;
@@ -73,7 +80,7 @@ public class PDBActor : MonoBehaviour
     {
         for (int i = 0; i < m_X.Length; i++)
         {
-            m_V[i] += (m_X[i] - m_X_last[i]) / dt;
+            m_V[i] = (m_X[i] - m_X_last[i]) / dt;
             m_V[i] *= velDamp;
         }
     }
@@ -82,18 +89,13 @@ public class PDBActor : MonoBehaviour
 
     public virtual void PostStep() {
 
-        SyncMesh(m_X);
+        SyncMesh();
     }
 
-    public void SyncMesh(Vector3[] x)
+    public void SyncMesh()
     {
-        var meshFilter = this.GetComponent<MeshFilter>();
-        if (meshFilter != null)
-        {
-            var mesh = meshFilter.sharedMesh;
-            mesh.vertices = x;
-            //mesh.RecalculateBounds();
-            meshFilter.sharedMesh = mesh;
-        }
+        m_mesh.vertices = m_X;
+        //Debug.Log($"y:{m_X[0].y} vy:{m_V[0].y}");
+        m_mesh.RecalculateNormals();
     }
 }

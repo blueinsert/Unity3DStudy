@@ -16,7 +16,7 @@ public interface ISolverEnv
 
     public void ModifyParticelPosition(int actorId, int particleId, Vector3 deltaPos);
 
-    public int[] GetTetVertexIndex(int actorId, int tetIndex);
+    public Vector4Int GetTetVertexIndex(int actorId, int tetIndex);
 
     public float GetTetRestVolume(int actorId, int tetIndex);
 }

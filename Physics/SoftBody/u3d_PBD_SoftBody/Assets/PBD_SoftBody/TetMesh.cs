@@ -19,7 +19,7 @@ public class TetMesh : MonoBehaviour
     //顶点or粒子位置数组
     public Vector3[] m_pos = null;
     //四面体顶点索引数组，每一个元素代表一个四面体，四个分量代表四个顶点
-    public Vector4[] m_tet = null;
+    public Vector4Int[] m_tet = null;
     //每个元素代表一条边，两个分量代表顶点索引
     public Vector2Int[] m_edge = null;
     //每个元素代表一个表面，三个分量代表顶点索引
@@ -63,10 +63,10 @@ public class TetMesh : MonoBehaviour
     public float TetVolume(int index)
     {
         var ids = m_tet[index];
-        var id1 = (int)ids[0];
-        var id2 = (int)ids[1];
-        var id3 = (int)ids[2];
-        var id4 = (int)ids[3];
+        var id1 = ids.x;
+        var id2 = ids.y;
+        var id3 = ids.z;
+        var id4 = ids.w;
         var p1 = m_pos[id1];
         var p2 = m_pos[id2];
         var p3 = m_pos[id3];
@@ -105,10 +105,10 @@ public class TetMesh : MonoBehaviour
         return m_restVol[tetIndex];
     }
 
-    public int[] GetTetVertexIndex(int tetIndex)
+    public Vector4Int GetTetVertexIndex(int tetIndex)
     {
         var tet = m_tet[tetIndex];
-        int[] res = new int[4] { (int)tet.x, (int)tet.y, (int)tet.z, (int)tet.w };
+        Vector4Int res = new Vector4Int((int)tet.x, (int)tet.y, (int)tet.z, (int)tet.w);
         return res;
     }
 

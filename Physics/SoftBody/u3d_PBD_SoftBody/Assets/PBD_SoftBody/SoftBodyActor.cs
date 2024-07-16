@@ -5,11 +5,12 @@ using UnityEngine;
 [RequireComponent(typeof(TetMesh))]
 public class SoftBodyActor : PDBActor
 {
-    const int CollideConstrainCountMax = 100;
+    const int CollideConstrainCountMax = 500;
     CollideConstrain[] m_collideConstrains = new CollideConstrain[CollideConstrainCountMax];
     int m_collideConstrainCount = 0;
 
     private PDBSolver m_solver = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,12 +22,13 @@ public class SoftBodyActor : PDBActor
         base.Initialize();
         m_solver = GetComponentInParent<PDBSolver>();
         m_solver.RegisterActor(this);
-        //PushStretchConstrains2Solver();
-        //PushVolumeConstrains2Solver();
+        PushStretchConstrains2Solver();
+        PushVolumeConstrains2Solver();
         for(int i=0;i< CollideConstrainCountMax; i++)
         {
             m_collideConstrains[i] = new CollideConstrain();
         }
+
     }
 
     public override void PreSubStep(float dt)
@@ -34,8 +36,8 @@ public class SoftBodyActor : PDBActor
         base.PreSubStep(dt);
         var solver = GetComponentInParent<PDBSolver>();
         solver.ClearConstrain(ActorId, ConstrainType.Collide);
-        //GenerateCollideConstrains();
-        //PushCollideConstrains2Solver();
+        GenerateCollideConstrains();
+        PushCollideConstrains2Solver();
     }
 
     void GenerateCollideConstrains()
@@ -45,7 +47,7 @@ public class SoftBodyActor : PDBActor
         for (int i = 0; i < m_X.Length; i++)
         {
             var p = m_X[i];
-            float planeY = -15;
+            float planeY = -2;
             if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
             {
                 m_collideConstrains[m_collideConstrainCount].m_actorId = this.ActorId;
@@ -59,11 +61,10 @@ public class SoftBodyActor : PDBActor
 
     void PushCollideConstrains2Solver()
     {
-        var solver = GetComponentInParent<PDBSolver>();
         for (int i = 0; i < m_collideConstrainCount; i++)
         {
-            var constrain = m_collideConstrains[m_collideConstrainCount];
-            solver.RegisterConstrain(constrain);
+            var constrain = m_collideConstrains[i];
+            m_solver.RegisterConstrain(constrain);
         }
     }
 

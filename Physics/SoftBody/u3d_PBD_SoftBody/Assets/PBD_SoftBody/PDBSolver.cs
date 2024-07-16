@@ -14,7 +14,7 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
     public float m_edgeCompliance = 0.0f;
     [Range(0f, 1f)]
     public float m_volumeCompliance = 0.0f;
-    [Range(7, 55)]
+    [Range(1, 55)]
     public int m_subStep = 22;
     [Range(0f, 1f)]
     public float m_collideCompliance = 0.0f;
@@ -28,6 +28,7 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
 
     public void Awake()
     {
+        Application.targetFrameRate = 30;
         m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
         m_dtSubStep = m_dtStep / m_subStep;
     }
@@ -258,7 +259,7 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
         actor.ModifyParticelPosition(particleId, deltaPos);
     }
 
-    public int[] GetTetVertexIndex(int actorId, int tetIndex)
+    public Vector4Int GetTetVertexIndex(int actorId, int tetIndex)
     {
         var actor = GetActor(actorId);
         return actor.GetTetVertexIndex(tetIndex);
