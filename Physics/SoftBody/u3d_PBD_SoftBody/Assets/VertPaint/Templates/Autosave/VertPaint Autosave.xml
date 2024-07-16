@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<vertPaintTemplate version="1.1.0">
-  <enabled>false</enabled>
-  <togglePreview>false</togglePreview>
+<vertPaintTemplate version="1.1.1">
+  <enabled>true</enabled>
+  <togglePreview>true</togglePreview>
   <hideTransformHandle>true</hideTransformHandle>
   <brushSettings>
-    <radius>1.5</radius>
+    <radius>0.05</radius>
     <maxRadius>10</maxRadius>
     <delay>0.025</delay>
     <opacity>0.25</opacity>

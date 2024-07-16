@@ -28,7 +28,7 @@ public class PDBActor : MonoBehaviour
         m_X[particleId] += deltaPos;
     }
 
-    public float GetEdgeRestLen(int edgeIndex)
+    public virtual float  GetEdgeRestLen(int edgeIndex)
     {
         return m_tetMesh.GetEdgeRestLen(edgeIndex);
     }
@@ -43,7 +43,7 @@ public class PDBActor : MonoBehaviour
         return m_tetMesh.GetTetVertexIndex(tetIndex);
     }
 
-    public float GetTetRestVolume(int tetIndex)
+    public virtual float GetTetRestVolume(int tetIndex)
     {
         return m_tetMesh.GetTetRestVolume(tetIndex);
     }

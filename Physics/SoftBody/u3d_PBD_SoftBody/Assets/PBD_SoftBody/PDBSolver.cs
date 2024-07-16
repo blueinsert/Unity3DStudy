@@ -219,20 +219,6 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
     void Update()
     {
         Step();
-        /*
-        float speed = 3.0f;
-        if (Input.GetKey(KeyCode.O))
-        {
-            m_scale += speed * Time.deltaTime;
-        }
-        if (Input.GetKey(KeyCode.P))
-        {
-            m_scale -= speed * Time.deltaTime;
-        }
-        m_scale = Mathf.Clamp(m_scale, 1.0f, 20.0f);
-        m_mesh.vertices = this.m_X;
-        m_mesh.RecalculateNormals();
-        */
     }
 
     #region ISolverEnv

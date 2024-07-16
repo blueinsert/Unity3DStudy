@@ -591,7 +591,7 @@ MonoBehaviour:
   m_damping_subStep: 0.99
   m_edgeCompliance: 0
   m_volumeCompliance: 0
-  m_subStep: 8
+  m_subStep: 21
   m_collideCompliance: 0
   m_actors: []
 --- !u!4 &447064283
