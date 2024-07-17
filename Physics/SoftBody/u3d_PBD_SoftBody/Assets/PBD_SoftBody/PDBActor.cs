@@ -25,7 +25,10 @@ public class PDBActor : MonoBehaviour
 
     public void ModifyParticelPosition(int particleId, Vector3 deltaPos)
     {
-        m_X[particleId] += deltaPos;
+        if (!m_tetMesh.IsParticleFixed(particleId))
+        {
+            m_X[particleId] += deltaPos;
+        }
     }
 
     public virtual float  GetEdgeRestLen(int edgeIndex)
@@ -66,12 +69,15 @@ public class PDBActor : MonoBehaviour
         m_mesh = m_meshFilter.mesh;
     }
 
-    public virtual void PreSubStep(float dt) {
+    public virtual void PreSubStep(float dt, Vector3 g) {
         Util.CopyArray(m_X, m_X_last);
         for (int i = 0; i < m_X.Length; i++)
         {
-            m_V[i] += new Vector3(0, -9.8f, 0) * dt;
-            m_X[i] += m_V[i] * dt;
+            if (!m_tetMesh.IsParticleFixed(i))
+            {
+                m_V[i] += g * dt;
+                m_X[i] += m_V[i] * dt;
+            }
         }
 
     }

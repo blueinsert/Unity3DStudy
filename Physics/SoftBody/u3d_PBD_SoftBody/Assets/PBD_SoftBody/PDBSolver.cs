@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.ParticleSystem;
+using UnityEngine.Profiling;
 
 public class PDBSolver : MonoBehaviour, ISolverEnv
 {
+    public int m_targetFrameRate = 60;
     public float m_dtSubStep = 0.0333f;
     public float m_dtStep = 0.0333f;
     public float m_damping = 0.99f;
@@ -18,6 +18,8 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
     public int m_subStep = 22;
     [Range(0f, 1f)]
     public float m_collideCompliance = 0.0f;
+    [Header("重力加速度")]
+    public Vector3 m_g = new Vector3(0, -9.8f, 0);
 
     public List<VolumeConstrain> m_volumeConstrains = new List<VolumeConstrain>();
     public List<StretchConstrain> m_stretchConstrains = new List<StretchConstrain>();
@@ -28,7 +30,8 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
 
     public void Awake()
     {
-        Application.targetFrameRate = 30;
+        Application.targetFrameRate = m_targetFrameRate;
+        m_dtStep = 1.0f / m_targetFrameRate;
         m_damping_subStep = Mathf.Pow(m_damping, 1.0f / m_subStep);
         m_dtSubStep = m_dtStep / m_subStep;
     }
@@ -133,7 +136,7 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
     {
         for (int i = 0; i < m_actors.Count; i++)
         {
-            m_actors[i].PreSubStep(m_dtSubStep);
+            m_actors[i].PreSubStep(m_dtSubStep, m_g);
         }
     }
 
@@ -190,29 +193,48 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
 
     void Solve()
     {
+        Profiler.BeginSample("SolveStrethConstrains");
         SolveStrethConstrains();
+        Profiler.EndSample();
+
+        Profiler.BeginSample("SolveVolumeConstrains");
         SolveVolumeConstrains();
+        Profiler.EndSample();
+
+        Profiler.BeginSample("SolveCollideConstrains");
         SolveCollideConstrains();
+        Profiler.EndSample();
     }
 
     void SubStep()
     {
+        Profiler.BeginSample("PreSubStep");
         PreSubStep();
+        Profiler.EndSample();
 
+        Profiler.BeginSample("Solve");
         Solve();
+        Profiler.EndSample();
 
+        Profiler.BeginSample("PostSubStep");
         PostSubStep();
-
+        Profiler.EndSample();
     }
 
     void Step()
     {
+        Profiler.BeginSample("PreStep");
         PreStep();
+        Profiler.EndSample();
+        Profiler.BeginSample("SubStep");
         for (int i = 0; i < m_subStep; i++)
         {
             SubStep();
         }
+        Profiler.EndSample();
+        Profiler.BeginSample("PreStep");
         PostStep();
+        Profiler.EndSample();
     }
 
     // Update is called once per frame

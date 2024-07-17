@@ -34,6 +34,8 @@ public class TetMesh : MonoBehaviour
     public float[] m_mass = null;
     //每个顶点的初始质量倒数
     public float[] m_invMass = null;
+    //顶点粒子颜色数组
+    public Color[] m_particleColors = null;
 
     public bool m_isInitialized = false;
 
@@ -50,7 +52,7 @@ public class TetMesh : MonoBehaviour
         res *= (1.0f / 6);
         if (res < -1E-06)
         {
-            Debug.LogError(string.Format("volume < 0,{0}", res));
+            //Debug.LogError(string.Format("volume < 0,{0}", res));
         }
         return res;
     }
@@ -81,12 +83,26 @@ public class TetMesh : MonoBehaviour
         var meshFilter = this.GetComponent<MeshFilter>();
         if (meshFilter != null)
         {
+            var oldMesh = meshFilter.sharedMesh;
             var mesh = new Mesh();
             mesh.name = GetMeshName();
             mesh.vertices = this.m_pos;
             mesh.triangles = this.m_tetSurfaceTriIds;
             mesh.RecalculateNormals();
             meshFilter.sharedMesh = mesh;
+            if (oldMesh != null)
+            {
+                if(oldMesh.vertices.Length == m_pos.Length)
+                {
+                    m_particleColors = new Color[oldMesh.colors.Length];
+                    for (int i = 0; i < m_particleColors.Length; i++)
+                    {
+                        m_particleColors[i] = oldMesh.colors[i];
+                    }
+                }
+                mesh.colors = m_particleColors;
+            }
+            
         }
     }
 
@@ -115,5 +131,10 @@ public class TetMesh : MonoBehaviour
     public Vector2Int GetEdgeParticles(int edgeIndex)
     {
         return m_edge[edgeIndex];
+    }
+
+    public bool IsParticleFixed(int particleIndex)
+    {
+        return m_particleColors[particleIndex].r > 0;
     }
 }

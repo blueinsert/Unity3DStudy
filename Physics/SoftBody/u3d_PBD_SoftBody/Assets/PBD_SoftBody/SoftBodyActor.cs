@@ -26,16 +26,16 @@ public class SoftBodyActor : PDBActor
         m_solver.RegisterActor(this);
         PushStretchConstrains2Solver();
         PushVolumeConstrains2Solver();
-        for(int i=0;i< CollideConstrainCountMax; i++)
+        for (int i = 0; i < CollideConstrainCountMax; i++)
         {
             m_collideConstrains[i] = new CollideConstrain();
         }
 
     }
 
-    public override void PreSubStep(float dt)
+    public override void PreSubStep(float dt, Vector3 g)
     {
-        base.PreSubStep(dt);
+        base.PreSubStep(dt, g);
         var solver = GetComponentInParent<PDBSolver>();
         solver.ClearConstrain(ActorId, ConstrainType.Collide);
         GenerateCollideConstrains();
@@ -101,18 +101,45 @@ public class SoftBodyActor : PDBActor
     public override float GetTetRestVolume(int tetIndex)
     {
         var volume = base.GetTetRestVolume(tetIndex);
-        return volume * m_scale*m_scale*m_scale;
+        var tet = m_tetMesh.m_tet[tetIndex];
+        var fixedCount = 0;
+        fixedCount += m_tetMesh.IsParticleFixed(tet[0]) ? 1 : 0;
+        fixedCount += m_tetMesh.IsParticleFixed(tet[1]) ? 1 : 0;
+        fixedCount += m_tetMesh.IsParticleFixed(tet[2]) ? 1 : 0;
+        fixedCount += m_tetMesh.IsParticleFixed(tet[3]) ? 1 : 0;
+        switch (fixedCount)
+        {
+            case 0:
+                volume = volume * m_scale * m_scale * m_scale;
+                break;
+            case 1:
+                volume = volume * m_scale * m_scale * m_scale;
+                break;
+            case 2: 
+                volume = volume * m_scale * m_scale;
+                break;
+            case 3:
+                volume = volume * m_scale;
+                break;
+            case 4:break;
+        }
+        return volume;
     }
 
     public override float GetEdgeRestLen(int edgeIndex)
     {
+        var edge = m_tetMesh.m_edge[edgeIndex];
         var len = m_tetMesh.GetEdgeRestLen(edgeIndex);
+        if (m_tetMesh.IsParticleFixed(edge[0]) && m_tetMesh.IsParticleFixed(edge[1]))
+        {
+            return len;
+        }
         return len * m_scale;
     }
 
     public void Update()
     {
-        
+
         float speed = 3.0f;
         if (Input.GetKey(KeyCode.O))
         {
@@ -125,7 +152,7 @@ public class SoftBodyActor : PDBActor
         m_scale = Mathf.Clamp(m_scale, 1.0f, 20.0f);
         m_mesh.vertices = this.m_X;
         m_mesh.RecalculateNormals();
-        
+
     }
 
 }
