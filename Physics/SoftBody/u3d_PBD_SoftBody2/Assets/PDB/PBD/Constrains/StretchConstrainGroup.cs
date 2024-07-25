@@ -83,6 +83,7 @@ namespace bluebean.UGFramework.Physics
                 m_deltaTimeSqr = substepTime*substepTime,
 
                 m_positionDeltasPerConstrain = this.m_positionDeltasPerConstrain,
+                m_compliance = this.m_solver.StretchConstrainCompliance,
             };
             return job.Schedule(m_constrainCount, 32, inputDeps);
         }

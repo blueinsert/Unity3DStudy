@@ -24,7 +24,8 @@ namespace bluebean.UGFramework.Physics
         /// <summary>
         /// 约束柔度
         /// </summary>
-        public NativeArray<float> m_compliances;
+        [ReadOnly] public NativeArray<float> m_compliances;
+        [ReadOnly] public float m_compliance;
         /// <summary>
         /// 粒子位置数组
         /// </summary>
@@ -33,25 +34,25 @@ namespace bluebean.UGFramework.Physics
         /// 粒子质量
         /// </summary>
         [ReadOnly] public NativeArray<float> m_invMasses;
+        [ReadOnly] public float m_deltaTimeSqr;
+
+        [NativeDisableContainerSafetyRestriction]
+        [NativeDisableParallelForRestriction]
+        public NativeArray<float4> m_positionDeltasPerConstrain;
+
         /// <summary>
         /// 本次约束求解产生的位置梯度
         /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> m_gradients;
-        /// <summary>
-        /// 本次约束求解产生的位置变化
-        /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> m_deltas;
-        /// <summary>
-        /// 每个顶点被累计次数
-        /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<int> m_counts;
+        [NativeDisableContainerSafetyRestriction]
+        [NativeDisableParallelForRestriction] 
+        public NativeArray<float4> m_gradientsPerConstrain;
 
-        [ReadOnly] public float m_deltaTimeSqr;
-
+        
         public void Execute(int index)
         {
             //index 是约束索引或四面体索引
-            float alpha = m_compliances[index] / m_deltaTimeSqr;
+            float alpha = m_compliance / m_deltaTimeSqr;
+            int startIndex = index * 4;
 
             var tet = m_tets[index];
             var p1Index = tet.x;
@@ -62,32 +63,27 @@ namespace bluebean.UGFramework.Physics
             var p2 = m_positions[p2Index];
             var p3 = m_positions[p3Index];
             var p4 = m_positions[p4Index];
-            Unity.Collections.NativeList<int> particleIndices = new Unity.Collections.NativeList<int>(4, Allocator.Temp);
-            particleIndices.Add(p1Index);
-            particleIndices.Add(p2Index);
-            particleIndices.Add(p3Index);
-            particleIndices.Add(p4Index);
-            for (int j = 0; j < 4; ++j)
-                m_gradients[particleIndices[j]] = float4.zero;
-            m_gradients[p1Index] = new float4(math.cross((p4 - p2).xyz, (p3 - p2).xyz),0);
-            m_gradients[p2Index] = new float4(math.cross((p3 - p2).xyz, (p4 - p1).xyz), 0);
-            m_gradients[p3Index] = new float4(math.cross((p4 - p1).xyz, (p2 - p1).xyz), 0);
-            m_gradients[p4Index] = new float4(math.cross((p2 - p1).xyz, (p3 - p1).xyz), 0);
+
+            m_gradientsPerConstrain[startIndex] = new float4(math.cross((p4 - p2).xyz, (p3 - p2).xyz),0);
+            m_gradientsPerConstrain[startIndex + 1] = new float4(math.cross((p3 - p1).xyz, (p4 - p1).xyz), 0);
+            m_gradientsPerConstrain[startIndex + 2] = new float4(math.cross((p4 - p1).xyz, (p2 - p1).xyz), 0);
+            m_gradientsPerConstrain[startIndex + 3] = new float4(math.cross((p2 - p1).xyz, (p3 - p1).xyz), 0);
             float w = 0;
             for (int j = 0; j < 4; j++)
             {
-                int p = particleIndices[j];
-                w += m_invMasses[p] * math.lengthsq(m_gradients[p]);
+                int p = tet[j];
+                w += m_invMasses[p] * math.lengthsq(m_gradientsPerConstrain[startIndex + j]);
             }
             var vol = BurstMath.CalcTetVolume(p1.xyz, p2.xyz, p3.xyz, p4.xyz);
             var restVol = m_restVolumes[index];
             float C = (vol - restVol) * 6f;
             float s = -C / (w + alpha);
+
             for (int j = 0; j < 4; j++)
             {
-                var p = particleIndices[j];
-                m_deltas[p] += m_gradients[p] * s * m_invMasses[p];
-                m_counts[p]++;
+                var p = tet[j];
+                float4 delta = m_gradientsPerConstrain[startIndex + j] * s * m_invMasses[p];
+                m_positionDeltasPerConstrain[startIndex + j] = delta;
             }
         }
 

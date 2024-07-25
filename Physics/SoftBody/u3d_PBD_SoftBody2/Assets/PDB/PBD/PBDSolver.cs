@@ -29,16 +29,26 @@ namespace bluebean.UGFramework.Physics
         public Vector3 m_g = new Vector3(0, -9.8f, 0);
 
         public List<PDBActor> m_actors = new List<PDBActor>();
-        public Dictionary<int, PDBActor> m_actorDic = new Dictionary<int, PDBActor>();
+        private Dictionary<int, PDBActor> m_actorDic = new Dictionary<int, PDBActor>();
 
-        public Dictionary<int, ConstrainGroup> m_constrains = new Dictionary<int, ConstrainGroup>();
+        private Dictionary<int, ConstrainGroup> m_constrains = new Dictionary<int, ConstrainGroup>();
 
         #region СЃзгЪ§Он
+
+        public NativeVector4List PositionList { get { return m_positionList; } }
+        public NativeVector4List VelList { get { return m_velList; } }
+        public NativeVector4List ExternalForceList { 
+            get { return m_velList; }
+            set { m_velList = value; }
+        }
+        public NativeFloatList InvMassList { get { return m_invMassList; } }
+
         // all particle positions [NonSerialized] private
-        public NativeVector4List m_positionList = new NativeVector4List();
-        public NativeVector4List m_velList = new NativeVector4List();
-        public NativeVector4List m_propertyList = new NativeVector4List();
-        public NativeVector4List m_externalForceList = new NativeVector4List();
+        private NativeVector4List m_positionList = new NativeVector4List();
+        private NativeVector4List m_prevPositionList = new NativeVector4List();
+        private NativeVector4List m_velList = new NativeVector4List();
+        private NativeVector4List m_propertyList = new NativeVector4List();
+        private NativeVector4List m_externalForceList = new NativeVector4List();
         private NativeIntList m_freeList = new NativeIntList();
         private NativeFloatList m_invMassList = new NativeFloatList();
         private NativeVector4List m_positionDeltaList = new NativeVector4List();
@@ -46,6 +56,7 @@ namespace bluebean.UGFramework.Physics
         private NativeIntList m_positionConstraintCountList = new NativeIntList();
 
         private NativeArray<float4> m_particlePositions;
+        private NativeArray<float4> m_prevParticlePositions;
         private NativeArray<float4> m_particleVels;
         private NativeArray<float4> m_particleProperties;
         private NativeArray<float4> m_externalForces;
@@ -62,6 +73,12 @@ namespace bluebean.UGFramework.Physics
         public NativeArray<float4> ParticleVels => m_particleVels;
         public NativeArray<float4> ExternalForces => m_externalForces;
         public NativeArray<float4> ParticleProperties => m_particleProperties;
+
+        public NativeArray<float4> PrevParticlePositions => m_prevParticlePositions;
+
+        public float StretchConstrainCompliance => m_edgeCompliance;
+
+        public float VolumeConstrainCompliance => m_volumeCompliance;
         #endregion
 
 
@@ -104,6 +121,7 @@ namespace bluebean.UGFramework.Physics
             m_gradients = m_gradientList.AsNativeArray<float4>();
             m_positionConstraintCounts = m_positionConstraintCountList.AsNativeArray<int>();
             m_particleProperties = m_propertyList.AsNativeArray<float4>();
+            m_prevParticlePositions = m_prevPositionList.AsNativeArray<float4>();
         }
 
         private void EnsureParticleArraysCapacity(int count)
@@ -119,6 +137,7 @@ namespace bluebean.UGFramework.Physics
                 m_gradientList.ResizeInitialized(count);
                 m_positionConstraintCountList.ResizeInitialized(count);
                 m_propertyList.ResizeInitialized(count);
+                m_prevPositionList.ResizeInitialized(count);
 
                 OnParticleCountChange();
             }
@@ -239,20 +258,33 @@ namespace bluebean.UGFramework.Physics
                 m_deltaTime = m_dtSubStep,
                 m_gravity = new float4(m_g.x,m_g.y,m_g.z,0),
                 m_positions = ParticlePositions,
+                m_prevPositions = this.PrevParticlePositions,
                 m_externalForces = ExternalForces,
                 m_velocities = ParticleVels,
                 m_inverseMasses = InvMasses,
                 m_particleProperties = this.ParticleProperties,
             };
             handle = predictPositionsJob.Schedule(ParticlePositions.Count(), 4, handle);
-            
-            for (int i = 2; i < (int)ConstrainType.Max; i++)
+
+            var start = (int)ConstrainType.Start + 1;
+            var end =  (int)ConstrainType.Max;
+            for (int i = start; i < end; i++)
             {
                 var constrain = m_constrains[i];
                 handle = constrain.Solve(handle, m_dtSubStep);
                 handle = constrain.Apply(handle, m_dtSubStep);
             }
-            
+
+            var updateVel = new UpdateVelJob()
+            {
+                m_deltaTime = m_dtSubStep,
+                m_positions = this.ParticlePositions,
+                m_prevPositions = this.PrevParticlePositions,
+                m_velocities = this.ParticleVels,
+                m_velDamping = this.m_damping_subStep,
+            };
+            handle = updateVel.Schedule(m_positionList.count, 32, handle);
+
             handle.Complete();
             /*
             Profiler.BeginSample("SolveStrethConstrains");

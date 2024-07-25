@@ -17,11 +17,13 @@ struct PredictPositionsJob : IJobParallelFor
     [ReadOnly] public float m_deltaTime;
 
     [NativeDisableParallelForRestriction] public NativeArray<float4> m_positions;
+    [NativeDisableParallelForRestriction] public NativeArray<float4> m_prevPositions;
     [NativeDisableParallelForRestriction] public NativeArray<float4> m_velocities;
 
     public void Execute(int index)
     {
         int i = index;
+        m_prevPositions[i] = m_positions[i];
         float4 property = m_particleProperties[i];
         float4 vel = m_velocities[i] + (m_inverseMasses[i] * m_externalForces[i] + m_gravity) * m_deltaTime;
         if (!PBDUtil.IsParticleFixed(property))

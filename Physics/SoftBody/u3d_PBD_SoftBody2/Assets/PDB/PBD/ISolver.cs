@@ -9,7 +9,10 @@ namespace bluebean.UGFramework.Physics
 {
     public interface ISolver
     {
+        float StretchConstrainCompliance { get; }
+        float VolumeConstrainCompliance { get; }
         NativeArray<float4> ParticlePositions { get; }
+        NativeArray<float4> PrevParticlePositions { get; }
         NativeArray<float4> ParticleVels { get; }
         NativeArray<float4> ParticleProperties { get; }
         NativeArray<float4> ExternalForces { get; }

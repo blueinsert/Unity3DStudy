@@ -10,60 +10,41 @@ using UnityEngine;
 
 namespace bluebean.UGFramework.Physics
 {
+
+    /// <summary>
+    /// 汇总
+    /// </summary>
     [BurstCompile]
-    public struct VolumeConstrainApplyJob : IJobParallelFor
+    public struct VolumeConstrainSummarizeJob : IJobParallelFor
     {
 
-        /// <summary>
-        /// 四面体顶点索引数组
-        /// </summary>
         [ReadOnly] public NativeArray<int4> m_tets;
+        [ReadOnly] public NativeArray<float4> m_positionDeltasPerConstrain;
 
-        [ReadOnly] public float sorFactor;
-
-        [ReadOnly] public NativeArray<float4> m_particleProperties;
-
-        /// <summary>
-        /// 粒子位置数组
-        /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> m_positions;
         /// <summary>
         /// 本次约束求解产生的位置变化
         /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<float4> m_deltas;
+        [NativeDisableContainerSafetyRestriction]
+        [NativeDisableParallelForRestriction]
+        public NativeArray<float4> m_deltas;
         /// <summary>
         /// 每个顶点被累计次数
         /// </summary>
-        [NativeDisableContainerSafetyRestriction][NativeDisableParallelForRestriction] public NativeArray<int> m_counts;
-
+        [NativeDisableContainerSafetyRestriction]
+        [NativeDisableParallelForRestriction]
+        public NativeArray<int> m_counts;
 
         public void Execute(int index)
         {
-            //index 是约束索引或四面体索引
-
-            var tet = m_tets[index];
-            var p1Index = tet.x;
-            var p2Index = tet.y;
-            var p3Index = tet.z;
-            var p4Index = tet.w;
-            Unity.Collections.NativeList<int> particleIndices = new Unity.Collections.NativeList<int>(4, Allocator.Temp);
-            particleIndices.Add(p1Index);
-            particleIndices.Add(p2Index);
-            particleIndices.Add(p3Index);
-            particleIndices.Add(p4Index);
+            int constrainIndex = index;
+            var tet = m_tets[constrainIndex];
+            var startIndex = constrainIndex * 4;
             for (int j = 0; j < 4; j++)
             {
-                var p = particleIndices[j];
-                if (m_counts[p] > 0)
-                {
-                    float4 property = m_particleProperties[p];
-                    if (!PBDUtil.IsParticleFixed(property))
-                        m_positions[p] += m_deltas[p] / m_counts[p];
-                    m_deltas[p] = float4.zero;
-                    m_counts[p] = 0;
-                }
+                int p = tet[j];
+                m_deltas[p] += m_positionDeltasPerConstrain[startIndex+j];
+                m_counts[p]++;
             }
         }
-
     }
 }

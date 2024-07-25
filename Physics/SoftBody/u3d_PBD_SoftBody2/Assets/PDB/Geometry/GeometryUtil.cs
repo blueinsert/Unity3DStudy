@@ -292,5 +292,18 @@ namespace bluebean.UGFramework.Physics
 
             return normals;
         }
+
+        public static Vector3 ProjectPointLine(Vector3 point, Vector3 lineStart, Vector3 lineEnd, out float mu, bool clampToSegment = true)
+        {
+            Vector3 ap = point - lineStart;
+            Vector3 ab = lineEnd - lineStart;
+
+            mu = Vector3.Dot(ap, ab) / Vector3.Dot(ab, ab);
+
+            if (clampToSegment)
+                mu = Mathf.Clamp01(mu);
+
+            return lineStart + ab * mu;
+        }
     }
 }

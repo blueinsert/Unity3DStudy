@@ -6,8 +6,10 @@ namespace bluebean.UGFramework.Physics
 {
     public enum ConstrainType
     {
-        None = -1,
-        Collide = 0,
+        None = -2,
+        
+        Collide,
+        Start,
         Volume,
         Stretch,
         Max,

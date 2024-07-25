@@ -24,6 +24,7 @@ namespace bluebean.UGFramework.Physics
         /// 约束柔度
         /// </summary>
         [ReadOnly] public NativeArray<float> m_compliances;
+        [ReadOnly] public float m_compliance;
         /// <summary>
         /// 粒子位置数组
         /// </summary>
@@ -41,7 +42,7 @@ namespace bluebean.UGFramework.Physics
 
         public void Execute(int index)
         {
-            float alpha = m_compliances[index] / m_deltaTimeSqr;
+            float alpha = m_compliance / m_deltaTimeSqr;
 
             var l_e = m_restLen[index];
             var e = m_edges[index];
