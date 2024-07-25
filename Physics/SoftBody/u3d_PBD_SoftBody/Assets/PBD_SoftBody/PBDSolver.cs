@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-public class PDBSolver : MonoBehaviour, ISolverEnv
+public class PBDSolver : MonoBehaviour, ISolverEnv
 {
     public int m_targetFrameRate = 60;
     public float m_dtSubStep = 0.0333f;
     public float m_dtStep = 0.0333f;
     public float m_damping = 0.99f;
     public float m_damping_subStep = 0.99f;
-    [Range(0f, 0.1f)]
+    [Range(0f, 0.002f)]
     public float m_edgeCompliance = 0.0f;
     [Range(0f, 1f)]
     public float m_volumeCompliance = 0.0f;
@@ -289,6 +289,31 @@ public class PDBSolver : MonoBehaviour, ISolverEnv
     {
         var actor = GetActor(actorId);
         return actor.GetEdgeParticles(edgeIndex);
+    }
+
+    public List<int> GetActorIds()
+    {
+        var list = new List<int>();
+        list.AddRange(m_actorDic.Keys);
+        return list;
+    }
+
+    public int GetActorParticleCount(int actorId)
+    {
+        var actor = GetActor(actorId);
+        return actor.GetParticleCount();
+    }
+
+    public Vector3 GetParticleVel(int actorId, int particleId)
+    {
+        var actor = GetActor(actorId);
+        return actor.GetParticleVel(particleId);
+    }
+
+    public void SetParticleExternalForce(int actorId, int particleId, Vector3 force)
+    {
+        var actor = GetActor(actorId);
+        actor.SetParticleExternalForce(particleId, force);
     }
     #endregion
 }

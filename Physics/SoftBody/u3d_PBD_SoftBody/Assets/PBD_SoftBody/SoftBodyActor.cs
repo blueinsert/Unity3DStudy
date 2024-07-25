@@ -9,7 +9,7 @@ public class SoftBodyActor : PDBActor
     CollideConstrain[] m_collideConstrains = new CollideConstrain[CollideConstrainCountMax];
     int m_collideConstrainCount = 0;
 
-    private PDBSolver m_solver = null;
+    private PBDSolver m_solver = null;
 
     private float m_scale = 1.0f;
 
@@ -22,7 +22,7 @@ public class SoftBodyActor : PDBActor
     public override void Initialize()
     {
         base.Initialize();
-        m_solver = GetComponentInParent<PDBSolver>();
+        m_solver = GetComponentInParent<PBDSolver>();
         m_solver.RegisterActor(this);
         PushStretchConstrains2Solver();
         PushVolumeConstrains2Solver();
@@ -36,7 +36,7 @@ public class SoftBodyActor : PDBActor
     public override void PreSubStep(float dt, Vector3 g)
     {
         base.PreSubStep(dt, g);
-        var solver = GetComponentInParent<PDBSolver>();
+        var solver = GetComponentInParent<PBDSolver>();
         solver.ClearConstrain(ActorId, ConstrainType.Collide);
         GenerateCollideConstrains();
         PushCollideConstrains2Solver();
@@ -49,7 +49,7 @@ public class SoftBodyActor : PDBActor
         for (int i = 0; i < m_X.Length; i++)
         {
             var p = m_X[i];
-            float planeY = -5;
+            float planeY = -2;
             if (p.y < planeY && m_collideConstrainCount < CollideConstrainCountMax - 1)
             {
                 m_collideConstrains[m_collideConstrainCount].m_actorId = this.ActorId;
