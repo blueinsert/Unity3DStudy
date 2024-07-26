@@ -322,9 +322,9 @@ MonoBehaviour:
   m_dtStep: 0.0333
   m_damping: 0.98
   m_damping_subStep: 0.98
-  m_edgeCompliance: 0
-  m_volumeCompliance: 0.607
-  m_subStep: 34
+  m_edgeCompliance: 0.00023
+  m_volumeCompliance: 0.006
+  m_subStep: 22
   m_collideCompliance: 0
   m_g: {x: 0, y: -9.8, z: 0}
   m_actors: []

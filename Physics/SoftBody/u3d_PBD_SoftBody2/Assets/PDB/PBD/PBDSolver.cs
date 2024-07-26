@@ -17,7 +17,7 @@ namespace bluebean.UGFramework.Physics
         public float m_dtStep = 0.0333f;
         public float m_damping = 0.99f;
         public float m_damping_subStep = 0.99f;
-        [Range(0f, 0.1f)]
+        [Range(0f, 0.002f)]
         public float m_edgeCompliance = 0.0f;
         [Range(0f, 1f)]
         public float m_volumeCompliance = 0.0f;
@@ -38,8 +38,8 @@ namespace bluebean.UGFramework.Physics
         public NativeVector4List PositionList { get { return m_positionList; } }
         public NativeVector4List VelList { get { return m_velList; } }
         public NativeVector4List ExternalForceList { 
-            get { return m_velList; }
-            set { m_velList = value; }
+            get { return m_externalForceList; }
+            set { m_externalForceList = value; }
         }
         public NativeFloatList InvMassList { get { return m_invMassList; } }
 
@@ -248,6 +248,7 @@ namespace bluebean.UGFramework.Physics
             {
                 m_actors[i].OnPostStep();
             }
+            m_externalForceList.WipeToZero();
         }
 
         void Solve()

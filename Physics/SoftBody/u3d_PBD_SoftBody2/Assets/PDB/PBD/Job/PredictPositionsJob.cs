@@ -30,6 +30,6 @@ struct PredictPositionsJob : IJobParallelFor
         {
             m_velocities[i] = vel;
             m_positions[i] = m_positions[i] + m_velocities[i] * m_deltaTime;
-        }  
+        }
     }
 }
