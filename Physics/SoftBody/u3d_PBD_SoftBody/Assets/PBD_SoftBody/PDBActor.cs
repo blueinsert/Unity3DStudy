@@ -12,15 +12,26 @@ public class PDBActor : MonoBehaviour
     protected Vector3[] m_X_last = null;
     protected Vector3[] m_X = null;
     protected Vector3[] m_V = null;
+    protected Vector3[] m_externalForces = null;
 
     protected TetMesh m_tetMesh = null;
 
     public MeshFilter m_meshFilter = null;
     public Mesh m_mesh = null;
 
+    public int GetParticleCount()
+    {
+        return m_X.Length;
+    }
+
     public Vector3 GetParticlePosition(int index)
     {
         return m_X[index];
+    }
+
+    public Vector3 GetParticleVel(int index)
+    {
+        return m_V[index];
     }
 
     public void ModifyParticelPosition(int particleId, Vector3 deltaPos)
@@ -56,6 +67,11 @@ public class PDBActor : MonoBehaviour
         return m_tetMesh.GetEdgeParticles(edgeIndex);
     }
 
+    public void SetParticleExternalForce(int particleId, Vector3 force)
+    {
+        m_externalForces[particleId] = force;
+    }
+
     public virtual void Initialize()
     {
         m_tetMesh = GetComponent<TetMesh>();
@@ -64,6 +80,7 @@ public class PDBActor : MonoBehaviour
         m_X_last = new Vector3[m_X.Length];
         Util.CopyArray(m_X, m_X_last);
         m_V = new Vector3[m_X.Length];
+        m_externalForces = new Vector3[m_X.Length];
 
         m_meshFilter = GetComponent<MeshFilter>();
         m_mesh = m_meshFilter.mesh;
@@ -75,8 +92,9 @@ public class PDBActor : MonoBehaviour
         {
             if (!m_tetMesh.IsParticleFixed(i))
             {
-                m_V[i] += g * dt;
+                m_V[i] += (g + m_externalForces[i]* GetParticleInvMass(i)) * dt;
                 m_X[i] += m_V[i] * dt;
+                m_externalForces[i] = Vector3.zero;
             }
         }
 

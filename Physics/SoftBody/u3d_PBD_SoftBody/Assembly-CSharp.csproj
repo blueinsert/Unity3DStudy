@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{2804EBC0-0073-DE8E-BA56-E04591C7D81F}</ProjectGuid>
+    <ProjectGuid>{09C1F56E-F9DB-E82B-6F45-EA5C9D52293B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -27,7 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169;USG0001</NoWarn>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -60,52 +60,49 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.17f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\PDB\DataStruct\Triangle.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeFloatList.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\PositionDeltaApplyJob.cs" />
-    <Compile Include="Assets\PDB\PBD\Utils\ParticleDragger.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeInt4List.cs" />
-    <Compile Include="Assets\PDB\DataStruct\SDF\ASDF.cs" />
-    <Compile Include="Assets\PDB\DataStruct\VectorInt4.cs" />
-    <Compile Include="Assets\PDB\PBD\Actor\BunnyMeshData.cs" />
-    <Compile Include="Assets\PDB\CoroutineJob.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\VolumeConstrainGroup.cs" />
-    <Compile Include="Assets\PDB\PBD\Actor\TetMesh.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\ConstrainGroup.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeList.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\ConstrainData.cs" />
-    <Compile Include="Assets\PDB\Voxelization\MeshVoxelizer.cs" />
-    <Compile Include="Assets\PDB\PBD\ISolver.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\StretchConstrainSolveJob.cs" />
-    <Compile Include="Assets\PDB\BurstMath.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\StretchConstrainApplyJob.cs" />
-    <Compile Include="Assets\PDB\DataStruct\VectorInt2.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\PredictPositionsJob.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeInt3List.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\VolumeConstrainApplyJob.cs" />
-    <Compile Include="Assets\PDB\DataStruct\VectorInt3.cs" />
-    <Compile Include="Assets\PDB\Geometry\GeometryUtil.cs" />
-    <Compile Include="Assets\PDB\DataStruct\SDF\DFNode.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeIntList.cs" />
-    <Compile Include="Assets\PDB\PBD\Utils\ParticlePicker.cs" />
-    <Compile Include="Assets\PDB\PBD\Actor\SoftBodyActor.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\CollideConstrain.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\UpdateVelJob.cs" />
-    <Compile Include="Assets\PDB\PBD\PBDSolver.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\ConstrainType.cs" />
-    <Compile Include="Assets\PDB\PBD\Actor\BunnyTetMeshImpl.cs" />
-    <Compile Include="Assets\PDB\DataStruct\PriorityQueue.cs" />
-    <Compile Include="Assets\PDB\PBD\Actor\PDBActor.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeVector4List.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Aabb.cs" />
-    <Compile Include="Assets\PDB\PhysicsUtil.cs" />
-    <Compile Include="Assets\PDB\PBD\PBDUtil.cs" />
-    <Compile Include="Assets\PDB\DataStruct\Native\NativeInt2List.cs" />
-    <Compile Include="Assets\PDB\DataStruct\BVH\BIH.cs" />
-    <Compile Include="Assets\PDB\PBD\Constrains\StretchConstrainGroup.cs" />
-    <Compile Include="Assets\PDB\PBD\Job\VolumeConstrainSolveJob.cs" />
-    <Compile Include="Assets\PDB\DataStruct\BVH\IBounded.cs" />
-    <Compile Include="Assets\PDB\DataStruct\BVH\BIHNode.cs" />
+    <Compile Include="Assets\PBD_SoftBody\TetMesh.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Classes\EventArgs\PreviewStateChangedEventArgs.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Constrains\CollideConstrain.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Classes\EventArgs\PaintStrokeEventArgs.cs" />
+    <Compile Include="Assets\PBD_SoftBody\ParticlePicker.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Classes\EventArgs\ShaderPrepEventArgs.cs" />
+    <Compile Include="Assets\PBD_SoftBody\FPS.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Constrains\ConstrainBase.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Enums\BrushStyle.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Util.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Enums\PostRepackAction.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Enums\ColorComponent.cs" />
+    <Compile Include="Assets\PBD_SoftBody\PBDSolver.cs" />
+    <Compile Include="Assets\PBD_SoftBody\SoftBodyActor.cs" />
+    <Compile Include="Assets\PBD_SoftBody\BunnyTetMeshImpl.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Constrains\StretchConstrain.cs" />
+    <Compile Include="Assets\PBD_SoftBody\PDBActor.cs" />
+    <Compile Include="Assets\PBD_SoftBody\BunnyMeshData.cs" />
+    <Compile Include="Assets\PBD_SoftBody\GeometryUtil.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Constrains\ConstrainType.cs" />
+    <Compile Include="Assets\VertPaint\Scripts\Classes\EventArgs\TemplateSavedEventArgs.cs" />
+    <Compile Include="Assets\PBD_SoftBody\ParticleDragger.cs" />
+    <Compile Include="Assets\PBD_SoftBody\ISolverEnv.cs" />
+    <Compile Include="Assets\PBD_SoftBody\Constrains\VolumeConstrain.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\VertPaint\Templates\Readme.txt" />
+    <None Include="Assets\VertPaint\Shaders\2-Way Vertex Color Blending (Height Based).shader" />
+    <None Include="Assets\VertPaint\Shaders\3-Way Vertex Color Blending (Height Based Smooth).shader" />
+    <None Include="Assets\VertPaint\Templates\Autosave\VertPaint Autosave.xml" />
+    <None Include="Assets\VertPaint\Shaders\Vertex Colors Preview.shader" />
+    <None Include="Assets\VertPaint\Shaders\2-Way Vertex Color Blending (Height Based Smooth).shader" />
+    <None Include="Assets\VertPaint\Templates\Examples\Blue.xml" />
+    <None Include="Assets\VertPaint\Shaders\2-Way Vertex Color Blending (Simple).shader" />
+    <None Include="Assets\VertPaint\Shaders\4-Way Vertex Color Blending (Height Based).shader" />
+    <None Include="Assets\VertPaint\Shaders\4-Way Vertex Color Blending (Simple).shader" />
+    <None Include="Assets\VertPaint\Shaders\3-Way Vertex Color Blending (Height Based).shader" />
+    <None Include="Assets\VertPaint\Templates\Examples\Red.xml" />
+    <None Include="Assets\VertPaint\Shaders\4-Way Vertex Color Blending (Height Based Smooth).shader" />
+    <None Include="Assets\VertPaint\Templates\Examples\Green.xml" />
+    <None Include="Assets\VertPaint\Shaders\CG include files\heightblend.cginc" />
+    <None Include="Assets\VertPaint\Shaders\3-Way Vertex Color Blending (Simple).shader" />
+    <None Include="Assets\VertPaint\Templates\Autosave\VertPaint Favorite Templates.xml" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -438,10 +435,6 @@
     </Reference>
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.17f1c1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
@@ -996,20 +989,16 @@
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.VisualScripting.Core.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
@@ -1040,24 +1029,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.InputSystem.ForUI">
-      <HintPath>Library\ScriptAssemblies\Unity.InputSystem.ForUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
       <HintPath>Library\ScriptAssemblies\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections">
-      <HintPath>Library\ScriptAssemblies\Unity.Collections.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.State.Editor">
