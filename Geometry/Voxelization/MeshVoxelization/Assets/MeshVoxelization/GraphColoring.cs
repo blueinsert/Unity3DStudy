@@ -42,11 +42,13 @@ namespace bluebean
         {
             for (int i = 0; i < particles.Length; ++i)
             {
+                //动态扩容
                 while (particles[i] >= m_ConstraintsPerParticle.Count)
                     m_ConstraintsPerParticle.Add(new List<int>());
+                //m_ConstraintIndices.Count就是当前粒子索引，连接关系是相互的
+                //在其他粒子处建立与当前粒子的关系
                 m_ConstraintsPerParticle[particles[i]].Add(m_ConstraintIndices.Count);
             }
-
             m_ConstraintIndices.Add(m_ParticleIndices.Count);
             m_ParticleIndices.AddRange(particles);
         }

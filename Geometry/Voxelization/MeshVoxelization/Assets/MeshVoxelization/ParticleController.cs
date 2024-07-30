@@ -20,7 +20,7 @@ namespace bluebean
 
         public void SetRadius(float radius)
         {
-            Vector3 scale = new Vector3(radius, radius, radius);
+            Vector3 scale = new Vector3(radius, radius, radius) * 2;
             this.transform.localScale = scale;
         }
 

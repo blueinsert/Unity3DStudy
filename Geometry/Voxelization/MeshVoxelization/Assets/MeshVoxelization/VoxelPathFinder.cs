@@ -5,32 +5,32 @@ namespace bluebean
 {
     public class VoxelPathFinder
     {
-        private MeshVoxelizer voxelizer = null;
-        private bool[,,] closed;
-        private PriorityQueue<TargetVoxel> open;
+        private MeshVoxelizer m_voxelizer = null;
+        private bool[,,] m_closed;
+        private PriorityQueue<TargetVoxel> m_open;
 
         public struct TargetVoxel : IEquatable<TargetVoxel>, IComparable<TargetVoxel>
         {
-            public Vector3Int coordinates;
-            public float distance;
-            public float heuristic;
+            public Vector3Int m_coordinates;
+            public float m_distance;
+            public float m_heuristic;
             //public TargetVoxel parent;
 
             public float cost
             {
-                get { return distance + heuristic; }
+                get { return m_distance + m_heuristic; }
             }
 
             public TargetVoxel(Vector3Int coordinates, float distance, float heuristic)
             {
-                this.coordinates = coordinates;
-                this.distance = distance;
-                this.heuristic = heuristic;
+                this.m_coordinates = coordinates;
+                this.m_distance = distance;
+                this.m_heuristic = heuristic;
             }
 
             public bool Equals(TargetVoxel other)
             {
-                return this.coordinates.Equals(other.coordinates);
+                return this.m_coordinates.Equals(other.m_coordinates);
             }
 
             public int CompareTo(TargetVoxel other)
@@ -41,49 +41,49 @@ namespace bluebean
 
         public VoxelPathFinder(MeshVoxelizer voxelizer)
         {
-            this.voxelizer = voxelizer;
-            closed = new bool[voxelizer.resolution.x, voxelizer.resolution.y, voxelizer.resolution.z];
-            open = new PriorityQueue<TargetVoxel>();
+            this.m_voxelizer = voxelizer;
+            m_closed = new bool[voxelizer.m_resolution.x, voxelizer.m_resolution.y, voxelizer.m_resolution.z];
+            m_open = new PriorityQueue<TargetVoxel>();
         }
 
         private TargetVoxel AStar(in Vector3Int start, Func<TargetVoxel,bool> termination, Func<Vector3Int, float> heuristic)
         {
-            Array.Clear(closed, 0, closed.Length);
+            Array.Clear(m_closed, 0, m_closed.Length);
 
             // A* algorithm:
-            open.Clear();
-            open.Enqueue(new TargetVoxel(start, 0, 0));
+            m_open.Clear();
+            m_open.Enqueue(new TargetVoxel(start, 0, 0));
 
-            while (open.Count() != 0)
+            while (m_open.Count() != 0)
             {
-                var current = open.Dequeue();
+                var current = m_open.Dequeue();
 
                 if (termination(current))
                     return current;
 
-                closed[current.coordinates.x, current.coordinates.y, current.coordinates.z] = true;
+                m_closed[current.m_coordinates.x, current.m_coordinates.y, current.m_coordinates.z] = true;
 
                 for (int i = 0; i < MeshVoxelizer.fullNeighborhood.Length; ++i)
                 {
-                    var successorCoords = current.coordinates + MeshVoxelizer.fullNeighborhood[i];
+                    var successorCoords = current.m_coordinates + MeshVoxelizer.fullNeighborhood[i];
 
-                    if (voxelizer.VoxelExists(successorCoords) &&
-                        voxelizer[successorCoords.x, successorCoords.y, successorCoords.z] != MeshVoxelizer.Voxel.Outside &&
-                        !closed[successorCoords.x, successorCoords.y, successorCoords.z])
+                    if (m_voxelizer.VoxelExists(successorCoords) &&
+                        m_voxelizer[successorCoords.x, successorCoords.y, successorCoords.z] != MeshVoxelizer.Voxel.Outside &&
+                        !m_closed[successorCoords.x, successorCoords.y, successorCoords.z])
                     {
-                        var successor = new TargetVoxel(successorCoords, current.distance + voxelizer.GetDistanceToNeighbor(i),
+                        var successor = new TargetVoxel(successorCoords, current.m_distance + m_voxelizer.GetDistanceToNeighbor(i),
                                                         heuristic(successorCoords));
                         //successor.parent = current;
 
                         int index = -1;
-                        for (int j = 0; j < open.Count(); ++j)
-                            if (open.data[j].coordinates == successorCoords)
+                        for (int j = 0; j < m_open.Count(); ++j)
+                            if (m_open.data[j].m_coordinates == successorCoords)
                             { index = j; break; }
 
                         if (index < 0)
-                            open.Enqueue(successor);
-                        else if (successor.distance < open.data[index].distance)
-                            open.data[index] = successor;
+                            m_open.Enqueue(successor);
+                        else if (successor.m_distance < m_open.data[index].m_distance)
+                            m_open.data[index] = successor;
                     }
                 }
             }
@@ -93,19 +93,19 @@ namespace bluebean
 
         public TargetVoxel FindClosestNonEmptyVoxel(in Vector3Int start)
         {
-            if (voxelizer == null) return new TargetVoxel(Vector3Int.zero, -1, -1);
+            if (m_voxelizer == null) return new TargetVoxel(Vector3Int.zero, -1, -1);
 
-            if (!voxelizer.VoxelExists(start))
+            if (!m_voxelizer.VoxelExists(start))
                 return new TargetVoxel(Vector3Int.zero, -1, -1);
 
-            if (voxelizer[start.x, start.y, start.z] != MeshVoxelizer.Voxel.Outside)
+            if (m_voxelizer[start.x, start.y, start.z] != MeshVoxelizer.Voxel.Outside)
                 return new TargetVoxel(start, 0, 0);
 
-            Array.Clear(closed, 0, closed.Length);
+            Array.Clear(m_closed, 0, m_closed.Length);
 
             return AStar(start,
             (TargetVoxel v) => {
-                return voxelizer[v.coordinates.x, v.coordinates.y, v.coordinates.z] != MeshVoxelizer.Voxel.Outside;
+                return m_voxelizer[v.m_coordinates.x, v.m_coordinates.y, v.m_coordinates.z] != MeshVoxelizer.Voxel.Outside;
             },
             (Vector3Int c) => {
                 return 0;
@@ -114,21 +114,21 @@ namespace bluebean
 
         public TargetVoxel FindPath(in Vector3Int start, Vector3Int end)
         {
-            if (voxelizer == null) return new TargetVoxel(Vector3Int.zero,-1, -1);
+            if (m_voxelizer == null) return new TargetVoxel(Vector3Int.zero,-1, -1);
 
-            if (!voxelizer.VoxelExists(start) || !voxelizer.VoxelExists(end))
+            if (!m_voxelizer.VoxelExists(start) || !m_voxelizer.VoxelExists(end))
                 return new TargetVoxel(Vector3Int.zero, -1, -1);
 
-            if (voxelizer[start.x, start.y, start.z] == MeshVoxelizer.Voxel.Outside ||
-                voxelizer[end.x, end.y, end.z] == MeshVoxelizer.Voxel.Outside)
+            if (m_voxelizer[start.x, start.y, start.z] == MeshVoxelizer.Voxel.Outside ||
+                m_voxelizer[end.x, end.y, end.z] == MeshVoxelizer.Voxel.Outside)
                 return new TargetVoxel(Vector3Int.zero, -1, -1);
 
             return AStar(start,
             (TargetVoxel v) => {
-                return v.coordinates == end;
+                return v.m_coordinates == end;
             },
             (Vector3Int c) => {
-                return Vector3.Distance(c, end) * voxelizer.voxelSize;
+                return Vector3.Distance(c, end) * m_voxelizer.m_voxelSize;
             });
         }
     }

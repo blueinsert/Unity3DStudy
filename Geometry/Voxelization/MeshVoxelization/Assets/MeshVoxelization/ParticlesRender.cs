@@ -13,8 +13,12 @@ namespace bluebean
 
         private void OnValidate()
         {
-            m_particlePool.Destroy();
-            m_particlePool = null;
+            if (m_particlePool != null)
+            {
+                m_particlePool.Destroy();
+                m_particlePool = null;
+            }
+            
         }
 
         private GameObjectPool<ParticleController> ParticlePool
@@ -27,7 +31,7 @@ namespace bluebean
                     var child = this.transform.Find("Particles");
                     if (child != null)
                     {
-                        DestroyImmediate(child);
+                        DestroyImmediate(child.gameObject);
                     }
                     GameObject particleContent = new GameObject("Particles");
                     particleContent.transform.SetParent(this.transform, false);
