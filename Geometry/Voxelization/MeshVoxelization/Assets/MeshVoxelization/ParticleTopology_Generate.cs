@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using static bluebean.ParticleTopology;
 
 namespace bluebean
@@ -87,6 +88,9 @@ namespace bluebean
         [Tooltip("Voxel resolution used to analyze the shape of the mesh.")]
         [Range(2, 128)]
         public int shapeResolution = 48;
+
+        public UnityEvent<IParticleCollection> EventOnGenerateComplete;
+        //public event Action EventOnGenerateComplete;
 
         private VoxelDistanceField m_DistanceField;
         private VoxelPathFinder m_PathFinder;
@@ -187,6 +191,11 @@ namespace bluebean
             while (s.MoveNext()) yield return s.Current;
 
             generatedMesh = inputMesh;
+
+            if (EventOnGenerateComplete != null)
+            {
+                EventOnGenerateComplete.Invoke(this);
+            }
         }
 
         protected virtual IEnumerator CreateSimplices(List<Vector3> particles, int[] meshTriangles)
@@ -204,7 +213,7 @@ namespace bluebean
                 simplices.Add(new Vector3Int(p1, p2, p3));
 
                 if (i % 500 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: generating simplices geometry...", i / (float)meshTriangles.Length);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: generating simplices geometry...", i / (float)meshTriangles.Length);
             }
 
             i = 0;
@@ -254,7 +263,7 @@ namespace bluebean
             //    shapeMatchingConstraintsData.batches[i].activeConstraintCount = shapeMatchingConstraintsData.batches[i].constraintCount;
             //}
 
-            yield return new CoroutineJob.ProgressInfo("ObiSoftbody: batching constraints", 1);
+            yield return new CoroutineJob.ProgressInfo("ParticleTopology: batching constraints", 1);
         }
 
         private IEnumerator GenerateParticles(List<Vector3> particlePositions, List<Vector3> particleNormals)
@@ -320,11 +329,12 @@ namespace bluebean
                 //orientations[i] = orientation;
                 //restOrientations[i] = orientation;
                 //principalRadii[i] = principalValues;
+                radius[i] = particleRadius;
                 //filters[i] = ObiUtils.MakeFilter(ObiUtils.CollideWithEverything, 1);
                 colors[i] = Color.white;
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: generating particles...", i / (float)particlePositions.Count);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: generating particles...", i / (float)particlePositions.Count);
             }
         }
 
@@ -379,7 +389,7 @@ namespace bluebean
                 colorizer.AddConstraint(cluster.ToArray());
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: generating shape matching clusters...", i / (float)voxelizer.voxelCount);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: generating shape matching clusters...", i / (float)voxelizer.voxelCount);
             }
         }
 
@@ -397,7 +407,7 @@ namespace bluebean
                 voxelToParticles[index].Add(i);
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: inserting particles into voxels...", i / (float)particles.Count);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: inserting particles into voxels...", i / (float)particles.Count);
             }
         }
 
@@ -418,7 +428,7 @@ namespace bluebean
                             particleType.Add(pType);
                         }
                         if (++i % 1000 == 0)
-                            yield return new CoroutineJob.ProgressInfo("ObiSoftbody: sampling voxels...", i / (float)voxelizer.voxelCount);
+                            yield return new CoroutineJob.ProgressInfo("ParticleTopology: sampling voxels...", i / (float)voxelizer.voxelCount);
                     }
         }
 
@@ -495,7 +505,7 @@ namespace bluebean
                 }
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: sampling surface...", i / (float)vertices.Length);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: sampling surface...", i / (float)vertices.Length);
             }
         }
 
@@ -523,7 +533,7 @@ namespace bluebean
                 particleNormals[vertexToParticle[i]] += normals[i];
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: mapping vertices to particles...", i / (float)vertices.Length);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: mapping vertices to particles...", i / (float)vertices.Length);
             }
 
             for (int i = 0; i < particleNormals.Count; ++i)
@@ -561,7 +571,7 @@ namespace bluebean
                 }
 
                 if (i % 100 == 0)
-                    yield return new CoroutineJob.ProgressInfo("ObiSoftbody: generating shape matching clusters...", i / (float)meshTriangles.Length);
+                    yield return new CoroutineJob.ProgressInfo("ParticleTopology: generating shape matching clusters...", i / (float)meshTriangles.Length);
             }
 
             List<int> cluster = new List<int>();

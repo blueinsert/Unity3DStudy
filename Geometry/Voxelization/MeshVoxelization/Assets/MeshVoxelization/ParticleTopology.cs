@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace bluebean
 {
-    public partial class ParticleTopology : IParticleCollection
+    public partial class ParticleTopology : MonoBehaviour, IParticleCollection
     {
         
         [HideInInspector][SerializeField] protected Bounds _bounds = new Bounds();
@@ -21,22 +21,22 @@ namespace bluebean
 
         public Color GetParticleColor(int index)
         {
-            throw new System.NotImplementedException();
+            return colors[index];
         }
 
         public Vector3 GetParticlePosition(int index)
         {
-            throw new System.NotImplementedException();
+            return positions[index];
         }
 
         public float GetParticleRadius(int index)
         {
-            throw new System.NotImplementedException();
+            return radius[index];
         }
 
         public int GetParticleRuntimeIndex(int index)
         {
-            throw new System.NotImplementedException();
+            return index;
         }
     }
 }
