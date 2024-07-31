@@ -4,10 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using static bluebean.ParticleTopology;
 
 namespace bluebean
 {
+#if UNITY_EDITOR
     public partial class ParticleTopology
     {
         public class SimplexComparer : IEqualityComparer<Vector3Int>
@@ -687,4 +687,5 @@ namespace bluebean
             }
         }
     }
+#endif
 }
