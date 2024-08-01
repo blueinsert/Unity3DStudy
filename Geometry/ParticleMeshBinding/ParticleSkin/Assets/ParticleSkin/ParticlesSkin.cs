@@ -20,19 +20,30 @@ namespace bluebean
 
         [Tooltip("Influence of the softbody in the resulting skin.")]
         [Range(0, 1)]
-        public float softbodyInfluence = 1;
+        public float m_softbodyInfluence = 1;
         [Tooltip("Maximum amount of bone influences for each vertex.")]
         [Range(byte.MinValue, byte.MaxValue)]
-        public byte maxBonesPerVertex = 4;
+        public byte m_maxBonesPerVertex = 4;
         [Tooltip("The ratio at which the cluster's influence on a vertex falls off with distance.")]
         public float m_SkinningFalloff = 1.0f;
         [Tooltip("The maximum distance a cluster can be from a vertex before it will not influence it any more.")]
         public float m_SkinningMaxDistance = 0.5f;
 
+        /// <summary>
+        /// softbone骨骼的转换matrix
+        /// bindPos是骨骼变换矩阵的逆矩阵
+        /// 骨骼变换矩阵:将坐标从骨骼本地坐标系变化到物体本地坐标值
+        /// </summary>
         [HideInInspector]
         [SerializeField] List<Matrix4x4> m_Bindposes = new List<Matrix4x4>();
+        /// <summary>
+        /// 所有的顶点骨骼绑定权重数组
+        /// </summary>
         [HideInInspector]
         [SerializeField] NativeBoneWeightList m_BoneWeights;
+        /// <summary>
+        /// 每个byte是每个顶点被绑定的bone数量
+        /// </summary>
         [HideInInspector]
         [SerializeField] NativeByteList m_BonesPerVertex;
 
@@ -43,7 +54,8 @@ namespace bluebean
 
         private Mesh m_BakedMesh;
         private Mesh m_OriginalMesh;
-        [HideInInspector][SerializeField] private Mesh m_SoftMesh;
+        //[HideInInspector][SerializeField]
+        private Mesh m_SoftMesh;
         private List<Transform> m_SoftBones = new List<Transform>();
 
         public void Awake()
@@ -51,7 +63,6 @@ namespace bluebean
             // autoinitialize "target" with the first skinned mesh renderer we find up our hierarchy.
             m_skinnedMeshRender = GetComponent<SkinnedMeshRenderer>();
             //InitializeInfluences();
-            m_particleTopology = GetComponent<ParticleTopology>();
             m_particleCollection = m_particleTopology as IParticleCollection;
         }
 
@@ -139,9 +150,6 @@ namespace bluebean
             m_BonesPerVertex.Clear();
             m_BoneWeights.Clear();
 
-            // Calculate softbody local to world matrix, and target to world matrix.
-            Matrix4x4 source2w = this.transform.localToWorldMatrix;
-            Quaternion source2wRot = source2w.rotation;
             Matrix4x4 target2w = transform.localToWorldMatrix;
 
             // Create bind pose matrices, one per shape matching cluster:
@@ -149,14 +157,13 @@ namespace bluebean
             {
                 var pos = m_particleCollection.GetParticlePosition(i);
 
-                // world space bone center/orientation:
-                Vector3 clusterCenter = source2w.MultiplyPoint3x4(pos);
+                Vector3 clusterCenter = pos;
                 Quaternion clusterOrientation = Quaternion.identity;
 
                 clusterCenters.Add(clusterCenter);
 
-                // world space bone transform * object local to world.
-                m_Bindposes.Add(Matrix4x4.TRS(clusterCenter, clusterOrientation, Vector3.one).inverse * target2w);
+                var bone2World = Matrix4x4.TRS(clusterCenter, clusterOrientation, Vector3.one);
+                m_Bindposes.Add(bone2World.inverse* target2w);
 
                 yield return new CoroutineJob.ProgressInfo("calculating bind poses...", i);
             }
@@ -221,7 +228,7 @@ namespace bluebean
 
                 // Sort bones by decreasing weight:
                 var slice = m_BoneWeights.AsNativeArray<BoneWeight1>().Slice(newBoneWeightOffset, totalBoneCount);
-#if OBI_COLLECTIONS
+#if true
                 slice.Sort(comparer);
 #else
                 var sorted = slice.OrderByDescending(x => x.weight).ToList();
@@ -230,7 +237,7 @@ namespace bluebean
 #endif
 
                 // Limit the amount of bone  influences:
-                totalBoneCount = (byte)Mathf.Min(totalBoneCount, maxBonesPerVertex);
+                totalBoneCount = (byte)Mathf.Min(totalBoneCount, m_maxBonesPerVertex);
                 m_BoneWeights.RemoveRange(newBoneWeightOffset + totalBoneCount, m_BoneWeights.count - (newBoneWeightOffset + totalBoneCount));
 
                 // Renormalize all weights:
@@ -278,9 +285,6 @@ namespace bluebean
 
         private void AppendSoftBones()
         {
-            // Calculate softbody local to world matrix, and target to world matrix.
-            Matrix4x4 source2w = this.transform.localToWorldMatrix;
-            Quaternion source2wRot = source2w.rotation;
             m_SoftBones.Clear();
             var boneRoot = this.transform.Find("Bones");
             for (int i = 0; i < m_particleCollection.ParticleCount; ++i)
@@ -289,29 +293,16 @@ namespace bluebean
 
                 GameObject bone = new GameObject("bone" + i);
                 bone.transform.parent = boneRoot;
-                bone.transform.position = source2w.MultiplyPoint3x4(pos);
-                bone.transform.rotation = source2wRot;
+                bone.transform.position = pos;
+                bone.transform.localRotation = Quaternion.identity;
                 //bone.hideFlags = HideFlags.HideAndDontSave;
                 m_SoftBones.Add(bone.transform);
             }
-
 
             // append our bone list to the original one:
             var bones = new List<Transform>(m_skinnedMeshRender.bones);
             bones.AddRange(m_SoftBones);
             m_skinnedMeshRender.bones = bones.ToArray();
-        }
-
-        // Copies existing softbones from the skinned mesh renderer. Useful when reusing an existing mesh instead of creating an instance.
-        private void CopySoftBones()
-        {
-            int boneCount = m_particleCollection.ParticleCount;
-
-            m_SoftBones.Clear();
-            m_SoftBones.Capacity = boneCount;
-
-            for (int i = m_skinnedMeshRender.bones.Length - boneCount; i < m_skinnedMeshRender.bones.Length; ++i)
-                m_SoftBones.Add(m_skinnedMeshRender.bones[i]);
         }
 
         private void Setup()
@@ -327,31 +318,29 @@ namespace bluebean
                     SetBoneWeights();
                     AppendBindposes();
                     AppendSoftBones();
-                }
-                // Reuse the same mesh, just copy bone references as we need to update bones every frame.
-                else
-                {
-                    CopySoftBones();
-                }
 
-                // Set the new mesh:
-                m_SoftMesh.RecalculateBounds();
-                m_OriginalMesh = m_skinnedMeshRender.sharedMesh;
-                m_skinnedMeshRender.sharedMesh = m_SoftMesh;
+                    // Set the new mesh:
+                    m_SoftMesh.RecalculateBounds();
+                    m_OriginalMesh = m_skinnedMeshRender.sharedMesh;
+                    m_skinnedMeshRender.sharedMesh = m_SoftMesh;
 
-                // Recalculate bounds:
-                m_skinnedMeshRender.localBounds = m_SoftMesh.bounds;
-                m_skinnedMeshRender.rootBone = this.transform;
+                    // Recalculate bounds:
+                    m_skinnedMeshRender.localBounds = m_SoftMesh.bounds;
+                    m_skinnedMeshRender.rootBone = this.transform;
+                }
+  
             }
         }
 
+        /// <summary>
+        /// 从逻辑数据中同步骨骼位置
+        /// </summary>
         private void UpdateSoftBones()
         {
             if (m_SoftBones.Count > 0)
             {
                 if (m_particleCollection != null)
                 {
-
                     for (int i = 0; i < m_particleCollection.ParticleCount; i++)
                     {
                         var pos = m_particleCollection.GetParticlePosition(i);
