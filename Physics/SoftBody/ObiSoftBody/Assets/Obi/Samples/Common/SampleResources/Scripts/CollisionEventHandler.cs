@@ -86,9 +86,9 @@ public class CollisionEventHandler : MonoBehaviour
 
             //Gizmos.DrawSphere(point + normal.normalized * frame.contacts[i].distance, 0.01f);
 
-            Gizmos.DrawSphere(point + normal * radius, 0.01f);
+            Gizmos.DrawSphere(point - normal * radius, 0.01f);
 
-            Gizmos.DrawRay(point + normal * radius, normal.normalized * contact.distance);
+            Gizmos.DrawRay(point - normal * radius, normal.normalized * contact.distance);
         }
     }
 

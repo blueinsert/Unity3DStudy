@@ -283,7 +283,8 @@ namespace Obi
                         for (int j = 0; j < simplexSize; ++j)
                         {
                             int particleIndex = simplices[simplexStart + j];
-                            deltas[particleIndex] += delta * invMasses[particleIndex] * contact.pointA[j];
+                            var realDelta = delta * invMasses[particleIndex] * contact.pointA[j];
+                            deltas[particleIndex] += realDelta;
                             counts[particleIndex]++;
                         }
 

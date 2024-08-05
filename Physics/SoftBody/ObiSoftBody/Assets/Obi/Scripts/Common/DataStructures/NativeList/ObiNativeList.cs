@@ -107,8 +107,8 @@ namespace Obi
             }
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             // dispose of atomic safety handle:
-            AtomicSafetyHandle.CheckDeallocateAndThrow(m_SafetyHandle);
-            AtomicSafetyHandle.Release(m_SafetyHandle);
+            //AtomicSafetyHandle.CheckDeallocateAndThrow(m_SafetyHandle);
+            //AtomicSafetyHandle.Release(m_SafetyHandle);
 #endif
         }
 
