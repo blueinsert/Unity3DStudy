@@ -24,11 +24,20 @@ public class RopeCreater : MonoBehaviour
     void CreateRope()
     {
         var parent = this.transform;
+        m_jointPrefab.GetComponent<ArticulationBody>().enabled = false;
         for (int i = 0; i < m_jointCount; i++)
         {
             var go = Instantiate(m_jointPrefab, parent);
             go.transform.localPosition = m_jointAxisDir * m_jointOffset;// new Vector3(0, m_jointOffset, 0);
             parent = go.transform;
+        }
+        foreach(var body in GetComponentsInChildren<ArticulationBody>())
+        {
+            body.anchorPosition = new Vector3(0, m_jointOffset / 2.0f, 0);
+        }
+        foreach (var body in GetComponentsInChildren<ArticulationBody>())
+        {
+            body.enabled = true;
         }
     }
 }
