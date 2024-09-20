@@ -541,7 +541,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!23 &356301181
 MeshRenderer:
@@ -610,6 +610,7 @@ MonoBehaviour:
   m_jointCount: 10
   m_jointAxisDir: {x: 0, y: -1, z: 0}
   m_jointOffset: 1
+  m_rotateLimitPerLen: 20
 --- !u!135 &356301184
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1088,7 +1089,7 @@ Transform:
   m_GameObject: {fileID: 591901581}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 140, z: 0}
+  m_LocalPosition: {x: 0, y: 210, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1195,9 +1196,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jointPrefab: {fileID: 2022899713219167753, guid: 9f5cf1dc58643ef47bce41f16e8de448,
     type: 3}
-  m_jointCount: 40
+  m_jointCount: 80
   m_jointAxisDir: {x: 0, y: -1, z: 0}
-  m_jointOffset: 3
+  m_jointOffset: 1.2
+  m_rotateLimitPerLen: 20
 --- !u!171741748 &843708513
 ArticulationBody:
   m_ObjectHideFlags: 0
@@ -1262,7 +1264,7 @@ ArticulationBody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_Immovable: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!23 &843708515
 MeshRenderer:
@@ -1326,7 +1328,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 170a8e9f2de5aba429adcb8e5b3b5a51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_speed: 15
+  m_speed: 50
 --- !u!135 &843708518
 SphereCollider:
   m_ObjectHideFlags: 0
