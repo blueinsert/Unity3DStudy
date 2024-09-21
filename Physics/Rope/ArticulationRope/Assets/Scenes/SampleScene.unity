@@ -389,8 +389,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.092625275, y: 0.10791236, z: -0.010098667, w: -0.9897846}
+  m_LocalPosition: {x: -3.2083082, y: 13.165735, z: -22.229118}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -936,6 +936,7 @@ GameObject:
   - component: {fileID: 591901584}
   - component: {fileID: 591901583}
   - component: {fileID: 591901582}
+  - component: {fileID: 591901587}
   m_Layer: 0
   m_Name: Creater2
   m_TagString: Untagged
@@ -1006,8 +1007,8 @@ ArticulationBody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_Immovable: 1
-  m_UseGravity: 1
+  m_Immovable: 0
+  m_UseGravity: 0
   m_CollisionDetectionMode: 0
 --- !u!135 &591901583
 SphereCollider:
@@ -1089,13 +1090,26 @@ Transform:
   m_GameObject: {fileID: 591901581}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 210, z: 0}
+  m_LocalPosition: {x: 0, y: 120, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 843708511}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &591901587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591901581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad75bd6a7482fe346a3d30a57a0556fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_speed: 8
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1196,10 +1210,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_jointPrefab: {fileID: 2022899713219167753, guid: 9f5cf1dc58643ef47bce41f16e8de448,
     type: 3}
-  m_jointCount: 80
+  m_jointCount: 40
   m_jointAxisDir: {x: 0, y: -1, z: 0}
-  m_jointOffset: 1.2
-  m_rotateLimitPerLen: 20
+  m_jointOffset: 1.5
+  m_rotateLimitPerLen: 30
 --- !u!171741748 &843708513
 ArticulationBody:
   m_ObjectHideFlags: 0
@@ -1210,7 +1224,7 @@ ArticulationBody:
   m_Enabled: 1
   serializedVersion: 5
   m_Mass: 1
-  m_ParentAnchorPosition: {x: -0.00000019505018, y: -0.5659485, z: 0}
+  m_ParentAnchorPosition: {x: -0.00000019505018, y: -0.56594086, z: 0}
   m_ParentAnchorRotation: {x: 0, y: 0, z: 0, w: 1}
   m_AnchorPosition: {x: -0.00000019505018, y: 1.0320576, z: 0}
   m_AnchorRotation: {x: 0, y: 0, z: 0, w: 1}
