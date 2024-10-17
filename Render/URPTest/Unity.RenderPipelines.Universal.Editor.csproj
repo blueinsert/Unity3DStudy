@@ -226,8 +226,8 @@
     <Compile Include="URPUni\Editor\ScriptableRendererFeatureEditor.cs" />
     <Compile Include="URPUni\Editor\2D\ShaderGraph\AssetCallbacks\CreateSpriteUnlitShaderGraph.cs" />
     <Compile Include="URPUni\Editor\2D\ShapeEditor\GUIFramework\GenericDefaultControl.cs" />
-    <Compile Include="URPUni\Editor\ShaderScriptableStripper.cs" />
     <Compile Include="URPUni\Editor\Overrides\ColorCurvesEditor.cs" />
+    <Compile Include="URPUni\Editor\ShaderScriptableStripper.cs" />
     <Compile Include="URPUni\Editor\2D\ShapeEditor\EditorTool\ScriptablePath.cs" />
     <Compile Include="URPUni\Editor\Overrides\MotionBlurEditor.cs" />
     <Compile Include="URPUni\Editor\2D\ShapeEditor\View\CreatePointAction.cs" />

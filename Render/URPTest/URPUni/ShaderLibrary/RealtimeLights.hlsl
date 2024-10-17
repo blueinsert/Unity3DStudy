@@ -66,6 +66,12 @@ float DistanceAttenuation(float distanceSqr, half2 distanceAttenuation)
     // for directional lights attenuation will be 1
     //float lightAtten = rcp(distanceSqr);
     float lightAtten = rcp(1);
+    if(distanceSqr<=1)
+        lightAtten = 1.0;
+    else if(distanceSqr<400.0){
+        lightAtten = (distanceSqr - 1.0)/(399.0)*(-0.9) + 1.0;
+    }else
+        lightAtten = 0.1;
     float2 distanceAttenuationFloat = float2(distanceAttenuation);
 
     // Use the smoothing factor also used in the Unity lightmapper.
