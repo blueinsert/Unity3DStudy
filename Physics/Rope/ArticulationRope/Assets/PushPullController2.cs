@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PushPullController2 : MonoBehaviour
 {
-    PushPullState m_state = PushPullState.Fixed;
+    public PushPullState m_state = PushPullState.Fixed;
     public float m_speed;
     ArticulationBody m_articulationBody;
-
+    public bool m_kinematic;
     // Start is called before the first frame update
     void Start()
     {
@@ -44,17 +44,17 @@ public class PushPullController2 : MonoBehaviour
         }
         m_articulationBody.velocity = new Vector3(0,0, 0);
         if (m_state!= PushPullState.Fixed)
-        {
-            //var cur = m_articulationBody.transform.position;
-            //var value = cur + ((int)m_state) * m_speed * Time.fixedDeltaTime*new Vector3(0,-1,0);
-            //m_articulationBody.TeleportRoot(value, this.transform.rotation);
-
-            m_articulationBody.velocity = new Vector3(0, m_state == PushPullState.Push ? -m_speed : m_speed, 0);
-        }
-        var position = this.transform.position;
-        position.x = 0;
-        position.z = 0;
-        this.transform.position = position;
-        this.transform.rotation = Quaternion.identity;
+        {            
+            if (!m_kinematic)
+            {
+                m_articulationBody.velocity = new Vector3(0, m_state == PushPullState.Push ? -m_speed : m_speed, 0);
+            }
+            else
+            {
+                var cur = m_articulationBody.transform.position;
+                var value = cur + ((int)m_state) * m_speed * Time.fixedDeltaTime*new Vector3(0,-1,0);
+                m_articulationBody.TeleportRoot(value, this.transform.rotation);
+            }
+        } 
     }
 }

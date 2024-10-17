@@ -60,9 +60,16 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\2022.3.17f1c1\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\BizerCurve.cs" />
     <Compile Include="Assets\PushPullController.cs" />
+    <Compile Include="Assets\Scripts\AnchorPointController.cs" />
+    <Compile Include="Assets\Scripts\CurvePointController.cs" />
     <Compile Include="Assets\PushPullController2.cs" />
     <Compile Include="Assets\RopeCreater.cs" />
+    <Compile Include="Assets\Scripts\FollowBizerCurve.cs" />
+    <Compile Include="Assets\Scripts\ControlPointController.cs" />
+    <Compile Include="Assets\Scripts\BizerCurveRuntimeEditor.cs" />
+    <Compile Include="Assets\Scripts\CurvePosition.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
