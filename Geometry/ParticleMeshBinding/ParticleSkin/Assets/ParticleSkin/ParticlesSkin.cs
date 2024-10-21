@@ -34,17 +34,17 @@ namespace bluebean
         /// bindPos是骨骼变换矩阵的逆矩阵
         /// 骨骼变换矩阵:将坐标从骨骼本地坐标系变化到物体本地坐标值
         /// </summary>
-        [HideInInspector]
+        //[HideInInspector]
         [SerializeField] List<Matrix4x4> m_Bindposes = new List<Matrix4x4>();
         /// <summary>
         /// 所有的顶点骨骼绑定权重数组
         /// </summary>
-        [HideInInspector]
+        //[HideInInspector]
         [SerializeField] NativeBoneWeightList m_BoneWeights;
         /// <summary>
         /// 每个byte是每个顶点被绑定的bone数量
         /// </summary>
-        [HideInInspector]
+        //[HideInInspector]
         [SerializeField] NativeByteList m_BonesPerVertex;
 
         public ParticleTopology m_particleTopology = null;
