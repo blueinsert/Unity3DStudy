@@ -542,8 +542,8 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3769455780579549021, guid: f13fd6cc56aca7a49a32514038bdc7c5,
         type: 3}
-      propertyPath: m_SkinningMaxDistance
-      value: 2
+      propertyPath: m_drawGizmons
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4890808807162884008, guid: f13fd6cc56aca7a49a32514038bdc7c5,
         type: 3}

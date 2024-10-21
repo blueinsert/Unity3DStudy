@@ -48,6 +48,11 @@ public class SkinBoneDynamicBinder : MonoBehaviour
     [Header("顶点骨骼数量数组")]
     [SerializeField] NativeByteList m_BonesPerVertex;
 
+    public bool m_drawGizmons = false;
+
+    private Mesh m_OriginalMesh;
+    private Mesh m_mesh;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -57,7 +62,14 @@ public class SkinBoneDynamicBinder : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (m_mesh == null)
+            Setup();
+    }
 
+    public void OnDestroy()
+    {
+        m_BoneWeights.Dispose();
+        m_BonesPerVertex.Dispose();
     }
 
     private void NormalizeWeights(int offset, int count)
@@ -85,6 +97,9 @@ public class SkinBoneDynamicBinder : MonoBehaviour
         if (m_BonesPerVertex == null)
             m_BonesPerVertex = new NativeByteList();
         m_Bindposes = new List<Matrix4x4>();
+        m_BoneWeights.Clear();
+        m_BonesPerVertex.Clear();
+
         if (m_boneTransforms.Count == 0)
             yield break;
 
@@ -160,6 +175,57 @@ public class SkinBoneDynamicBinder : MonoBehaviour
             newBoneWeightOffset += newBoneCount;
 
             yield return new CoroutineJob.ProgressInfo("calculating bone weights...", j / (float)vertices.Length);
+        }
+
+
+
+    }
+
+
+    private void Setup()
+    {
+        if (Application.isPlaying)
+        {
+            // Setup the mesh from scratch, in case it is not a clone of an already setup mesh.
+            if (m_mesh == null)
+            {
+                // Create a copy of the original mesh:
+                m_mesh = Instantiate(m_skinnedMeshRender.sharedMesh);
+
+                //SetBoneWeights
+                if (m_BoneWeights != null && m_BoneWeights.count > 0)
+                {
+                    m_mesh.SetBoneWeights(m_BonesPerVertex.AsNativeArray<byte>(), m_BoneWeights.AsNativeArray<BoneWeight1>());
+                }
+                //AppendBindposes
+                List<Matrix4x4> bindposes = new List<Matrix4x4>(m_mesh.bindposes);
+                bindposes.AddRange(m_Bindposes);
+                m_mesh.bindposes = bindposes.ToArray();
+                //set bones
+                var bones = new List<Transform>(m_skinnedMeshRender.bones);
+                bones.AddRange(m_boneTransforms);
+                m_skinnedMeshRender.bones = bones.ToArray();
+
+                // Set the new mesh:
+                m_mesh.RecalculateBounds();
+                m_OriginalMesh = m_skinnedMeshRender.sharedMesh;
+                m_skinnedMeshRender.sharedMesh = m_mesh;
+
+                // Recalculate bounds:
+                m_skinnedMeshRender.localBounds = m_mesh.bounds;
+                m_skinnedMeshRender.rootBone = this.transform;
+            }
+
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!m_drawGizmons) return;
+        Gizmos.color = Color.blue;
+        foreach(var bone in m_boneTransforms)
+        {
+            Gizmos.DrawWireSphere(bone.transform.position, m_SkinningMaxDistance);
         }
     }
 }
