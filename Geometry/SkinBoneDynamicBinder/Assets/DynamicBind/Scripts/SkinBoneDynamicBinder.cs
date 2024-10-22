@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SkinBoneDynamicBinder : MonoBehaviour
@@ -29,6 +30,8 @@ public class SkinBoneDynamicBinder : MonoBehaviour
 
     [SerializeField]
     public List<Transform> m_boneTransforms = null;
+    [SerializeField]
+    public Transform m_emptyBoneTransform = null;
     [SerializeField]
     public SkinnedMeshRenderer m_skinnedMeshRender = null;
 
@@ -108,6 +111,7 @@ public class SkinBoneDynamicBinder : MonoBehaviour
 
         var boneCenters = new List<Vector3>(m_boneTransforms.Count);
         //计算Bindposes矩阵
+        m_Bindposes.Add(m_emptyBoneTransform.localToWorldMatrix.inverse * target2w);
         for (int i = 0; i < m_boneTransforms.Count; ++i)
         {
             var tran = m_boneTransforms[i];
@@ -138,17 +142,26 @@ public class SkinBoneDynamicBinder : MonoBehaviour
             for (int i = 0; i < boneCenters.Count; ++i)
             {
                 float distance = Vector3.Distance(vertexPosition, boneCenters[i]);
-
-                if (distance <= m_SkinningMaxDistance)
+                float fluenceDistance = GetBoneFluenceDistance(m_boneTransforms[i]);
+                if (distance <= fluenceDistance)
                 {
                     var boneWeight = new BoneWeight1();
 
-                    boneWeight.boneIndex = i;
-                    boneWeight.weight = distance > 0 ? m_SkinningMaxDistance / distance : 100;
+                    boneWeight.boneIndex = i+1;//加1是由于emptyBone
+                    boneWeight.weight = distance > 0 ? fluenceDistance / distance : 100;
                     boneWeight.weight = Mathf.Pow(boneWeight.weight, m_SkinningFalloff);
                     m_BoneWeights.Add(boneWeight);
                     newBoneCount++;
                 }
+            }
+
+            if (newBoneCount == 0)
+            {
+                newBoneCount = 1;
+                var boneWeight = new BoneWeight1();
+                boneWeight.boneIndex = 0;//emptyBone
+                boneWeight.weight = 1.0f;
+                m_BoneWeights.Add(boneWeight);
             }
 
             // normalize new weights only:
@@ -170,6 +183,7 @@ public class SkinBoneDynamicBinder : MonoBehaviour
 
             NormalizeWeights(newBoneWeightOffset, newBoneCount);
 
+           
             //更新顶点骨骼数量
             m_BonesPerVertex.Add((byte)newBoneCount);
             newBoneWeightOffset += newBoneCount;
@@ -203,6 +217,7 @@ public class SkinBoneDynamicBinder : MonoBehaviour
                 m_mesh.bindposes = bindposes.ToArray();
                 //set bones
                 var bones = new List<Transform>(m_skinnedMeshRender.bones);
+                bones.Add(m_emptyBoneTransform);
                 bones.AddRange(m_boneTransforms);
                 m_skinnedMeshRender.bones = bones.ToArray();
 
@@ -219,13 +234,23 @@ public class SkinBoneDynamicBinder : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
+    private float GetBoneFluenceDistance(Transform transform)
+    {
+        var boneDesc = transform.GetComponent<BoneDesc>();
+        if (boneDesc != null)
+        {
+            return boneDesc.m_skinningMaxDistance;
+        }
+        return m_SkinningMaxDistance;
+    }
+
+    private void OnDrawGizmosSelected()
     {
         if (!m_drawGizmons) return;
-        Gizmos.color = Color.blue;
+        Gizmos.color = Color.green;
         foreach(var bone in m_boneTransforms)
         {
-            Gizmos.DrawWireSphere(bone.transform.position, m_SkinningMaxDistance);
+            Gizmos.DrawWireSphere(bone.transform.position, GetBoneFluenceDistance(bone)+0.02f);
         }
     }
 }
