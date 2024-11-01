@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Text;
+using bluebean.PathFinding;
 
 namespace bluebean
 {
@@ -34,6 +35,12 @@ namespace bluebean
             }
 
             return sb.ToString();
+        }
+
+        public void Init(List<NodePosition> posList)
+        {
+            this.Clear();
+            this.AddRange(posList);
         }
     }
 
@@ -77,8 +84,10 @@ namespace bluebean
 
         private Grid m_startGrid;
         private Grid m_endGrid;
-        private Path m_path;
+        private Path m_path = new Path();
         private float m_curDrawWeight = 0;
+
+        private AStar m_pathFinder = new AStar();
 
         private bool ValidPosition()
         {
@@ -121,6 +130,7 @@ namespace bluebean
         private void OnEnter() {
             InitGrids();
             SetEnabled(true);
+            m_path = new Path();
             SceneView.onSceneGUIDelegate += OnSceneGUI;
         }
 
@@ -266,65 +276,20 @@ namespace bluebean
         }
 
         private void FindPath() {
-            AStarPathfinder pathfinder = new AStarPathfinder();
+
             NodePosition startPos = m_startGrid.m_position;
             NodePosition endPos = m_endGrid.m_position;
             int width, height;
             var mapData = GetMapData(out width, out height);
             var map = new Map(mapData, width, height);
-            pathfinder.InitiatePathfind(map);
-            MapSearchNode nodeStart = pathfinder.AllocateMapSearchNode(startPos);
-            MapSearchNode nodeEnd = pathfinder.AllocateMapSearchNode(endPos);
-            pathfinder.SetStartAndGoalStates(nodeStart, nodeEnd);
 
-            AStarPathfinder.SearchState searchState = AStarPathfinder.SearchState.Searching;
-            uint searchSteps = 0;
-            do
+            List<NodePosition> path = new List<NodePosition>();
+            if(m_pathFinder.FindPath(map, startPos, endPos, path))
             {
-                searchState = pathfinder.SearchStep();
-                searchSteps++;
-            }
-            while (searchState == AStarPathfinder.SearchState.Searching);
-
-            // Search complete
-            bool pathfindSucceeded = (searchState == AStarPathfinder.SearchState.Succeeded);
-            if (pathfindSucceeded)
-            {
-                // Success
-                Path newPath = new Path();
-                int numSolutionNodes = 0;   // Don't count the starting cell in the path length
-
-                // Get the start node
-                MapSearchNode node = pathfinder.GetSolutionStart();
-                newPath.Add(node.position);
-                ++numSolutionNodes;
-
-                // Get all remaining solution nodes
-                for (; ; )
-                {
-                    node = pathfinder.GetSolutionNext();
-
-                    if (node == null)
-                    {
-                        break;
-                    }
-
-                    ++numSolutionNodes;
-                    newPath.Add(node.position);
-                };
-
-                // Once you're done with the solution we can free the nodes up
-                pathfinder.FreeSolutionNodes();
-                m_path = newPath;
+                m_path.Init(path);
                 _sceneView.Repaint();
-                Debug.Log("Solution path length: " + numSolutionNodes);
-                Debug.Log("Solution: " + newPath.ToString());
             }
-            else if (searchState == AStarPathfinder.SearchState.Failed)
-            {
-                // FAILED, no path to goal
-                Debug.Log("Pathfind FAILED!");
-            }
+
         }
 
         /// <summary>
