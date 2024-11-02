@@ -88,6 +88,8 @@ namespace bluebean
         private float m_curDrawWeight = 0;
 
         private AStar m_pathFinder = new AStar();
+        private int m_movePoint4FindPath = 0;
+        private int m_movePoint4FindRegion = 0;
 
         private bool ValidPosition()
         {
@@ -246,8 +248,10 @@ namespace bluebean
                 
             }
 
-            if (m_path != null && m_path.Count >2) {
-                for (int i = 0; i < m_path.Count - 1; i++) {
+            if (m_path != null && m_path.Count > 0)
+            {
+                for (int i = 0; i < m_path.Count; i++)
+                {
                     var nodePos = m_path[i];
                     Handles.DrawSolidRectangleWithOutline(new Rect(new Vector2(nodePos.x, nodePos.y), new Vector2(1, 1)), new Color(0, 0, 0.5f, 0.5f), Color.black);
                 }
@@ -284,7 +288,26 @@ namespace bluebean
             var map = new Map(mapData, width, height);
 
             List<NodePosition> path = new List<NodePosition>();
-            if(m_pathFinder.FindPath(map, startPos, endPos, path))
+            m_path.Clear();
+            if (m_pathFinder.FindPath(map, startPos, endPos, path, m_movePoint4FindPath))
+            {
+                m_path.Init(path);
+                _sceneView.Repaint();
+            }
+
+        }
+
+        private void FindRegion()
+        {
+
+            NodePosition startPos = m_startGrid.m_position;
+            int width, height;
+            var mapData = GetMapData(out width, out height);
+            var map = new Map(mapData, width, height);
+
+            List<NodePosition> path = new List<NodePosition>();
+            m_path.Clear();
+            if (m_pathFinder.FindRegion(map, startPos, m_movePoint4FindRegion, path))
             {
                 m_path.Init(path);
                 _sceneView.Repaint();
@@ -313,13 +336,31 @@ namespace bluebean
                     OnExit();
                 }
                 m_selectedOperMode = GUILayout.Toolbar(m_selectedOperMode, m_modeStrings);
+                GUILayout.BeginHorizontal();
                 if (m_selectedOperMode == (int)EditMode.DrawWeight) {
                     GUILayout.Label("Weight:");
                     m_curDrawWeight = GUILayout.HorizontalSlider(m_curDrawWeight, 0, 1.0f);
                 }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
                 if (GUILayout.Button("FindPath")) {
                     FindPath();
                 }
+                var str = GUILayout.TextField(m_movePoint4FindPath.ToString());
+                int.TryParse(str,out m_movePoint4FindPath);
+
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("FindRegion"))
+                {
+                    FindRegion();
+                }
+                str = GUILayout.TextField(m_movePoint4FindRegion.ToString());
+                int.TryParse(str, out m_movePoint4FindRegion);
+
+                GUILayout.EndHorizontal();
             }
         }
 
