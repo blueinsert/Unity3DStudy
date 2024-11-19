@@ -106,6 +106,11 @@ namespace Obi
                             Vector2 sectionVertex = section.vertices[j];
 
                             // calculate normal using section vertex, curve normal and binormal:
+                            //以曲线点的normal和binormal为坐标轴建立垂直于曲线方向的平面坐标系，
+                            //将section中顶点的x，y坐标认为是定义在该坐标系中的坐标，
+                            //下面的变化将点坐标从局部变化到世界；原点不变，在曲线上，因此得到的就是曲线外扩网格表面点的法线
+                            //p_global = p_l.x*dir_x_local+p_l.y*dir_y_local
+                            //p_global.x = p_l.x*dir_x_local.x + p_l.y*dir_y_local.x
                             normal.x = (sectionVertex.x * curve.Data[i].normal.x + sectionVertex.y * curve.Data[i].binormal.x) * sectionThickness;
                             normal.y = (sectionVertex.x * curve.Data[i].normal.y + sectionVertex.y * curve.Data[i].binormal.y) * sectionThickness;
                             normal.z = (sectionVertex.x * curve.Data[i].normal.z + sectionVertex.y * curve.Data[i].binormal.z) * sectionThickness;
@@ -116,6 +121,7 @@ namespace Obi
                             vertex.z = curve.Data[i].position.z + normal.z;
 
                             // cross(normal, curve tangent)
+                            //曲线外扩网格表面点的副切线，垂直于曲线走向，该方向uv.y不变
                             texTangent.x = normal.y * curve.Data[i].tangent.z - normal.z * curve.Data[i].tangent.y;
                             texTangent.y = normal.z * curve.Data[i].tangent.x - normal.x * curve.Data[i].tangent.z;
                             texTangent.z = normal.x * curve.Data[i].tangent.y - normal.y * curve.Data[i].tangent.x;
@@ -130,8 +136,12 @@ namespace Obi
                             vertColors.Add(curve.Data[i].color);
                             uvs.Add(uv);
 
+                            //添加三角形索引
                             if (j < sectionSegments && i < curve.Count - 1)
                             {
+                                //每次添加一个顶点
+                                //添加当前环(section)当前添加的顶点和下个将要添加的顶点构成的线段
+                                //与下一个环对应线段构成的两个三角形
                                 tris.Add(sectionIndex * verticesPerSection + j);
                                 tris.Add(nextSectionIndex * verticesPerSection + j);
                                 tris.Add(sectionIndex * verticesPerSection + (j + 1));
