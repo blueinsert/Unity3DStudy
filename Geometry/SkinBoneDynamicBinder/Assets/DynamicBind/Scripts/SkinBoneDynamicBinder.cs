@@ -31,7 +31,9 @@ public class SkinBoneDynamicBinder : MonoBehaviour
     [SerializeField]
     public List<Transform> m_boneTransforms = null;
     [SerializeField]
-    public Transform m_emptyBoneTransform = null;
+    public Transform m_BoneRootTransform = null;
+    [SerializeField]
+    public Transform m_BoneEmptyTransform = null;
     [SerializeField]
     public SkinnedMeshRenderer m_skinnedMeshRender = null;
 
@@ -106,12 +108,12 @@ public class SkinBoneDynamicBinder : MonoBehaviour
         if (m_boneTransforms.Count == 0)
             yield break;
 
-        Matrix4x4 target2w = m_skinnedMeshRender.localToWorldMatrix;
+        Matrix4x4 target2w = this.transform.localToWorldMatrix;
         m_Bindposes.Capacity = m_boneTransforms.Count;
 
         var boneCenters = new List<Vector3>(m_boneTransforms.Count);
         //º∆À„Bindposesæÿ’Û
-        m_Bindposes.Add(m_emptyBoneTransform.localToWorldMatrix.inverse * target2w);
+        m_Bindposes.Add(m_BoneEmptyTransform.localToWorldMatrix.inverse * target2w);
         for (int i = 0; i < m_boneTransforms.Count; ++i)
         {
             var tran = m_boneTransforms[i];
@@ -217,7 +219,7 @@ public class SkinBoneDynamicBinder : MonoBehaviour
                 m_mesh.bindposes = bindposes.ToArray();
                 //set bones
                 var bones = new List<Transform>(m_skinnedMeshRender.bones);
-                bones.Add(m_emptyBoneTransform);
+                bones.Add(m_BoneEmptyTransform);
                 bones.AddRange(m_boneTransforms);
                 m_skinnedMeshRender.bones = bones.ToArray();
 
@@ -228,7 +230,7 @@ public class SkinBoneDynamicBinder : MonoBehaviour
 
                 // Recalculate bounds:
                 m_skinnedMeshRender.localBounds = m_mesh.bounds;
-                m_skinnedMeshRender.rootBone = this.transform;
+                m_skinnedMeshRender.rootBone = m_BoneRootTransform;
             }
 
         }

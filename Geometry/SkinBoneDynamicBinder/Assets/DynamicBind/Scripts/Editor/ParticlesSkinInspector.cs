@@ -22,12 +22,22 @@ namespace bluebean
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+
+            serializedObject.Update();
+
             if (GUILayout.Button("BindSkin"))
             {
                 CoroutineJob job = new CoroutineJob();
                 routine = job.Start(m_binder.BindSkin());
                 EditorCoroutine.ShowCoroutineProgressBar("BindSkin...", ref routine);
                 Debug.Log("BindSkin complete");
+                EditorUtility.SetDirty(m_binder);
+                EditorGUIUtility.ExitGUI();
+            }
+
+            if (GUI.changed)
+            {
+                serializedObject.ApplyModifiedProperties();
             }
         }
     }

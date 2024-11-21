@@ -8,8 +8,10 @@ using System.Collections;
 
 namespace bluebean
 {
+    [Serializable]
     public unsafe abstract class NativeList<T> : IEnumerable<T>, IDisposable, ISerializationCallbackReceiver where T : struct
     {
+        [SerializeField]
         public T[] serializedContents;
         protected void* m_AlignedPtr = null;
 
