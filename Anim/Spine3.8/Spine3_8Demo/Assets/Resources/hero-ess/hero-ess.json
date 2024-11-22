@@ -1,11 +1,11 @@
 {
 "skeleton": {
-	"hash": "GKlLtUkXkXrplEF0opVpUHvO7E4",
+	"hash": "Js2uQYeirDfKiPfrXQiCrk2BwbQ",
 	"spine": "3.8.75",
-	"x": -87.83,
+	"x": -117.12,
 	"y": 0.01,
-	"width": 319.3,
-	"height": 336.96,
+	"width": 348.59,
+	"height": 353.79,
 	"images": "./images/",
 	"audio": ""
 },
@@ -90,7 +90,7 @@
 				"forearm2": { "x": 13.09, "y": -0.64, "rotation": 83.72, "width": 31, "height": 32 }
 			},
 			"upperarm1": {
-				"upper-arm1": { "x": 6.6, "y": 0.06, "rotation": 137.18, "width": 50, "height": 56 }
+				"upper-arm1": { "x": 12.01, "y": -1.79, "rotation": 148.74, "width": 50, "height": 56 }
 			},
 			"hand1": {
 				"hand1": { "x": 11.93, "y": -0.7, "rotation": 90.37, "width": 37, "height": 48 }
@@ -105,7 +105,15 @@
 				"shin2": { "x": 2.25, "y": -2.94, "rotation": 87.72, "width": 51, "height": 54 }
 			},
 			"head": {
-				"head": { "x": 7.8, "y": 71.88, "rotation": 0.12, "width": 172, "height": 173 }
+				"head": {
+					"x": 7.8,
+					"y": 71.88,
+					"scaleX": 1.3297,
+					"scaleY": 1.1731,
+					"rotation": 0.12,
+					"width": 172,
+					"height": 173
+				}
 			},
 			"body": {
 				"body": { "x": 33.82, "y": 2.6, "rotation": -92.7, "width": 97, "height": 95 }
