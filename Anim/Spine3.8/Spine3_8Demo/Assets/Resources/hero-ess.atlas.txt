@@ -1,0 +1,139 @@
+
+hero-ess.png
+size: 396,269
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+body
+  rotate: false
+  xy: 176, 101
+  size: 97, 95
+  orig: 97, 95
+  offset: 0, 0
+  index: -1
+eyes
+  rotate: false
+  xy: 2, 5
+  size: 82, 30
+  orig: 82, 31
+  offset: 0, 0
+  index: -1
+fingers
+  rotate: false
+  xy: 86, 2
+  size: 30, 33
+  orig: 31, 33
+  offset: 1, 0
+  index: -1
+foot1
+  rotate: false
+  xy: 263, 48
+  size: 49, 42
+  orig: 50, 42
+  offset: 1, 0
+  index: -1
+foot2
+  rotate: false
+  xy: 314, 41
+  size: 53, 38
+  orig: 53, 38
+  offset: 0, 0
+  index: -1
+forearm1
+  rotate: true
+  xy: 195, 2
+  size: 41, 49
+  orig: 41, 49
+  offset: 0, 0
+  index: -1
+forearm2
+  rotate: true
+  xy: 157, 2
+  size: 31, 32
+  orig: 31, 32
+  offset: 0, 0
+  index: -1
+hand1
+  rotate: true
+  xy: 263, 9
+  size: 37, 46
+  orig: 37, 48
+  offset: 0, 0
+  index: -1
+hand2
+  rotate: true
+  xy: 118, 2
+  size: 31, 37
+  orig: 31, 37
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 2, 94
+  size: 172, 173
+  orig: 172, 173
+  offset: 0, 0
+  index: -1
+mantles
+  rotate: false
+  xy: 2, 37
+  size: 136, 55
+  orig: 136, 55
+  offset: 0, 0
+  index: -1
+mouth
+  rotate: true
+  xy: 248, 39
+  size: 60, 13
+  orig: 61, 13
+  offset: 1, 0
+  index: -1
+shin1
+  rotate: false
+  xy: 140, 35
+  size: 53, 57
+  orig: 53, 57
+  offset: 0, 0
+  index: -1
+shin2
+  rotate: false
+  xy: 195, 45
+  size: 51, 54
+  orig: 51, 54
+  offset: 0, 0
+  index: -1
+sword
+  rotate: false
+  xy: 176, 198
+  size: 215, 69
+  orig: 216, 69
+  offset: 0, 0
+  index: -1
+thigh1
+  rotate: false
+  xy: 275, 133
+  size: 60, 63
+  orig: 60, 63
+  offset: 0, 0
+  index: -1
+thigh2
+  rotate: false
+  xy: 337, 132
+  size: 57, 64
+  orig: 57, 64
+  offset: 0, 0
+  index: -1
+upper-arm1
+  rotate: true
+  xy: 335, 81
+  size: 49, 56
+  orig: 50, 56
+  offset: 1, 0
+  index: -1
+upper-arm2
+  rotate: true
+  xy: 275, 92
+  size: 39, 58
+  orig: 39, 59
+  offset: 0, 0
+  index: -1
