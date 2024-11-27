@@ -43,7 +43,12 @@ namespace Spine {
 
 		internal float x, y, rotation, scaleX = 1, scaleY = 1, width, height;
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
-		internal float[] offset = new float[8], uvs = new float[8];
+
+		/// <summary>
+		/// 矩形四个角点的本地坐标
+		/// </summary>
+		internal float[] offset = new float[8];
+        internal float[] uvs = new float[8];
 		internal float r = 1, g = 1, b = 1, a = 1;
 
 		public float X { get { return x; } set { x = value; } }
@@ -78,6 +83,7 @@ namespace Spine {
 		public void UpdateOffset () {
 			float width = this.width;
 			float height = this.height;
+			//角点坐标
 			float localX2 = width * 0.5f;
 			float localY2 = height * 0.5f;
 			float localX = -localX2;
@@ -95,6 +101,7 @@ namespace Spine {
 			localX2 *= scaleX;
 			localY2 *= scaleY;
 			float rotation = this.rotation;
+			//应用旋转和偏移
 			float cos = MathUtils.CosDeg(rotation);
 			float sin = MathUtils.SinDeg(rotation);
 			float x = this.x;

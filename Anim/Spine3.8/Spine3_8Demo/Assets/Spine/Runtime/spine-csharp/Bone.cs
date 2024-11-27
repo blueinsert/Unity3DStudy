@@ -49,6 +49,9 @@ namespace Spine {
 		internal float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
 		internal bool appliedValid;
 
+		/// <summary>
+		/// a,b,c,d,是旋转缩放矩阵左上角四个值，worldX,worldY是bone的世界坐标
+		/// </summary>
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 
@@ -152,10 +155,11 @@ namespace Spine {
 			if (parent == null) { // Root bone.
 				float rotationY = rotation + 90 + shearY, sx = skeleton.ScaleX, sy = skeleton.ScaleY;
 				a = MathUtils.CosDeg(rotation + shearX) * scaleX * sx;
-				b = MathUtils.CosDeg(rotationY) * scaleY * sx;
-				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sy;
-				d = MathUtils.SinDeg(rotationY) * scaleY * sy;
-				worldX = x * sx + skeleton.x;
+				b = MathUtils.CosDeg(rotationY) * scaleY * sx;//== -MathUtils.SinDeg(rotation + shearY) * scaleY * sx
+                c = MathUtils.SinDeg(rotation + shearX) * scaleX * sy;
+				d = MathUtils.SinDeg(rotationY) * scaleY * sy;// == MathUtils.CosDeg(rotation + shearY) * scaleY * sy
+                                                              //应用缩放和偏移
+                worldX = x * sx + skeleton.x;
 				worldY = y * sy + skeleton.y;
 				return;
 			}
