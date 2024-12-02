@@ -64,8 +64,8 @@
     <Compile Include="Assets\Spine Examples\Scripts\DraggableTransform.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\SpineboyFreeze.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Goblins.cs" />
-    <Compile Include="Assets\Spine Examples\Scripts\Sample Components\SkeletonGraphicMirror.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Getting Started Scripts\BasicPlatformerController.cs" />
+    <Compile Include="Assets\Spine Examples\Scripts\Sample Components\SkeletonGraphicMirror.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Rotator.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Mix and Match Character Customize\EquipSystemExample.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\DataAssetsFromExportsExample.cs" />
@@ -94,8 +94,8 @@
     <Compile Include="Assets\Spine Examples\Scripts\MixAndMatchGraphic.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Sample Components\Legacy\SpriteAttacher.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Getting Started Scripts\SpineboyBeginnerInput.cs" />
-    <Compile Include="Assets\Spine Examples\Scripts\SpineboyFootplanter.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\HandleEventWithAudioExample.cs" />
+    <Compile Include="Assets\Spine Examples\Scripts\SpineboyFootplanter.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\SpineGauge.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Sample Components\Sample VertexEffects\JitterEffectExample.cs" />
     <Compile Include="Assets\Spine Examples\Scripts\Sample Components\SkeletonAnimationFixedTimestep.cs" />

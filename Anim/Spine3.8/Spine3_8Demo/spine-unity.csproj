@@ -86,8 +86,8 @@
     <Compile Include="Assets\Spine\Runtime\spine-unity\Mesh Generation\SkeletonRendererInstruction.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Attachments\BoundingBoxAttachment.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Collections\OrderedDictionary.cs" />
-    <Compile Include="Assets\Spine\Runtime\spine-unity\Components\Following\BoundingBoxFollower.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-unity\Mesh Generation\SpineMesh.cs" />
+    <Compile Include="Assets\Spine\Runtime\spine-unity\Components\Following\BoundingBoxFollower.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Slot.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\SkeletonClipping.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-unity\Components\Following\BoundingBoxFollowerGraphic.cs" />
@@ -117,15 +117,15 @@
     <Compile Include="Assets\Spine\Runtime\spine-unity\Components\SkeletonUtility\FollowLocationRigidbody2D.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\AnimationStateData.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\ConstraintData.cs" />
-    <Compile Include="Assets\Spine\Runtime\spine-csharp\SkeletonData.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Animation.cs" />
+    <Compile Include="Assets\Spine\Runtime\spine-csharp\SkeletonData.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-unity\Asset Types\AtlasAssetBase.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-unity\Modules\TK2D\SpriteCollectionAttachmentLoader.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\EventData.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-unity\ISkeletonAnimation.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\SkeletonBounds.cs" />
-    <Compile Include="Assets\Spine\Runtime\spine-csharp\ExposedList.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\SlotData.cs" />
+    <Compile Include="Assets\Spine\Runtime\spine-csharp\ExposedList.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Event.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\IUpdatable.cs" />
     <Compile Include="Assets\Spine\Runtime\spine-csharp\Bone.cs" />
