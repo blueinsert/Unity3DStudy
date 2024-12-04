@@ -144,6 +144,8 @@ namespace Spine {
 
 				float currentDelta = delta * current.timeScale;
 
+				//只有current.last==null的情形才会在这里处理delayTime
+				//否则在之后的处理next时被处理了
 				if (current.delay > 0) {
 					current.delay -= currentDelta;
 					if (current.delay > 0) continue;
@@ -154,6 +156,7 @@ namespace Spine {
 				TrackEntry next = current.next;
 				if (next != null) {
 					// When the next entry's delay is passed, change to the next entry, preserving leftover time.
+					// 如上所述，对于不是链表首一个元素，会在这个处理delay
 					float nextTime = current.trackLast - next.delay;
 					if (nextTime >= 0) {
 						next.delay = 0;
@@ -166,16 +169,21 @@ namespace Spine {
 						}
 						continue;
 					}
-				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+				} 
+				else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+					//没有next要播放的动画，并且当前这个动画已经播放结束
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					tracksItems[i] = null;
 					queue.End(current);
 					DisposeNext(current);
 					continue;
 				}
-				if (current.mixingFrom != null && UpdateMixingFrom(current, delta)) {
-					// End mixing from entries once all have completed.
-					TrackEntry from = current.mixingFrom;
+
+                //UpdateMixingFrom
+                if (current.mixingFrom != null && UpdateMixingFrom(current, delta)) {
+                    // End mixing from entries once all have completed.
+                    // 混合完成，删除链表的所有父节点
+                    TrackEntry from = current.mixingFrom;
 					current.mixingFrom = null;
 					if (from != null) from.mixingTo = null;
 					while (from != null) {
@@ -191,9 +199,12 @@ namespace Spine {
 		}
 
 		/// <summary>Returns true when all mixing from entries are complete.</summary>
+		/// 更新混合链上的trackTime和mixTime
 		private bool UpdateMixingFrom (TrackEntry to, float delta) {
 			TrackEntry from = to.mixingFrom;
-			if (from == null) return true;
+			//递归函数只有这种情况下，意味着混合完成
+			if (from == null) 
+				return true;
 
 			bool finished = UpdateMixingFrom(from, delta);
 
@@ -209,10 +220,16 @@ namespace Spine {
 					to.interruptAlpha = from.interruptAlpha;
 					queue.End(from);
 				}
-				return finished;
+				//最顶层from==null,之后每一层都混合完成to.mixTime >= to.mixDuration，返回true
+				if (finished)
+				{
+					int i = 0;//debug
+				}
+                return finished;
 			}
 
 			from.trackTime += delta * from.timeScale;
+			//混合时间不受trackEntry的timeScale影响，但受animateState的timeScale影响
 			to.mixTime += delta;
 			return false;
 		}
@@ -234,6 +251,7 @@ namespace Spine {
 				applied = true;
 
 				// Track 0 animations aren't for layering, so do not show the previously applied animations before the first key.
+				//TrackEntry的mixBlend默认为Replace
 				MixBlend blend = i == 0 ? MixBlend.First : current.mixBlend;
 
 				// Apply mixing from entries first.
@@ -256,7 +274,8 @@ namespace Spine {
 						else
 							timeline.Apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
 					}
-				} else {
+				} 
+				else {
 					var timelineMode = current.timelineMode.Items;
 
 					bool firstFrame = current.timelinesRotation.Count != timelineCount << 1;
@@ -362,7 +381,8 @@ namespace Spine {
 			if (blend == MixBlend.Add) {
 				for (int i = 0; i < timelineCount; i++)
 					timelinesItems[i].Apply(skeleton, animationLast, animationTime, eventBuffer, alphaMix, blend, MixDirection.Out);
-			} else {
+			} 
+			else {
 				var timelineMode = from.timelineMode.Items;
 				var timelineHoldMix = from.timelineHoldMix.Items;
 
@@ -438,9 +458,10 @@ namespace Spine {
 				if (mix > 1) mix = 1;
 			}
 
-			var eventBuffer = mix < from.eventThreshold ? this.events : null;
+            //from.eventThreshold默认为0
+            var eventBuffer = mix < from.eventThreshold ? this.events : null;
 			if (eventBuffer == null)
-				return mix;
+				return mix;//默认返回，不会apply mix out的event timeline
 
 			float animationLast = from.animationLast, animationTime = from.AnimationTime;
 			var timelines = from.animation.timelines;
@@ -663,6 +684,7 @@ namespace Spine {
 				current.mixTime = 0;
 
 				// Store the interrupted mix percentage.
+				//from也正在混合
 				if (from.mixingFrom != null && from.mixDuration > 0)
 					current.interruptAlpha *= Math.Min(1, from.mixTime / from.mixDuration);
 
@@ -692,10 +714,14 @@ namespace Spine {
 			TrackEntry current = ExpandToIndex(trackIndex);
 			if (current != null) {
 				if (current.nextTrackLast == -1) {
-					// Don't mix from an entry that was never applied.
-					tracks.Items[trackIndex] = current.mixingFrom;
+                    // Don't mix from an entry that was never applied.
+                    //current未被实际播放，将current及链接在之后的TrackEntry从链表中删除
+					//current指向父指针
+                    tracks.Items[trackIndex] = current.mixingFrom;
+					//事件队列添加消息
 					queue.Interrupt(current);
 					queue.End(current);
+					//释放链表中之后所有
 					DisposeNext(current);
 					current = current.mixingFrom;
 					interrupt = false; // mixingFrom is current again, but don't interrupt it twice.
@@ -743,6 +769,8 @@ namespace Spine {
 				queue.Drain();
 			} else {
 				last.next = entry;
+				//方法参数中的delay指的是动画在上一个动画播放结束后，开始播放自身时，自身的播放延迟
+				//只找到等于0一种情形
 				if (delay <= 0) {
 					float duration = last.animationEnd - last.animationStart;
 					if (duration != 0) {
@@ -751,13 +779,16 @@ namespace Spine {
 						} else {
 							delay += Math.Max(duration, last.trackTime); // After duration, else next update.
 						}
+						//提前一点，以应用动画混合
 						delay -= data.GetMix(last.animation, animation);
 					} else
 						delay = last.trackTime; // Next update.
 				}
 			}
-
-			entry.delay = delay;
+            //entry中记录的delay指的是相对于上一个动画播放开始时刻trackTime==0的延迟
+            //current.trackTime > next.delay 时开始播放next
+			//两个delay的定义时的观测坐标并不一致
+            entry.delay = delay;
 			return entry;
 		}
 
@@ -897,7 +928,8 @@ namespace Spine {
 			var timelineHoldMix = entry.timelineHoldMix.Resize(timelinesCount).Items; //timelineHoldMix.setSize(timelinesCount);
 			var propertyIDs = this.propertyIDs;
 
-			if (to != null && to.holdPrevious) {
+            //目前没有holdPrevious==true的设置路径
+            if (to != null && to.holdPrevious) {
 				for (int i = 0; i < timelinesCount; i++)
 					timelineMode[i] = propertyIDs.Add(timelines[i].PropertyId) ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
 
@@ -917,7 +949,8 @@ namespace Spine {
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
 						if (next.animation.HasTimeline(id)) continue;
 						if (next.mixDuration > 0) {
-							timelineMode[i] = AnimationState.HoldMix;
+                            //用第一个不控制相同属性的TrackEntry来混合
+                            timelineMode[i] = AnimationState.HoldMix;
 							timelineHoldMix[i] = next;
 							goto continue_outer; // continue outer;
 						}
@@ -986,7 +1019,11 @@ namespace Spine {
 	public class TrackEntry : Pool<TrackEntry>.IPoolable {
 		internal Animation animation;
 
-		internal TrackEntry next, mixingFrom, mixingTo;
+		/// <summary>
+		/// AddAnimation时设置，这个动画播放完下个播放的动画
+		/// </summary>
+		internal TrackEntry next;
+        internal TrackEntry mixingFrom, mixingTo;
 		// difference to libgdx reference: delegates are used for event callbacks instead of 'AnimationStateListener listener'.
 		public event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 		public event AnimationState.TrackEntryEventDelegate Event;
@@ -1001,10 +1038,23 @@ namespace Spine {
 
 		internal bool loop, holdPrevious;
 		internal float eventThreshold, attachmentThreshold, drawOrderThreshold;
-		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
-		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
-		internal float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
-		internal MixBlend mixBlend = MixBlend.Replace;
+		//animationStart = 0, animationEnd = animation.Duration
+		internal float animationStart, animationEnd;
+        //上一帧的动画时间 AnimationTime,==trackTime
+        internal float animationLast, nextAnimationLast;
+		internal float delay, trackTime;
+		//上一帧的trackTime,trackEnd 默认float.MaxValue
+		internal float trackLast, nextTrackLast, trackEnd;
+        internal float timeScale = 1f;
+
+		internal float mixTime;
+        internal float mixDuration;
+		//初始是设置为1，没找到有修改的地方
+        internal float alpha;
+        //from本身正在过渡时设置，Math.Min(1, from.mixTime / from.mixDuration)，打断from时，from的过渡进度
+        internal float interruptAlpha;
+        internal float totalAlpha;
+        internal MixBlend mixBlend = MixBlend.Replace;
 		internal readonly ExposedList<int> timelineMode = new ExposedList<int>();
 		internal readonly ExposedList<TrackEntry> timelineHoldMix = new ExposedList<TrackEntry>();
 		internal readonly ExposedList<float> timelinesRotation = new ExposedList<float>();

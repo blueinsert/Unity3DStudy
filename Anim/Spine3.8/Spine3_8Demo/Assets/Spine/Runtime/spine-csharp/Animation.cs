@@ -289,7 +289,8 @@ namespace Spine {
 		/// <summary>Returns the interpolated percentage for the specified key frame and linear percentage.</summary>
 		public float GetCurvePercent (int frameIndex, float percent) {
 			percent = MathUtils.Clamp (percent, 0, 1);
-			float[] curves = this.curves;
+            //曲线被离散化后，存在curves数组，分段线性来近似采样
+            float[] curves = this.curves;
 			int i = frameIndex * BEZIER_SIZE;
 			float type = curves[i];
 			if (type == LINEAR) return percent;
@@ -473,10 +474,12 @@ namespace Spine {
 				y = frames[frames.Length + PREV_Y];
 			} else {
 				// Interpolate between the previous frame and the current frame.
+			    // 返回的是大于time的最小frame
 				int frame = Animation.BinarySearch(frames, time, ENTRIES);
 				x = frames[frame + PREV_X];
 				y = frames[frame + PREV_Y];
 				float frameTime = frames[frame];
+				//线性百分比 映射为 曲线百分比
 				float percent = GetCurvePercent(frame / ENTRIES - 1,
 					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 

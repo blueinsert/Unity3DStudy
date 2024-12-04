@@ -42,7 +42,7 @@ namespace Spine.Unity.Examples {
 			animationState.Event += HandleEvent;; // Call our method any time an animation fires an event.
 			animationState.End += (entry) => Debug.Log("start: " + entry.TrackIndex); // A lambda can be used for the callback instead of a method.
 
-			animationState.AddAnimation(0, "jump", false, 2);	// Queue jump to be played on track 0 two seconds after the starting animation.
+			animationState.AddAnimation(0, "jump", false, 0);	// Queue jump to be played on track 0 two seconds after the starting animation.
 			animationState.AddAnimation(0, "run", true, 0); // Queue walk to be looped on track 0 after the jump animation.
 		}
 
