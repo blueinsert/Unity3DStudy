@@ -29,6 +29,7 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace Spine {
 
@@ -561,7 +562,12 @@ namespace Spine {
 				// Mixing out uses sign of setup or current pose, else use sign of key.
 				float bx, by;
 				if (direction == MixDirection.Out) {
-					switch (blend) {
+                    //应该是为了表现效果的优化
+                    //对于out(渐出)，将方向调整到和默认值(boneData)相同，然后逐渐调整大小
+                    //否则会看到调整过程中的方向翻转
+                    //举例：默认缩放：[2,-2], timeline上的目标缩放:[-3,3]
+                    //对于从[-3,3]out到[2,-2]，实际是从[3,-3]渐变到[2,-2]
+                    switch (blend) {
 						case MixBlend.Setup:
 							bx = bone.data.scaleX;
 							by = bone.data.scaleY;
@@ -582,8 +588,11 @@ namespace Spine {
 							bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
 							break;
 					}
-				} else {
-					switch (blend) {
+				}
+				else {
+                    //对于in(渐入)，将方向调整到和目标值x,y相同，然后逐渐调整大小
+                    //对于从[2,-2]in到[-3,3]，实际是从[-2,2]渐变到[-3,3]
+                    switch (blend) {
 						case MixBlend.Setup:
 							bx = Math.Abs(bone.data.scaleX) * Math.Sign(x);
 							by = Math.Abs(bone.data.scaleY) * Math.Sign(y);
