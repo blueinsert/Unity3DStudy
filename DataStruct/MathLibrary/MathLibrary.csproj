@@ -1,0 +1,227 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E8BFACAF-ECFA-4F18-80BA-BBF0A20A0CC8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MathLibrary</RootNamespace>
+    <AssemblyName>MathLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MathLibrary\ComputationalGeometry\Circle.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Capsule3Capsule3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Sphere3Capsule3.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MathLibrary\Algebra\Polynomial.cs" />
+    <Compile Include="MathLibrary\Approximation\2D\GaussPointsFit2.cs" />
+    <Compile Include="MathLibrary\Approximation\2D\LineFit2.cs" />
+    <Compile Include="MathLibrary\Approximation\3D\GaussPointsFit3.cs" />
+    <Compile Include="MathLibrary\Approximation\3D\LineFit3.cs" />
+    <Compile Include="MathLibrary\Approximation\3D\PlaneFit3.cs" />
+    <Compile Include="MathLibrary\Basic\Mathex.cs" />
+    <Compile Include="MathLibrary\Basic\Matrix4X4.cs" />
+    <Compile Include="MathLibrary\Basic\Matrix4X4ex.cs" />
+    <Compile Include="MathLibrary\Basic\Quaternion.cs" />
+    <Compile Include="MathLibrary\Basic\Quaternionex.cs" />
+    <Compile Include="MathLibrary\Basic\Vector2D.cs" />
+    <Compile Include="MathLibrary\Basic\Vector2Dex.cs" />
+    <Compile Include="MathLibrary\Basic\Vector3D.cs" />
+    <Compile Include="MathLibrary\Basic\Vector3Dex.cs" />
+    <Compile Include="MathLibrary\Basic\Vector4D.cs" />
+    <Compile Include="MathLibrary\ComputationalGeometry\ConcaveHull.cs" />
+    <Compile Include="MathLibrary\ComputationalGeometry\ConvexHull.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Line2Line2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Line2Ray2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Line2Segment2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2AAB2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Box2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Circle2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Line2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Ray2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Segment2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Point2Triangle2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Ray2Ray2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Ray2Segment2.cs" />
+    <Compile Include="MathLibrary\Distance\2D\Segment2Segment2.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Line3Box3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Line3Line3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Line3Ray3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Line3Segment3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3AAB3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Box3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Circle3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Line3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Plane3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Ray3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Rectangle3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Segment3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Sphere3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Point3Triangle3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Ray3Ray3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Ray3Segment3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Segment3Box3.cs" />
+    <Compile Include="MathLibrary\Distance\3D\Segment3Segment3.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\AAB2AAB2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\AAB2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Box2Box2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Box2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Circle2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\ConvexPolygon2ConvexPolygon2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2AAB2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Box2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2ConvexPolygon2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Line2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Ray2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Segment2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Line2Triangle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2AAB2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Box2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2ConvexPolygon2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Polygon2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Ray2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Segment2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Ray2Triangle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2AAB2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2Box2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2Circle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2ConvexPolygon2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2Segment2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Segment2Triangle2.cs" />
+    <Compile Include="MathLibrary\Intersection\2D\Triangle2Triangle2.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\AAB3AAB3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\AAB3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Box3Box3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Box3Capsule3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Box3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3AAB3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Box3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Circle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Plane3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Polygon3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Rectangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Line3Triangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Plane3AAB3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Plane3Box3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Plane3Plane3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Plane3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Plane3Triangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3AAB3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Box3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Circle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Plane3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Polygon3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Rectangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Ray3Triangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3AAB3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Box3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Circle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Plane3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Polygon3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Rectangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Segment3Triangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Sphere3Sphere3.cs" />
+    <Compile Include="MathLibrary\Intersection\3D\Triangle3Triangle3.cs" />
+    <Compile Include="MathLibrary\Intersection\Intersection.cs" />
+    <Compile Include="MathLibrary\Intersection\IntersectionTypes.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\BrentsMethod.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\EigenDecomposition.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\Integrator.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\LinearSystem.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\OdeSolver.cs" />
+    <Compile Include="MathLibrary\NumericalAnalysis\PolynomialRoots.cs" />
+    <Compile Include="MathLibrary\Objects\2D\AAB2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Box2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Circle2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Line2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Polygon2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Ray2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Segment2.cs" />
+    <Compile Include="MathLibrary\Objects\2D\Triangle2.cs" />
+    <Compile Include="MathLibrary\Objects\3D\AAB3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Box3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Capsule3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Circle3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Line3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Plane3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Polygon3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Ray3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Rectangle3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Segment3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Sphere3.cs" />
+    <Compile Include="MathLibrary\Objects\3D\Triangle3.cs" />
+    <Compile Include="MathLibrary\Objects\Orientations.cs" />
+    <Compile Include="MathLibrary\Query\2D\Query2.cs" />
+    <Compile Include="MathLibrary\Query\3D\Query3.cs" />
+    <Compile Include="MathLibrary\Query\Query.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Doc\Help.pdf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Doc\VersionLog.txt" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
