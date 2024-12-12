@@ -125,7 +125,11 @@ namespace Spine.Unity {
 		}
 
 		protected virtual float AdditionalScale { get { return 1.0f; } }
-		abstract protected Vector2 CalculateAnimationsMovementDelta ();
+        /// <summary>
+        /// 计算root bone的当前帧的位移delta
+        /// </summary>
+        /// <returns></returns>
+        abstract protected Vector2 CalculateAnimationsMovementDelta ();
 		abstract public Vector2 GetRemainingRootMotion (int trackIndex = 0);
 
 		public struct RootMotionInfo {
@@ -182,7 +186,14 @@ namespace Spine.Unity {
 			return GetAnimationRootMotion(0, animation.duration, animation);
 		}
 
-		public Vector2 GetAnimationRootMotion (float startTime, float endTime,
+        /// <summary>
+        /// 获取rootBone的TranslateTimeline在两个时刻的位移delta
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        public Vector2 GetAnimationRootMotion (float startTime, float endTime,
 			Animation animation) {
 
 			var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
@@ -207,7 +218,15 @@ namespace Spine.Unity {
 			return rootMotion;
 		}
 
-		Vector2 GetTimelineMovementDelta (float startTime, float endTime,
+        /// <summary>
+        /// 获取TranslateTimeline在两个时刻位移的delta
+        /// </summary>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <param name="timeline"></param>
+        /// <param name="animation"></param>
+        /// <returns></returns>
+        Vector2 GetTimelineMovementDelta (float startTime, float endTime,
 			TranslateTimeline timeline, Animation animation) {
 
 			Vector2 currentDelta;
@@ -240,6 +259,11 @@ namespace Spine.Unity {
 			ApplyRootMotion(skeletonDelta, parentBoneScale);
 		}
 
+		/// <summary>
+		/// 应用位移delta到transform或者rigidbody上
+		/// </summary>
+		/// <param name="skeletonDelta"></param>
+		/// <param name="parentBoneScale"></param>
 		void ApplyRootMotion (Vector2 skeletonDelta, Vector2 parentBoneScale) {
 			// Apply root motion to Transform or RigidBody;
 			if (UsesRigidbody) {
@@ -262,38 +286,57 @@ namespace Spine.Unity {
 			return GetScaleAffectingRootMotion(out parentBoneScale);
 		}
 
-		Vector2 GetScaleAffectingRootMotion (out Vector2 parentBoneScale) {
+        /// <summary>
+        /// 返回值是rootMotionBone受影响的总的scale,不包括自身scale
+		/// 1.skeleton 2.AdditionalScale 3.parent bone's scales
+        /// </summary>
+        /// <param name="parentBoneScale"></param>
+        /// <returns></returns>
+        Vector2 GetScaleAffectingRootMotion (out Vector2 parentBoneScale) {
 			var skeleton = skeletonComponent.Skeleton;
 			Vector2 totalScale = Vector2.one;
+			//1.
 			totalScale.x *= skeleton.ScaleX;
 			totalScale.y *= skeleton.ScaleY;
 
 			parentBoneScale = Vector2.one;
 			Bone scaleBone = rootMotionBone;
-			while ((scaleBone = scaleBone.parent) != null) {
+            //如果rootMotionBone还有父级，收集父级的总的scale
+			//3.
+            while ((scaleBone = scaleBone.parent) != null) {
 				parentBoneScale.x *= scaleBone.ScaleX;
 				parentBoneScale.y *= scaleBone.ScaleY;
 			}
+			
 			totalScale = Vector2.Scale(totalScale, parentBoneScale);
+			//2.
 			totalScale *= AdditionalScale;
-			return totalScale;
+            //返回值是rootMotionBone的总的scale,不包括自身scale
+            return totalScale;
 		}
 
+		/// <summary>
+		/// 应用缩放，位移转换到skeleton坐标系
+		/// </summary>
+		/// <param name="boneLocalDelta">bone本地坐标系下位移delta</param>
+		/// <param name="parentBoneScale"></param>
+		/// <returns></returns>
 		Vector2 GetSkeletonSpaceMovementDelta (Vector2 boneLocalDelta, out Vector2 parentBoneScale) {
 			Vector2 skeletonDelta = boneLocalDelta;
 			Vector2 totalScale = GetScaleAffectingRootMotion(out parentBoneScale);
+			//对位移应用总的缩放
 			skeletonDelta.Scale(totalScale);
 
 			Vector2 rootMotionTranslation = new Vector2(
 				rootMotionTranslateXPerY * skeletonDelta.y,
 				rootMotionTranslateYPerX * skeletonDelta.x);
-
+			//应用本脚本的自定义缩放
 			skeletonDelta.x *= rootMotionScaleX;
 			skeletonDelta.y *= rootMotionScaleY;
 			skeletonDelta.x += rootMotionTranslation.x;
 			skeletonDelta.y += rootMotionTranslation.y;
-
-			if (!transformPositionX) skeletonDelta.x = 0f;
+            //应用本脚本的自定义 应用维度
+            if (!transformPositionX) skeletonDelta.x = 0f;
 			if (!transformPositionY) skeletonDelta.y = 0f;
 			return skeletonDelta;
 		}
@@ -315,6 +358,11 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>
+		/// 因为已经提取rootBone的位移delta数据并应用于外部的transform 或rigidbody
+		/// rootBone本身不再应用位移
+		/// </summary>
+		/// <param name="parentBoneScale"></param>
 		void ClearEffectiveBoneOffsets (Vector2 parentBoneScale) {
 			SetEffectiveBoneOffsetsTo(Vector2.zero, parentBoneScale);
 		}

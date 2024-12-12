@@ -220,7 +220,7 @@ namespace Spine {
 					to.interruptAlpha = from.interruptAlpha;
 					queue.End(from);
 				}
-				//最顶层from==null,之后每一层都混合完成to.mixTime >= to.mixDuration，返回true
+				//最顶层from==null也就是不需要混合,之后每一层都混合完成(to.mixTime >= to.mixDuration)，返回true
 				if (finished)
 				{
 					int i = 0;//debug
@@ -1023,6 +1023,7 @@ namespace Spine {
 		/// AddAnimation时设置，这个动画播放完下个播放的动画
 		/// </summary>
 		internal TrackEntry next;
+		//
         internal TrackEntry mixingFrom, mixingTo;
 		// difference to libgdx reference: delegates are used for event callbacks instead of 'AnimationStateListener listener'.
 		public event AnimationState.TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
@@ -1049,7 +1050,7 @@ namespace Spine {
 
 		internal float mixTime;
         internal float mixDuration;
-		//初始是设置为1，没找到有修改的地方
+		//动作数据权重，初始是设置为1，没找到有修改的地方
         internal float alpha;
         //from本身正在过渡时设置，Math.Min(1, from.mixTime / from.mixDuration)，打断from时，from的过渡进度
         internal float interruptAlpha;

@@ -489,15 +489,18 @@ namespace Spine {
 			}
 			switch (blend) {
 				case MixBlend.Setup:
+					//设置到目标值
 					bone.x = bone.data.x + x * alpha;
 					bone.y = bone.data.y + y * alpha;
 					break;
 				case MixBlend.First:
 				case MixBlend.Replace:
+					//根据目标值与当前值的差值进行设置
 					bone.x += (bone.data.x + x - bone.x) * alpha;
 					bone.y += (bone.data.y + y - bone.y) * alpha;
 					break;
 				case MixBlend.Add:
+					//在当前值上增加影响
 					bone.x += x * alpha;
 					bone.y += y * alpha;
 					break;

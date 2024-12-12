@@ -98,6 +98,10 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>
+		/// 计算root bone的当前帧的位移delta
+		/// </summary>
+		/// <returns></returns>
 		protected override Vector2 CalculateAnimationsMovementDelta () {
 			Vector2 localDelta = Vector2.zero;
 			int trackCount = animationState.Tracks.Count;
@@ -117,6 +121,7 @@ namespace Spine.Unity {
 					var currentDelta = GetAnimationRootMotion(start, end, animation);
 					if (currentDelta != Vector2.zero) {
 						ApplyMixAlphaToDelta(ref currentDelta, next, track);
+						//累积加权后的位移
 						localDelta += currentDelta;
 					}
 
@@ -128,7 +133,13 @@ namespace Spine.Unity {
 			return localDelta;
 		}
 
-		void ApplyMixAlphaToDelta (ref Vector2 currentDelta, TrackEntry next, TrackEntry track) {
+        /// <summary>
+        /// 对于track的rootBond的位移delta应用过渡混合权重
+        /// </summary>
+        /// <param name="currentDelta"></param>
+        /// <param name="next"></param>
+        /// <param name="track"></param>
+        void ApplyMixAlphaToDelta (ref Vector2 currentDelta, TrackEntry next, TrackEntry track) {
 			// Apply mix alpha to the delta position (based on AnimationState.cs).
 			float mix;
 			if (next != null) {

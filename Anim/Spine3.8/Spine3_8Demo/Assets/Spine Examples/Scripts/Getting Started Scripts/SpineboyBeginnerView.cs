@@ -126,6 +126,7 @@ namespace Spine.Unity.Examples {
 			var shootTrack = skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
 			shootTrack.AttachmentThreshold = 1f;
 			shootTrack.MixDuration = 0f;
+			//shootTrack.Alpha = 1f;
 			var empty1 = skeletonAnimation.state.AddEmptyAnimation(1, 0.5f, 0.1f);
 			empty1.AttachmentThreshold = 1f;
 
