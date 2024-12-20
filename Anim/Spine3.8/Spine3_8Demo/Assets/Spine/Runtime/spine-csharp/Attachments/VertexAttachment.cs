@@ -94,6 +94,7 @@ namespace Spine {
 				}
 				return;
 			}
+			//ºöÂÔ£¬start==0
 			int v = 0, skip = 0;
 			for (int i = 0; i < start; i += 2) {
 				int n = bones[v];

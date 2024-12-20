@@ -279,7 +279,8 @@ Client.prototype.processServerMessages = function() {
 Client.prototype.interpolateEntities = function() {
   // Compute render timestamp.
   var now = +new Date();
-  var render_timestamp = now - (1000.0 / server.update_rate);//在一个servertick周期内，插值追平到服务器确认数据
+  //在一个servertick周期内，插值追平到服务器确认数据
+  var render_timestamp = now - (1000.0 / server.update_rate);
 
   for (var i in this.entities) {
     var entity = this.entities[i];
@@ -322,7 +323,7 @@ var Server = function(canvas, status) {
   this.last_processed_input = [];
 
   // Simulated network connection.
-  this.00 = new LagNetwork();
+  this.network = new LagNetwork();
 
   // UI.
   this.canvas = canvas;

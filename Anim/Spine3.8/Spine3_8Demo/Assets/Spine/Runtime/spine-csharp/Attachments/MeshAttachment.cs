@@ -34,7 +34,14 @@ namespace Spine {
 	public class MeshAttachment : VertexAttachment, IHasRendererObject {
 		internal float regionOffsetX, regionOffsetY, regionWidth, regionHeight, regionOriginalWidth, regionOriginalHeight;
 		private MeshAttachment parentMesh;
-		internal float[] uvs, regionUVs;
+		/// <summary>
+		/// 顶点在图集空间中的uv坐标
+		/// </summary>
+		internal float[] uvs;
+		/// <summary>
+		/// 顶点在图片内部的uv坐标
+		/// </summary>
+        internal float[] regionUVs;
 		internal int[] triangles;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal int hulllength;
@@ -141,8 +148,9 @@ namespace Spine {
 				v -= (RegionOriginalHeight - RegionOffsetY - RegionHeight) / textureHeight;
 				width = RegionOriginalWidth / textureWidth;
 				height = RegionOriginalHeight / textureHeight;
-
+				//uv从region内本地定义变换到图集定义
 				for (int i = 0, n = uvs.Length; i < n; i += 2) {
+					//region左下角的图集uv + regionUV*uvWidth
 					uvs[i] = u + regionUVs[i] * width;
 					uvs[i + 1] = v + regionUVs[i + 1] * height;
 				}
