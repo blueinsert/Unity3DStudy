@@ -82,7 +82,7 @@ namespace Spine {
 			var deformArray = slot.deform;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
-			if (bones == null) {
+			if (bones == null) {//只受到当前骨骼的影响
 				if (deformArray.Count > 0) vertices = deformArray.Items;
 				Bone bone = slot.bone;
 				float x = bone.worldX, y = bone.worldY;
@@ -103,13 +103,22 @@ namespace Spine {
 			}
 			var skeletonBones = skeleton.bones.Items;
 			if (deformArray.Count == 0) {
-				for (int w = offset, b = skip * 3; w < count; w += stride) {
+                //w:当前处理的顶点数据索引
+                //v:当前顶点正在处理的骨骼数组中的索引
+                //b:当前顶点正在处理的位置权重数组中的索引
+                for (int w = offset, b = skip * 3; w < count; w += stride) {
 					float wx = 0, wy = 0;
+					//获取当前顶点的英雄骨骼数量
 					int n = bones[v++];
+					//现在n处于下一个顶点对应的数据在bones数组的开始index
 					n += v;
+					//v追赶n,遍历每个骨骼
 					for (; v < n; v++, b += 3) {
+						//获取骨骼索引，来获取运行时骨骼数据
 						Bone bone = skeletonBones[bones[v]];
+						//获取顶点在bone local坐标系下的位置和权重
 						float vx = vertices[b], vy = vertices[b + 1], weight = vertices[b + 2];
+						//转换到世界坐标并加权
 						wx += (vx * bone.a + vy * bone.b + bone.worldX) * weight;
 						wy += (vx * bone.c + vy * bone.d + bone.worldY) * weight;
 					}

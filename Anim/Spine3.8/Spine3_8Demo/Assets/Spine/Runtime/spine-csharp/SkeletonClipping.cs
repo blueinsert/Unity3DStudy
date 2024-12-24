@@ -54,6 +54,7 @@ namespace Spine {
 
 			int n = clip.worldVerticesLength;
 			float[] vertices = clippingPolygon.Resize(n).Items;
+			//计算clipping区域的顶点的世界坐标
 			clip.ComputeWorldVertices(slot, 0, n, vertices, 0, 2);
 			MakeClockwise(clippingPolygon);
 			clippingPolygons = triangulator.Decompose(clippingPolygon, triangulator.Triangulate(clippingPolygon));
@@ -89,16 +90,18 @@ namespace Spine {
 			clippedUVs.Clear();
 			clippedTriangles.Clear();
 			//outer:
+			//遍历所有三角形
 			for (int i = 0; i < trianglesLength; i += 3) {
+				//顶点1 坐标和uv坐标
 				int vertexOffset = triangles[i] << 1;
 				float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
 				float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
-
-				vertexOffset = triangles[i + 1] << 1;
+                //顶点2
+                vertexOffset = triangles[i + 1] << 1;
 				float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
 				float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
-
-				vertexOffset = triangles[i + 2] << 1;
+                //顶点3 
+                vertexOffset = triangles[i + 2] << 1;
 				float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
 				float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
@@ -269,6 +272,10 @@ namespace Spine {
 			return clipped;
 		}
 
+		/// <summary>
+		/// 调整为顺时钟
+		/// </summary>
+		/// <param name="polygon"></param>
 		public static void MakeClockwise (ExposedList<float> polygon) {
 			float[] vertices = polygon.Items;
 			int verticeslength = polygon.Count;

@@ -500,19 +500,22 @@ namespace Spine {
 				attachment.vertices = vertices;
 				return;
 			}
-            //这种情况下vertices中数据格式:[影响顶点的骨骼数量boneCount,[顶点在bone中bindPos位置，权重] 重复 boneCount] 重复 顶点数量
-
-            //每个顶点最多三个影响骨骼，即三个权重，格式：权重*3，重复以上
-            ExposedList<float> weights = new ExposedList<float>(verticesLength * 3 * 3);
-			//bones中数据格式：影响顶点的骨骼数量boneCount，骨骼的索引*boneCount，重复以上
-			ExposedList<int> bones = new ExposedList<int>(verticesLength * 3);
+            //这种情况下vertices中数据格式:[影响顶点的骨骼数量boneCount,[骨骼索引,bindPos下顶点在bone local坐标下位置x,y，权重] 重复 boneCount] 重复 顶点数量
+            ExposedList<float> weights = new ExposedList<float>(verticesLength * 3 * 3);//18 > 5*3
+			ExposedList<int> bones = new ExposedList<int>(verticesLength * 3);//6=1+5，每个顶点最多5个影响骨骼？
 			for (int i = 0, n = vertices.Length; i < n;) {
 				int boneCount = (int)vertices[i++];
+				//影响顶点的骨骼数量
 				bones.Add(boneCount);
-				for (int nn = i + boneCount * 4; i < nn; i += 4) {
+                //[骨骼索引, bindPos下顶点在bone local坐标下位置x, y，权重]
+				//每个骨骼四个元素
+                for (int nn = i + boneCount * 4; i < nn; i += 4) {
+					//顶点索引
 					bones.Add((int)vertices[i]);
-					weights.Add(vertices[i + 1] * this.Scale);
+                    //顶点在bone local坐标下位置x,y
+                    weights.Add(vertices[i + 1] * this.Scale);
 					weights.Add(vertices[i + 2] * this.Scale);
+					//顶点权重
 					weights.Add(vertices[i + 3]);
 				}
 			}

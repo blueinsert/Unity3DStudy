@@ -41,6 +41,14 @@ namespace Spine {
 		private readonly Pool<ExposedList<float>> polygonPool = new Pool<ExposedList<float>>();
 		private readonly Pool<ExposedList<int>> polygonIndicesPool = new Pool<ExposedList<int>>();
 
+
+		/// <summary>
+		/// 三角剖分
+		/// 输入：多边形顶点列表
+		/// 输出：三角形索引列表
+		/// </summary>
+		/// <param name="verticesArray"></param>
+		/// <returns></returns>
 		public ExposedList<int> Triangulate (ExposedList<float> verticesArray) {
 			var vertices = verticesArray.Items;
 			int vertexCount = verticesArray.Count >> 1;
@@ -121,7 +129,14 @@ namespace Spine {
 			return triangles;
 		}
 
-		public ExposedList<ExposedList<float>> Decompose (ExposedList<float> verticesArray, ExposedList<int> triangles) {
+        /// <summary>
+        /// 三角形合并
+        /// 输出：ExposedList<ExposedList<float>> 每个内部列表包含一个凸多边形的顶点
+        /// </summary>
+        /// <param name="verticesArray"></param>
+        /// <param name="triangles"></param>
+        /// <returns></returns>
+        public ExposedList<ExposedList<float>> Decompose (ExposedList<float> verticesArray, ExposedList<int> triangles) {
 			var vertices = verticesArray.Items;
 			var convexPolygons = this.convexPolygons;
 			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
