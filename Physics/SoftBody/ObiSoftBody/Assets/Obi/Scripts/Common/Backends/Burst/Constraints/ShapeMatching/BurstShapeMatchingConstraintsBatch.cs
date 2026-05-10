@@ -366,7 +366,7 @@ namespace Obi
                 float plastic_creep = shapeMaterialParameters[i * 5 + 2];
                 float plastic_recovery = shapeMaterialParameters[i * 5 + 3];
                 float max_deform = shapeMaterialParameters[i * 5 + 4];
-
+                Debug.Log($"{shapeMaterialParameters[i * 5]} {plastic_yield} {plastic_creep} {plastic_recovery} {max_deform}");
                 // if we are allowed to absorb deformation:
                 if (plastic_creep > 0)
                 {
