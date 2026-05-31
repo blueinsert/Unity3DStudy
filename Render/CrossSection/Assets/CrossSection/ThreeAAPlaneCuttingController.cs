@@ -29,6 +29,30 @@ public class ThreeAAPlaneCuttingController : MonoBehaviour
     //private List<MaterialPropertyBlock> m_propBlocks = null;
     private Dictionary<Renderer, MaterialPropertyBlock> m_cacheBlocks = new Dictionary<Renderer, MaterialPropertyBlock>();
 
+    private void OnEnable()
+    {
+        Refresh();
+    }
+
+    private void Refresh()
+    {
+        rends = new List<Renderer>();
+        if (m_rendersRoot != null && m_rendersRoot.Count != 0)
+        {
+            foreach (var root in m_rendersRoot)
+            {
+                var rs = root.GetComponentsInChildren<Renderer>();
+                rends.AddRange(rs);
+            }
+        }
+        m_cacheBlocks.Clear();
+    }
+
+    public void RefreshFromExternal()
+    {
+        Refresh();
+    }
+
     private MaterialPropertyBlock GetCacheBlock(Renderer renderer)
     {
         if (m_cacheBlocks.ContainsKey(renderer))
@@ -43,26 +67,9 @@ public class ThreeAAPlaneCuttingController : MonoBehaviour
 
     void Start()
     {
-       
-        rends = new List<Renderer>();
-        if (m_rendersRoot != null && m_rendersRoot.Count != 0)
-        {
-            foreach (var root in m_rendersRoot)
-            {
-                var rs = root.GetComponentsInChildren<Renderer>();
-                rends.AddRange(rs);
-            }
-        }
-        //m_propBlocks = new List<MaterialPropertyBlock>();
-        //if (rends.Count != 0)
-        //{
-        //    foreach(var item in rends)
-        //    {
-        //        var block = new MaterialPropertyBlock();
-        //        item.GetPropertyBlock(block);
-        //        m_propBlocks.Add(block);
-        //    }
-        //}
+
+        Refresh();
+
         UpdateShaderProperties();
     }
 
