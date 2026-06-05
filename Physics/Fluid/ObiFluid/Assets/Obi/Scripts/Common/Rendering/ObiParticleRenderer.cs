@@ -1,106 +1,78 @@
 using UnityEngine;
-using Unity.Profiling;
-using System;
-using System.Threading;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Obi
 {
+    public interface IParticleRenderer
+    {
+        public ObiActor actor { get; }
+        public Color particleColor { get; }
+        public float radiusScale { get; }
+    }
+
+    public struct ParticleRendererData
+    {
+        public Color color;
+        public float radiusScale;
+
+        public ParticleRendererData(Color color, float radiusScale)
+        {
+            this.color = color;
+            this.radiusScale = radiusScale;
+        }
+    }
+
     [AddComponentMenu("Physics/Obi/Obi Particle Renderer", 1000)]
     [ExecuteInEditMode]
     [RequireComponent(typeof(ObiActor))]
-    public class ObiParticleRenderer : MonoBehaviour
+    public class ObiParticleRenderer : MonoBehaviour, IParticleRenderer, ObiActorRenderer<ObiParticleRenderer>
     {
-        static ProfilerMarker m_DrawParticlesPerfMarker = new ProfilerMarker("DrawParticles");
+        public Material material;
+        public RenderBatchParams renderParameters = new RenderBatchParams(true);
 
-        public bool render = true;
-        public Shader shader;
-        public Color particleColor = Color.white;
-        public float radiusScale = 1;
+        [field: SerializeField]
+        public Color particleColor { get; set; } = Color.white;
 
-        private Material material;
-        private ParticleImpostorRendering impostors;
+        [field: SerializeField]
+        public float radiusScale { get; set; } = 1;
 
-        public IEnumerable<Mesh> ParticleMeshes
+        public ObiActor actor { get; private set; }
+
+        public void Awake()
         {
-            get { return impostors.Meshes; }
-        }
-
-        public Material ParticleMaterial
-        {
-            get { return material; }
+            actor = GetComponent<ObiActor>();
         }
 
         public void OnEnable()
         {
-            impostors = new ParticleImpostorRendering();
-            GetComponent<ObiActor>().OnInterpolate += DrawParticles;
+            ((ObiActorRenderer<ObiParticleRenderer>)this).EnableRenderer();
         }
 
         public void OnDisable()
         {
-            GetComponent<ObiActor>().OnInterpolate -= DrawParticles;
-
-            if (impostors != null)
-                impostors.ClearMeshes();
-            DestroyImmediate(material);
+            ((ObiActorRenderer<ObiParticleRenderer>)this).DisableRenderer();
         }
 
-        void CreateMaterialIfNeeded()
+        public void OnValidate()
         {
+            ((ObiActorRenderer<ObiParticleRenderer>)this).SetRendererDirty(Oni.RenderingSystemType.Particles);
+        }
 
-            if (shader != null)
+        RenderSystem<ObiParticleRenderer> ObiRenderer<ObiParticleRenderer>.CreateRenderSystem(ObiSolver solver)
+        {
+            switch (solver.backendType)
             {
 
-                if (!shader.isSupported)
-                    Debug.LogWarning("Particle rendering shader not suported.");
+#if (OBI_BURST && OBI_MATHEMATICS && OBI_COLLECTIONS)
+                case ObiSolver.BackendType.Burst: return new BurstParticleRenderSystem(solver);
+#endif
+                case ObiSolver.BackendType.Compute:
+                default:
 
-                if (material == null || material.shader != shader)
-                {
-                    DestroyImmediate(material);
-                    material = new Material(shader);
-                    material.hideFlags = HideFlags.HideAndDontSave;
-                }
+                    if (SystemInfo.supportsComputeShaders)
+                        return new ComputeParticleRenderSystem(solver);
+                    return null;
             }
         }
-
-        void DrawParticles(ObiActor actor)
-        {
-            using (m_DrawParticlesPerfMarker.Auto())
-            {
-                if (!isActiveAndEnabled || !actor.isActiveAndEnabled || actor.solver == null)
-                {
-                    impostors.ClearMeshes();
-                    return;
-                }
-
-                CreateMaterialIfNeeded();
-
-                impostors.UpdateMeshes(actor);
-
-                DrawParticles();
-            }
-        }
-
-        private void DrawParticles()
-        {
-            if (material != null)
-            {
-
-                material.SetFloat("_RadiusScale", radiusScale);
-                material.SetColor("_Color", particleColor);
-
-                // Send the meshes to be drawn:
-                if (render)
-                {
-                    foreach (Mesh mesh in impostors.Meshes)
-                        Graphics.DrawMesh(mesh, Matrix4x4.identity, material, gameObject.layer);
-                }
-            }
-
-        }
-
     }
 }
 

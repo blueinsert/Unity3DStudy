@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Obi
+namespace Obi.Samples
 {
     public class MoveAndRotate : MonoBehaviour
     {
@@ -25,7 +25,7 @@ namespace Obi
                 m_LastRealTime = Time.realtimeSinceStartup;
             }
             transform.Translate(moveUnitsPerSecond.value*deltaTime, moveUnitsPerSecond.space);
-            transform.Rotate(rotateDegreesPerSecond.value*deltaTime, moveUnitsPerSecond.space);
+            transform.Rotate(rotateDegreesPerSecond.value*deltaTime, rotateDegreesPerSecond.space);
         }
 
 

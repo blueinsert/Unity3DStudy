@@ -40,7 +40,7 @@ namespace Obi
 						Vector3 pos = new Vector3(x*particleSize - width*0.5f ,y*particleSize - height*0.5f,0);
 						Vector3 vel = Vector3.forward;
 	
-						distribution.Add(new ObiEmitterShape.DistributionPoint(pos,vel,sample));
+						distribution.Add(new EmitPoint(pos,vel,sample));
 					}	
 				}
 			}
@@ -87,8 +87,8 @@ namespace Obi
 
 			Handles.DrawPolyLine(corners);
 
-			foreach (DistributionPoint point in distribution)
-				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.velocity),0.05f,EventType.Repaint);
+			foreach (EmitPoint point in distribution)
+				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.direction),0.05f,EventType.Repaint);
 
 		}
 	#endif

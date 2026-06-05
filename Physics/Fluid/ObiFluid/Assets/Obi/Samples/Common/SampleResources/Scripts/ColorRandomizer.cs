@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 
-namespace Obi
+namespace Obi.Samples
 {
 	[RequireComponent(typeof(ObiActor))]
 	public class ColorRandomizer : MonoBehaviour
@@ -14,13 +11,16 @@ namespace Obi
 		void Start()
         {
 			actor = GetComponent<ObiActor>();
+            actor.OnBlueprintLoaded += Actor_OnBlueprintLoaded;
+		}
 
-            for (int i = 0; i < actor.solverIndices.Length; ++i)
+        private void Actor_OnBlueprintLoaded(ObiActor a, ObiActorBlueprint blueprint)
+        {
+            for (int i = 0; i < actor.solverIndices.count; ++i)
             {
                 actor.solver.colors[actor.solverIndices[i]] = gradient.Evaluate(UnityEngine.Random.value);
-			}
-		}
-	
-	}
+            }
+        }
+    }
 }
 

@@ -1,0 +1,32 @@
+#pragma kernel ColorToUserData
+#pragma kernel UserDataToColor
+
+#include "../../../../Resources/Compute/MathUtils.cginc"
+
+RWStructuredBuffer<float4> userData;
+RWStructuredBuffer<float4> colors;
+RWStructuredBuffer<float4> velocities;
+
+uint particleCount;
+float deltaTime;
+
+[numthreads(128,1,1)]
+void ColorToUserData (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= particleCount)
+        return;
+        
+    userData[id.x] = RGBToAbsorption(colors[id.x]);
+
+    // uncomment for some color-dependent buoyancy.
+    //velocities[id.x] += float4(0,1,0,0) * length(colors[id.x].rgb) * deltaTime * 10;
+}
+
+[numthreads(128,1,1)]
+void UserDataToColor (uint3 id : SV_DispatchThreadID)
+{
+    if(id.x >= particleCount)
+        return;
+        
+    colors[id.x] = AbsorptionToRGB(userData[id.x]);
+}

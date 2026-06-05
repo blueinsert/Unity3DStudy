@@ -5,28 +5,47 @@ namespace Obi{
 
 	public class ObiCircleShapeTracker2D : ObiShapeTracker
 	{
-		private float radius;
-		private Vector2 center;
 
-		public ObiCircleShapeTracker2D(CircleCollider2D collider){
+		public ObiCircleShapeTracker2D(ObiCollider2D source, CircleCollider2D collider)
+        {
+            this.source = source;
 			this.collider = collider;
-			adaptor.is2D = true;
-			oniShape = Oni.CreateShape(Oni.ShapeType.Sphere);
 		}	
 
-		public override bool UpdateIfNeeded (){
+		public override void UpdateIfNeeded ()
+        {
 
 			CircleCollider2D sphere = collider as CircleCollider2D;
-	
-			if (sphere != null && (sphere.radius != radius || sphere.offset != center)){
-				radius = sphere.radius;
-				center = sphere.offset;
-				adaptor.Set(center, radius);
-				Oni.UpdateShape(oniShape,ref adaptor);
-				return true;
-			}
-			return false;
-		}
+
+            // retrieve collision world and index:
+            var world = ObiColliderWorld.GetInstance();
+            int index = source.Handle.index;
+
+            // update collider:
+            var shape = world.colliderShapes[index];
+            shape.is2D = true;
+            shape.type = ColliderShape.ShapeType.Sphere;
+            shape.filter = source.Filter;
+            shape.SetSign(source.Inverted);
+            shape.isTrigger = sphere.isTrigger;
+            shape.rigidbodyIndex = source.Rigidbody != null ? source.Rigidbody.Handle.index : -1;
+            shape.materialIndex = source.CollisionMaterial != null ? source.CollisionMaterial.handle.index : -1;
+            shape.forceZoneIndex = source.ForceZone != null ? source.ForceZone.Handle.index : -1;
+            shape.contactOffset = source.Thickness;
+            shape.center = sphere.offset;
+            shape.size = Vector3.one * sphere.radius;
+            world.colliderShapes[index] = shape;
+
+            // update bounds:
+            var aabb = world.colliderAabbs[index];
+            aabb.FromBounds(sphere.bounds, shape.contactOffset, true);
+            world.colliderAabbs[index] = aabb;
+
+            // update transform:
+            var trfm = world.colliderTransforms[index];
+            trfm.FromTransform2D(sphere.transform, source.Rigidbody as ObiRigidbody2D);
+            world.colliderTransforms[index] = trfm;
+        }
 
 	}
 }

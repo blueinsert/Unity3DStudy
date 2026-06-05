@@ -45,7 +45,7 @@ namespace Obi
 								Vector3 pos = new Vector3(x,y,z) * norm;
 			
 								if (pos.magnitude < radius){
-									distribution.Add(new ObiEmitterShape.DistributionPoint(pos,Vector3.forward));
+									distribution.Add(new EmitPoint(pos,Vector3.forward));
 								}
 							}
 						}
@@ -73,7 +73,7 @@ namespace Obi
 
 						for (int j = 0; j < steps; ++j){
 							Vector3 pos = new Vector3(r * Mathf.Cos(angleIncrement*j), r * Mathf.Sin(angleIncrement*j),h);
-							distribution.Add(new ObiEmitterShape.DistributionPoint(pos,pos.normalized));
+							distribution.Add(new EmitPoint(pos,pos.normalized));
 						}
 					}
 					
@@ -91,8 +91,8 @@ namespace Obi
 			Handles.DrawWireDisc(Vector3.zero,Vector3.up,radius);
 			Handles.DrawWireDisc(Vector3.zero,Vector3.right,radius);
 
-			foreach (DistributionPoint point in distribution)
-				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.velocity),0.05f,EventType.Repaint);
+			foreach (EmitPoint point in distribution)
+				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.direction),0.05f,EventType.Repaint);
 
 		}
 	#endif

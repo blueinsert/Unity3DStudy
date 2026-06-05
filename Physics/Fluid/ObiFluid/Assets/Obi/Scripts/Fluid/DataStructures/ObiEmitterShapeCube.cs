@@ -47,7 +47,7 @@ namespace Obi
 								Vector3 pos = new Vector3(x * size.x/(float)numX - size.x*0.5f,
 														  y * size.y/(float)numY - size.y*0.5f,
 														  z * size.z/(float)numZ - size.z*0.5f);
-								distribution.Add(new ObiEmitterShape.DistributionPoint(pos,Vector3.forward));
+								distribution.Add(new EmitPoint(pos,Vector3.forward));
 							}
 						}
 					}
@@ -84,7 +84,7 @@ namespace Obi
 									if (z == 0) normal.z = -1;
 									else if (z == numZ) normal.z = 1;
 
-									distribution.Add(new ObiEmitterShape.DistributionPoint(pos,normal.normalized));
+									distribution.Add(new EmitPoint(pos,normal.normalized));
 								}
 							}
 						}
@@ -102,8 +102,8 @@ namespace Obi
 
 			Handles.DrawWireCube(Vector3.zero,size);
 
-			foreach (DistributionPoint point in distribution)
-				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.velocity),0.05f,EventType.Repaint);
+			foreach (EmitPoint point in distribution)
+				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.direction),0.05f,EventType.Repaint);
 
 		}
 	#endif

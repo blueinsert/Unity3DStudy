@@ -1,6 +1,4 @@
-using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
 namespace Obi
 {
@@ -26,10 +24,10 @@ namespace Obi
             {
                 ObiPaintBrushEditorTool paintTool = (ObiPaintBrushEditorTool)meshBasedEditor.currentTool;
 
-                float[] weights = new float[editor.selectionStatus.Length];
+                float[] weights = new float[ObiActorBlueprintEditor.selectionStatus.Length];
                 for (int i = 0; i < weights.Length; i++)
                 {
-                    if (paintTool.selectionMask && !editor.selectionStatus[i])
+                    if (paintTool.selectionMask && !ObiActorBlueprintEditor.selectionStatus[i])
                         weights[i] = 0;
                     else
                         weights[i] = 1;

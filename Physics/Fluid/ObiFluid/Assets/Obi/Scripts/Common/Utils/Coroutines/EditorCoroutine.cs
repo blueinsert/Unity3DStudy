@@ -6,38 +6,31 @@ using System.Collections;
 
 namespace Obi
 {
+    public class EditorCoroutine
+    {
 
-public class EditorCoroutine
-{
+	    public static bool ShowCoroutineProgressBar(string title, IEnumerator coroutine)
+        {
 
-	public static void ShowCoroutineProgressBar(string title, ref IEnumerator coroutine){
+            bool cancelled = false;
+
+        #if (UNITY_EDITOR)
+            if (coroutine != null){
+
+                while (coroutine.MoveNext() && !cancelled)
+                {
+                    var progressInfo = coroutine.Current as CoroutineJob.ProgressInfo;
+                    cancelled |= EditorUtility.DisplayCancelableProgressBar(title, progressInfo.userReadableInfo, progressInfo.progress);
+                }
+
+			    // once finished, set coroutine to null and clear progress bar.
+			    coroutine = null;
+			    EditorUtility.ClearProgressBar();
+
+            }
+        #endif
+            return cancelled;
+        }
 		
-		#if (UNITY_EDITOR)
-		if (coroutine != null){
-
-			CoroutineJob.ProgressInfo progressInfo;
-
-			do{
-				if (!coroutine.MoveNext())
-					progressInfo = null;
-				else 
-					progressInfo = coroutine.Current as CoroutineJob.ProgressInfo;
-			
-				if (progressInfo != null && EditorUtility.DisplayCancelableProgressBar(title, progressInfo.userReadableInfo, progressInfo.progress)){
-					progressInfo = null;
-				}
-			}while (progressInfo != null);
-
-			// once finished, clear progress bar and set coroutine to null.
-			coroutine = null;
-
-			// Unity bug here: https://issuetracker.unity3d.com/issues/unity-throws-nullreferenceexception-or-endlayoutgroup-errors-when-editorutility-dot-clearprogressbar-is-called
-			EditorUtility.ClearProgressBar();
-
-		}
-		#endif
-
-	}
-		
-}
+    }
 }

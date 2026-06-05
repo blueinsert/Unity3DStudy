@@ -33,7 +33,7 @@ namespace Obi{
         }
 
 
-        private void FixedUpdate()
+        private void Update()
         {
             if (!m_Jump)
             {

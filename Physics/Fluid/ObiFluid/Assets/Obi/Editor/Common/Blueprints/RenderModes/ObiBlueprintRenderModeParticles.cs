@@ -13,18 +13,20 @@ namespace Obi
         private Shader shader;
         private Material material;
         private ParticleImpostorRendering impostorDrawer;
+        private MaterialPropertyBlock mpb;
 
         public ObiBlueprintRenderModeParticles(ObiActorBlueprintEditor editor) :base(editor)
         {
             impostorDrawer = new ParticleImpostorRendering();
-            impostorDrawer.UpdateMeshes(editor.Blueprint);
+            impostorDrawer.UpdateMeshes(editor.blueprint);
+            mpb = new MaterialPropertyBlock();
         }
 
         void CreateMaterialIfNeeded()
         {
             if (shader == null)
             {
-                shader = Shader.Find("Obi/Particles");
+                shader = Shader.Find("Obi/EditorParticles");
                 if (shader != null)
                 {
                     if (!shader.isSupported)
@@ -43,13 +45,15 @@ namespace Obi
         public override void DrawWithCamera(Camera camera) 
         {
             CreateMaterialIfNeeded();
+            mpb.SetFloat("_RadiusScale", 1);
+            mpb.SetColor("_ParticleColor", Color.white);
             foreach (Mesh mesh in impostorDrawer.Meshes)
-                Graphics.DrawMesh(mesh, Matrix4x4.identity, material, 0);
+                Graphics.DrawMesh(mesh, Matrix4x4.identity, material, 0, camera, 0, mpb);
         }
 
         public override void Refresh()
         {
-            impostorDrawer.UpdateMeshes(editor.Blueprint);
+            impostorDrawer.UpdateMeshes(editor.blueprint, editor.visible, editor.tint);
         }
 
         public override void OnDestroy()

@@ -14,6 +14,7 @@ namespace Obi{
 
 		private MethodInfo eventMethodInfo = null;
 		private FieldInfo fieldInfo = null;
+        private PropertyInfo propertyInfo = null;
 
 		public VisibleIf(string methodName, bool negate = false)
 	    {
@@ -39,13 +40,19 @@ namespace Obi{
 			// If we could not find a method with that name, look for a field:
 			if (eventMethodInfo == null && fieldInfo == null)
 				fieldInfo = eventOwnerType.GetField(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
-			
-			if (eventMethodInfo != null)
+
+            // or maybe a property
+            if (eventMethodInfo == null && fieldInfo == null && propertyInfo == null)
+                propertyInfo = eventOwnerType.GetProperty(eventName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+            if (eventMethodInfo != null)
 				return (bool)eventMethodInfo.Invoke(property.serializedObject.targetObject, null); 
 			else if (fieldInfo != null)
 				return (bool)fieldInfo.GetValue(property.serializedObject.targetObject);
-			else
-				Debug.LogWarning(string.Format("VisibleIf: Unable to find method or field {0} in {1}", eventName, eventOwnerType));
+            else if (propertyInfo != null)
+                return (bool)propertyInfo.GetValue(property.serializedObject.targetObject);
+            else
+				Debug.LogWarning(string.Format("VisibleIf: Unable to find method, field or property {0} in {1}", eventName, eventOwnerType));
 
 			return true;
 	    }

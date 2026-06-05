@@ -16,7 +16,7 @@ namespace Obi{
 
 	    public virtual void OnGUI(Rect position, SerializedProperty property, GUIContent label)
 		{
-			EditorGUI.PropertyField(position,property,label);
+			EditorGUI.PropertyField(position,property,label,true);
 		}
 	 
 		internal virtual void OnPreGUI(Rect position, SerializedProperty property){}
@@ -53,8 +53,9 @@ namespace Obi{
 				if (!attr.IsVisible(property)) 
 					return -EditorGUIUtility.standardVerticalSpacing;
 
-			// In case no attribute returns a modified height, return the property's default one:
-	        float height = base.GetPropertyHeight(property, label);
+            // In case no attribute returns a modified height, return the property's default one:
+            float height = EditorGUI.GetPropertyHeight(property, label, true);
+            //base.GetPropertyHeight(property, label);
 
 			// Check if any of the attributes wants to modify height:
 	        foreach (object atr in mAttribute.stored)

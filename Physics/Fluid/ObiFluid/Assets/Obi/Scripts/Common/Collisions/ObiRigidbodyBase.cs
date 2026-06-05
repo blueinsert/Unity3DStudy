@@ -5,75 +5,53 @@ using System.Collections;
 
 namespace Obi{
 
-	/**
+    /**
 	 * Small helper class that lets you specify Obi-only properties for rigidbodies.
 	 */
 
-	[ExecuteInEditMode]
-	public abstract class ObiRigidbodyBase : MonoBehaviour
-	{
-        static ProfilerMarker m_UpdateRigidbodiesPerfMarker = new ProfilerMarker("UpdateRigidbodies");
-        static ProfilerMarker m_UpdateRigidbodyVelocitiesPerfMarker = new ProfilerMarker("UpdateRigidbodyVelocities");
+    [ExecuteInEditMode]
+    public abstract class ObiRigidbodyBase : MonoBehaviour
+    {
 
         public bool kinematicForParticles = false;
 
-        private IntPtr oniRigidbody = IntPtr.Zero;
-		protected Oni.Rigidbody adaptor = new Oni.Rigidbody();
-		protected Oni.RigidbodyVelocities oniVelocities = new Oni.RigidbodyVelocities();
-
-		protected Vector3 velocity, angularVelocity;
-
-        private delegate void RigidbodyUpdateCallback();
-        private static event RigidbodyUpdateCallback OnUpdateRigidbodies;
-        private static event RigidbodyUpdateCallback OnUpdateVelocities;
-
-		public IntPtr OniRigidbody {
-			get{
-                if (oniRigidbody == IntPtr.Zero)
-                    oniRigidbody = Oni.CreateRigidbody();
-                return oniRigidbody;
-            }
-		}
-
-		public virtual void Awake()
+        protected ObiRigidbodyHandle rigidbodyHandle;
+        public ObiRigidbodyHandle Handle
         {
-			UpdateIfNeeded();
-            ObiRigidbodyBase.OnUpdateRigidbodies += UpdateIfNeeded;
-            ObiRigidbodyBase.OnUpdateVelocities += UpdateVelocities;
-		}
-
-		public void OnDestroy()
-        {
-            ObiRigidbodyBase.OnUpdateRigidbodies -= UpdateIfNeeded;
-            ObiRigidbodyBase.OnUpdateVelocities -= UpdateVelocities;
-			Oni.DestroyRigidbody(oniRigidbody);
-			oniRigidbody = IntPtr.Zero;
-		}
-
-        public static void UpdateAllRigidbodies()
-        {
-            using (m_UpdateRigidbodiesPerfMarker.Auto())
+            get
             {
-                if (OnUpdateRigidbodies != null)
-                    OnUpdateRigidbodies();
+                // don't check rigidbodyHandle.isValid:
+                // CreateRigidbody may defer creation, so we get a non-null, but invalid handle.
+                // If calling handle again right away before it becomes valid, it will call CreateRigidbody() again and create a second handle to the same body.
+                if (rigidbodyHandle == null) 
+                {
+                    var world = ObiColliderWorld.GetInstance();
+
+                    // create the material:
+                    rigidbodyHandle = world.CreateRigidbody();
+                    rigidbodyHandle.owner = this;
+                }
+                return rigidbodyHandle;
             }
         }
 
-        public static void UpdateAllVelocities()
+        protected virtual void OnEnable()
         {
-            using (m_UpdateRigidbodyVelocitiesPerfMarker.Auto())
-            {
-                if (OnUpdateVelocities != null)
-                    OnUpdateVelocities();
-            }
+            rigidbodyHandle = ObiColliderWorld.GetInstance().CreateRigidbody();
+            rigidbodyHandle.owner = this;
         }
 
-		public abstract void UpdateIfNeeded();
+		public void OnDisable()
+        {
+            ObiColliderWorld.GetInstance().DestroyRigidbody(rigidbodyHandle);
+        }
+
+		public abstract void UpdateIfNeeded(float stepTime);
 
 		/**
 		 * Reads velocities back from the solver.
 		 */
-		public abstract void UpdateVelocities();
+		public abstract void UpdateVelocities(Vector3 linearDelta, Vector3 angularDelta);
 
 	}
 }

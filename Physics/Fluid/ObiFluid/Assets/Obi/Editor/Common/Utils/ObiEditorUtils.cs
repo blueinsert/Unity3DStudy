@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using System.IO;
+using UnityEngine.Rendering;
 
 namespace Obi{
 
@@ -11,6 +12,7 @@ namespace Obi{
 	{
         static GUIStyle separatorLine;
         static GUIStyle toggleablePropertyGroup;
+        static GUIStyle boldToggle;
 
         public static GUIStyle GetSeparatorLineStyle()
         {
@@ -40,7 +42,17 @@ namespace Obi{
             return toggleablePropertyGroup;
         }
 
-		public static void SaveMesh (Mesh mesh, string title, string name, bool makeNewInstance = true, bool optimizeMesh = true) {
+        public static GUIStyle GetBoldToggleStyle()
+        {
+            if (boldToggle == null)
+            {
+                boldToggle = new GUIStyle(EditorStyles.toggle);
+                boldToggle.fontStyle = FontStyle.Bold;
+            }
+            return boldToggle;
+        }
+
+        public static void SaveMesh (Mesh mesh, string title, string name, bool makeNewInstance = true, bool optimizeMesh = true) {
 
 			string path = EditorUtility.SaveFilePanel(title, "Assets/", name, "asset");
 			if (string.IsNullOrEmpty(path)) return;
@@ -116,17 +128,7 @@ namespace Obi{
         public static GameObject CreateNewSolver()
         {
             // Root for the actors.
-            var root = new GameObject("Obi Solver");
-            ObiSolver solver = root.AddComponent<ObiSolver>();
-
-            // Try to find a fixed updater in the scene (though other kinds of updaters can exist, updating in FixedUpdate is the preferred option).
-            ObiFixedUpdater updater = StageUtility.GetCurrentStageHandle().FindComponentOfType<ObiFixedUpdater>();
-            // If we could not find an fixed updater in the scene, add one to the solver object.
-            if (updater == null)
-                updater = root.AddComponent<ObiFixedUpdater>();
-
-            // Add the solver to the updater:
-            updater.solvers.Add(solver);
+            var root = new GameObject("Obi Solver", typeof(ObiSolver));
 
             // Works for all stages.
             StageUtility.PlaceGameObjectInCurrentStage(root);
@@ -149,11 +151,30 @@ namespace Obi{
             return true;
         }
 
+        public static void DoPropertyGroup(GUIContent content, System.Action action)
+        {
+            EditorGUILayout.BeginVertical(GetToggleablePropertyGroupStyle());
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(content, EditorStyles.boldLabel); 
+                EditorGUILayout.EndHorizontal();
+
+                if (action != null)
+                {
+                    EditorGUI.indentLevel++;
+                    action();
+                    EditorGUI.indentLevel--;
+                }
+            }
+            EditorGUILayout.EndVertical();
+        }
+
         public static void DoToggleablePropertyGroup(SerializedProperty enabledProperty, GUIContent content, System.Action action)
         {
-            GUI.enabled = enabledProperty.boolValue;
+            bool enabled = GUI.enabled;
+            GUI.enabled &= enabledProperty.boolValue;
             EditorGUILayout.BeginVertical(GetToggleablePropertyGroupStyle());
-            GUI.enabled = true;
+            GUI.enabled = enabled;
             {
                 EditorGUILayout.BeginHorizontal();
                     enabledProperty.boolValue = EditorGUILayout.ToggleLeft(content,enabledProperty.boolValue,EditorStyles.boldLabel);
@@ -200,7 +221,34 @@ namespace Obi{
             // Return the currently selected item's index
             return selected;
         }
-	}
+
+        public static void DrawArrowHandle(Vector3 posA, Vector3 posB, float headAngle = 30, float headLength = 0.18f)        {
+            Handles.DrawLine(posA, posB);
+
+            var look = Quaternion.LookRotation(posA - posB, Camera.current.transform.forward);
+            var one = look * Quaternion.Euler(0, 180 + headAngle, 0) * new Vector3(0, 0, 1);
+            var two = look * Quaternion.Euler(0, 180 - headAngle, 0) * new Vector3(0, 0, 1);
+
+            var sizeA = HandleUtility.GetHandleSize(posA) * headLength;
+            Handles.DrawLine(posA, posA + one * sizeA);
+            Handles.DrawLine(posA, posA + two * sizeA);
+
+            var sizeB = HandleUtility.GetHandleSize(posB) * headLength;
+            Handles.DrawLine(posB, posB - one * sizeB);
+            Handles.DrawLine(posB, posB - two * sizeB);        }
+
+        public static Material GetDefaultMaterial()
+        {
+            if (GraphicsSettings.defaultRenderPipeline != null)
+            {
+                return GraphicsSettings.defaultRenderPipeline.defaultMaterial;
+            }
+            else
+            {
+                return AssetDatabase.GetBuiltinExtraResource<Material>("Default-Diffuse.mat");
+            }
+        }
+    }
 }
 
 

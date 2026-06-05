@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Obi
+namespace Obi.Samples
 {
 	/**
 	 * Sample script that colors fluid particles based on their vorticity (2D only)
@@ -23,10 +23,10 @@ namespace Obi
 
 		void LateUpdate()
 		{
-			if (!isActiveAndEnabled)
+			if (!isActiveAndEnabled || !emitter.isLoaded)
 				return;
 
-			for (int i = 0; i < emitter.solverIndices.Length; ++i)
+			for (int i = 0; i < emitter.solverIndices.count; ++i)
             {
                 int k = emitter.solverIndices[i];
                 emitter.solver.colors[k] = grad.Evaluate(emitter.solver.userData[k][0]);

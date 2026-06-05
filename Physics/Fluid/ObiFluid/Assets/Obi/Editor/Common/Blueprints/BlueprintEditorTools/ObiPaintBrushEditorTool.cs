@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
-using System;
 
 namespace Obi
 {
@@ -9,8 +7,7 @@ namespace Obi
     {
         public ObiRaycastBrush paintBrush;
         public bool selectionMask = false;
-
-        protected bool visualizationOptions;
+        public int sourcePropertyIndex = 0; /**<index of the property to copy from*/
 
         public ObiMeshBasedActorBlueprintEditor meshBasedEditor
         {
@@ -28,15 +25,15 @@ namespace Obi
                                      {
                                          // As RecordObject diffs with the end of the current frame,
                                          // and this is a multi-frame operation, we need to use RegisterCompleteObjectUndo instead.
-                                         Undo.RegisterCompleteObjectUndo(editor.Blueprint, "Paint particles");
-                                     },
-                                     ()=>
-                                     {
-                                        editor.Refresh();
+                                         Undo.RegisterCompleteObjectUndo(editor.blueprint, "Paint particles");
                                      },
                                      () =>
                                      {
-                                         EditorUtility.SetDirty(editor.Blueprint);
+                                         editor.Refresh();
+                                     },
+                                     () =>
+                                     {
+                                         EditorUtility.SetDirty(editor.blueprint);
                                      });
 
         }
@@ -54,10 +51,28 @@ namespace Obi
             // toolbar with available brush modes  for the current property:
             editor.currentProperty.BrushModes(paintBrush);
 
-            EditorGUILayout.Space(); 
+            EditorGUILayout.Space();
 
-            if (editor.PropertySelector())
+            EditorGUI.BeginChangeCheck();
+            editor.currentPropertyIndex = editor.PropertySelector(editor.currentPropertyIndex);
+            if (EditorGUI.EndChangeCheck())
+            {
+                editor.Refresh();
                 editor.currentProperty.OnSelect(paintBrush);
+            }
+
+            if (paintBrush.brushMode is ObiFloatCopyBrushMode)
+            {
+                EditorGUI.BeginChangeCheck();
+                sourcePropertyIndex = editor.PropertySelector(sourcePropertyIndex, "Copy from");
+                var sourceProperty = editor.GetProperty(sourcePropertyIndex) as ObiBlueprintFloatProperty; 
+                if (EditorGUI.EndChangeCheck())
+                {
+                    (paintBrush.brushMode as ObiFloatCopyBrushMode).source = sourceProperty;
+                }
+                if (sourceProperty == null)
+                    EditorGUILayout.HelpBox("You can't copy value from this property.", MessageType.Error);
+            }
 
             if (paintBrush.brushMode.needsInputValue)
                 editor.currentProperty.PropertyField();
@@ -65,10 +80,12 @@ namespace Obi
             paintBrush.radius = EditorGUILayout.Slider("Brush size", paintBrush.radius, 0.0001f, 0.5f);
             paintBrush.innerRadius = EditorGUILayout.Slider("Brush inner size", paintBrush.innerRadius, 0, 1);
             paintBrush.opacity = EditorGUILayout.Slider("Brush opacity", paintBrush.opacity, 0, 1);
+            paintBrush.mirror.axis = (ObiBrushMirrorSettings.MirrorAxis)EditorGUILayout.EnumPopup("Brush mirror axis", paintBrush.mirror.axis);
+            paintBrush.mirror.space = (ObiBrushMirrorSettings.MirrorSpace)EditorGUILayout.EnumPopup("Brush mirror space", paintBrush.mirror.space);
 
             EditorGUI.BeginChangeCheck();
-            meshBasedEditor.particleCulling = (ObiMeshBasedActorBlueprintEditor.ParticleCulling) EditorGUILayout.EnumPopup("Culling", meshBasedEditor.particleCulling);
-            if (editor.selectedCount == 0)
+            meshBasedEditor.particleCulling = (ObiMeshBasedActorBlueprintEditor.ParticleCulling)EditorGUILayout.EnumPopup("Culling", meshBasedEditor.particleCulling);
+            if (ObiActorBlueprintEditor.selectedCount == 0)
             {
                 EditorGUILayout.HelpBox("Select at least one particle to use selection mask.", MessageType.Info);
                 selectionMask = false;
@@ -85,27 +102,27 @@ namespace Obi
             GUILayout.Box(GUIContent.none, ObiEditorUtils.GetSeparatorLineStyle());
 
             EditorGUILayout.BeginVertical(EditorStyles.inspectorDefaultMargins);
-            visualizationOptions = EditorGUILayout.Foldout(visualizationOptions, "Visualization");
 
-            if (visualizationOptions)
-            {
                 editor.RenderModeSelector();
                 editor.currentProperty.VisualizationOptions();
-            }
+           
             EditorGUILayout.EndVertical();
         }
 
         public override bool Editable(int index)
         {
-            return editor.visible[index] && (!selectionMask || editor.selectionStatus[index]);
+            return editor.visible[index] && (!selectionMask || ObiActorBlueprintEditor.selectionStatus[index]);
         }
 
         public override void OnSceneGUI(SceneView view)
         {
             if (Camera.current != null)
             {
+                var blueprint = meshBasedEditor.blueprint as ObiMeshBasedActorBlueprint;
+                paintBrush.raycastTransform = blueprint != null ? Matrix4x4.TRS(Vector3.zero, blueprint.rotation, blueprint.scale) : Matrix4x4.identity;
+
                 paintBrush.raycastTarget = meshBasedEditor.sourceMesh;
-                paintBrush.DoBrush(editor.Blueprint.positions);
+                paintBrush.DoBrush(editor.blueprint.positions);
             }
         }
 

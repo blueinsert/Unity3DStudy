@@ -42,6 +42,9 @@ namespace Obi{
 			if (EditorGUI.EndChangeCheck()){
 				Undo.RecordObject(stitcher, "Set first actor");
 				stitcher.Actor1 = actor1;
+                if (actor1 != null)
+                    sewingToolHandle1 = actor1.transform.position;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(stitcher);
 			}
 
 			EditorGUI.BeginChangeCheck();
@@ -49,7 +52,10 @@ namespace Obi{
 			if (EditorGUI.EndChangeCheck()){
 				Undo.RecordObject(stitcher, "Set second actor");
 				stitcher.Actor2 = actor2;
-			}
+                if (actor2 != null)
+                    sewingToolHandle2 = actor2.transform.position;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(stitcher);
+            }
 
 			if (stitcher.Actor1 != null && stitcher.Actor2 != null && stitcher.Actor1.solver != stitcher.Actor2.solver){
 				EditorGUILayout.HelpBox("Both actors must be managed by the same solver.",MessageType.Error);
@@ -63,14 +69,13 @@ namespace Obi{
 
 			if (editing){
 
-				EditorGUILayout.HelpBox("Remember that when working with the sewing tool, you can use Unity's snap to vertex feature by pressing 'V' in your keyboard.",MessageType.Info);
-
 				// Clear all stitches
 				if (GUILayout.Button("Clear all stitches")){
 					if (EditorUtility.DisplayDialog("Clearing stitches","Are you sure you want to remove all stitches?","Ok","Cancel")){
 						Undo.RecordObject(stitcher, "Clear all stitches");
 						stitcher.Clear();
-					}
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(stitcher);
+                    }
 				}
 	
 				// Remove selected stitches
@@ -93,19 +98,22 @@ namespace Obi{
 						foreach(int i in removedStitches.OrderByDescending(i => i)){
 							stitcher.RemoveStitch(i);
 						}
-					}
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(stitcher);
+                    }
 				}
 
 				// Add stitch:
-				if (GUILayout.Button("Add Stitch")){
-					Undo.RecordObject(stitcher, "Add stitch");
+				if (GUILayout.Button("Add Stitch"))
+                {
+                    FindClosestParticles(out int particle1, out int particle2);
 
-					int particle1 = 0;
-					int particle2 = 0;
-					UseSewingTool(ref particle1, ref particle2);
-
-					stitcher.AddStitch(particle1,particle2);
-				}
+                    if (particle1 >= 0 && particle2 >= 0)
+                    {
+                        Undo.RecordObject(stitcher, "Add stitch");
+                        stitcher.AddStitch(particle1, particle2);
+                        PrefabUtility.RecordPrefabInstancePropertyModifications(stitcher);
+                    }
+                }
 			}
 			GUI.enabled = true;
 
@@ -120,16 +128,28 @@ namespace Obi{
 			
 		}
 
-		public void UseSewingTool(ref int particle1, ref int particle2){
+		public void FindClosestParticles(out int particle1, out int particle2)
+        {
+            particle1 = -1;
+            particle2 = -1;
+            float minDistance = float.MaxValue;
 
-			float minDistance = float.MaxValue;
+            if (stitcher.Actor1 == null || stitcher.Actor2 == null)
+                return;
 
-			if (stitcher.Actor1 == stitcher.Actor2){
+            var handle1 = HandleUtility.WorldToGUIPointWithDepth(sewingToolHandle1);
+            var handle2 = HandleUtility.WorldToGUIPointWithDepth(sewingToolHandle2);
+
+            if (stitcher.Actor1 == stitcher.Actor2)
+            {
 				float minDistance2 = float.MaxValue;
-                for (int i = 0; i < stitcher.Actor1.particleCount;++i){
+                for (int i = 0; i < stitcher.Actor1.activeParticleCount;++i)
+                {
 					Vector3 pos = stitcher.Actor1.GetParticlePosition(stitcher.Actor1.solverIndices[i]);
-					float distance1 = (pos - sewingToolHandle1).sqrMagnitude;
-					float distance2 = (pos - sewingToolHandle2).sqrMagnitude;
+                    pos = HandleUtility.WorldToGUIPointWithDepth(pos);
+
+					float distance1 = (pos - handle1).sqrMagnitude;
+					float distance2 = (pos - handle2).sqrMagnitude;
 					if (distance1 < minDistance){
 						minDistance = distance1;
 						particle1 = i;
@@ -142,24 +162,28 @@ namespace Obi{
 			}else{
 
 				// find closest particle to each end of the sewing tool:
-                for (int i = 0; i < stitcher.Actor1.particleCount;++i){
+                for (int i = 0; i < stitcher.Actor1.activeParticleCount; ++i)
+                {
 					Vector3 pos = stitcher.Actor1.GetParticlePosition(stitcher.Actor1.solverIndices[i]);
-					float distance1 = (pos - sewingToolHandle1).sqrMagnitude;
-					float distance2 = (pos - sewingToolHandle2).sqrMagnitude;
-					float min = Mathf.Min(distance1,distance2);
-					if (min < minDistance){
+                    pos = HandleUtility.WorldToGUIPointWithDepth(pos);
+
+                    float min = (pos - handle1).sqrMagnitude;
+					if (min < minDistance)
+                    {
 						minDistance = min;
 						particle1 = i;
 					}
 				}
 		
 				minDistance = float.MaxValue;
-                for (int i = 0; i < stitcher.Actor2.particleCount;++i){
+                for (int i = 0; i < stitcher.Actor2.activeParticleCount; ++i)
+                {
 					Vector3 pos = stitcher.Actor2.GetParticlePosition(stitcher.Actor2.solverIndices[i]);
-					float distance1 = (pos - sewingToolHandle1).sqrMagnitude;
-					float distance2 = (pos - sewingToolHandle2).sqrMagnitude;
-					float min = Mathf.Min(distance1,distance2);
-					if (min < minDistance){
+                    pos = HandleUtility.WorldToGUIPointWithDepth(pos);
+
+					float min = (pos - handle2).sqrMagnitude;
+					if (min < minDistance)
+                    {
 						minDistance = min;
 						particle2 = i;
 					}
@@ -167,10 +191,32 @@ namespace Obi{
 			}
 		}
 
-		public void DrawSewingTool(){
-	        var fmh_171_72_638565848175515414 = Quaternion.identity; sewingToolHandle1 = Handles.FreeMoveHandle(sewingToolHandle1,HandleUtility.GetHandleSize(sewingToolHandle1)*0.05f,new Vector3(.5f,.5f,.5f),Handles.RectangleHandleCap);
-			var fmh_172_66_638565848175542706 = Quaternion.identity; sewingToolHandle2 = Handles.FreeMoveHandle(sewingToolHandle2,HandleUtility.GetHandleSize(sewingToolHandle2)*0.05f,new Vector3(.5f,.5f,.5f),Handles.RectangleHandleCap);
-			Handles.DrawDottedLine(sewingToolHandle1,sewingToolHandle2,2);
+		public void DrawSewingTool()
+        {
+
+            FindClosestParticles(out int particle1, out int particle2);
+
+            if (particle1 >= 0 && particle2 >= 0)
+            {
+                sewingToolHandle1 = stitcher.Actor1.GetParticlePosition(stitcher.Actor1.solverIndices[particle1]);
+                sewingToolHandle2 = stitcher.Actor2.GetParticlePosition(stitcher.Actor2.solverIndices[particle2]);
+
+                float radius1 = stitcher.Actor1.GetParticleMaxRadius(stitcher.Actor1.solverIndices[particle1]);
+                float radius2 = stitcher.Actor2.GetParticleMaxRadius(stitcher.Actor2.solverIndices[particle2]);
+
+                Handles.color = Color.white;
+#if (UNITY_2022_1_OR_NEWER)
+                sewingToolHandle1 = Handles.FreeMoveHandle(sewingToolHandle1, radius1 * 2, new Vector3(.5f,.5f,.5f),Handles.SphereHandleCap);
+			    sewingToolHandle2 = Handles.FreeMoveHandle(sewingToolHandle2, radius2 * 2, new Vector3(.5f,.5f,.5f),Handles.SphereHandleCap);
+#else
+                sewingToolHandle1 = Handles.FreeMoveHandle(sewingToolHandle1, Quaternion.identity, radius1 * 2, new Vector3(.5f, .5f, .5f), Handles.SphereHandleCap);
+                sewingToolHandle2 = Handles.FreeMoveHandle(sewingToolHandle2, Quaternion.identity, radius2 * 2, new Vector3(.5f, .5f, .5f), Handles.SphereHandleCap);
+#endif
+
+                Vector3 direction = Vector3.Normalize(sewingToolHandle2 - sewingToolHandle1);
+                Handles.color = Color.yellow;
+                ObiEditorUtils.DrawArrowHandle(sewingToolHandle1 + direction*(radius1 + 0.05f), sewingToolHandle2 - direction*(radius2+0.05f)); 
+            }
 		}
 
 		/**
@@ -221,7 +267,7 @@ namespace Obi{
 							}
 						break;
 						case EventType.Repaint:
-							Handles.color = selectionStatus[i]?Color.red:Color.green;
+							Handles.color = selectionStatus[i]?Color.red:Color.cyan;
 							Handles.DrawDottedLine(pos1,pos2,2);
 						break;
 					}

@@ -33,7 +33,7 @@ namespace Obi
 
 					for (int j = 0; j < steps; ++j){
 						Vector3 pos = new Vector3(radius * Mathf.Cos(angleIncrement*j), radius * Mathf.Sin(angleIncrement*j),0);
-						distribution.Add(new ObiEmitterShape.DistributionPoint(pos,pos.normalized));
+						distribution.Add(new EmitPoint(pos,pos.normalized));
 					}
 				}
 			}
@@ -46,7 +46,7 @@ namespace Obi
 					for (int i = 0; i <= numCircles; ++i){
 
 						if (i == 0){
-							distribution.Add(new ObiEmitterShape.DistributionPoint(Vector3.zero,Vector3.forward));
+							distribution.Add(new EmitPoint(Vector3.zero,Vector3.forward));
 							continue;
 						}
 					
@@ -58,8 +58,7 @@ namespace Obi
 
 						for (int j = 0; j < steps; ++j){
 							Vector3 pos = new Vector3(r * Mathf.Cos(angleIncrement*j), r * Mathf.Sin(angleIncrement*j),0);
-							distribution.Add(new ObiEmitterShape.DistributionPoint(pos,Vector3.forward));
-							//distribution.Add(new ObiEmitterShape.DistributionPoint(pos,Vector3.forward * (radius/pos.magnitude)));
+							distribution.Add(new EmitPoint(pos,Vector3.forward));
 						}
 					}
 				}
@@ -74,8 +73,8 @@ namespace Obi
 
 			Handles.DrawWireDisc(Vector3.zero,Vector3.forward,radius);
 
-			foreach (DistributionPoint point in distribution)
-				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.velocity),0.05f * point.velocity.magnitude,EventType.Repaint);
+			foreach (EmitPoint point in distribution)
+				Handles.ArrowHandleCap(0,point.position,Quaternion.LookRotation(point.direction),0.05f * point.direction.magnitude,EventType.Repaint);
 
 		}
 	#endif

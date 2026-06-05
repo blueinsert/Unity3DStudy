@@ -15,7 +15,9 @@ namespace Obi
             public static GUIContent brushWireframe = new GUIContent("Brush wireframe");
             public static GUIContent particle = new GUIContent("Particle");
             public static GUIContent selectedParticle = new GUIContent("Selected particle");
+            public static GUIContent activeParticle = new GUIContent("Active particle");
             public static GUIContent propertyGradient = new GUIContent("Property gradient");
+            public static GUIContent particlePicking = new GUIContent("Particle GO picking");
         }
 
         const string m_ObiEditorSettingsPath = "Assets/ObiEditorSettings.asset";
@@ -52,7 +54,11 @@ namespace Obi
             EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_BrushWireframe"),Styles.brushWireframe);
             EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_Particle"),Styles.particle);
             EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_SelectedParticle"),Styles.selectedParticle);
+            EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_ActiveParticle"), Styles.activeParticle);
             EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_PropertyGradient"), Styles.propertyGradient);
+
+            EditorGUILayout.LabelField("Scene view", EditorStyles.boldLabel);
+            EditorGUILayout.PropertyField(m_ObiSettings.FindProperty("m_ParticlePicking"), Styles.particlePicking);
         }
 
         // Register the SettingsProvider

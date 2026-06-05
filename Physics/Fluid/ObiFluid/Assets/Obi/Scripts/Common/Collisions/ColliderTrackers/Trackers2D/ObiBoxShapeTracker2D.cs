@@ -5,27 +5,42 @@ namespace Obi{
 
 	public class ObiBoxShapeTracker2D : ObiShapeTracker
 	{
-		private Vector2 size;
-		private Vector2 center;
-
-		public ObiBoxShapeTracker2D(BoxCollider2D collider){
+		public ObiBoxShapeTracker2D(ObiCollider2D source, BoxCollider2D collider){
+            this.source = source;
 			this.collider = collider;
-			adaptor.is2D = true;
-			oniShape = Oni.CreateShape(Oni.ShapeType.Box);
 		}		
 	
-		public override bool UpdateIfNeeded (){
+		public override void UpdateIfNeeded (){
 
 			BoxCollider2D box = collider as BoxCollider2D;
-	
-			if (box != null && (box.size != size || box.offset != center)){
-				size = box.size;
-				center = box.offset;
-				adaptor.Set(center, size);
-				Oni.UpdateShape(oniShape,ref adaptor);
-				return true;
-			}
-			return false;
+
+            var world = ObiColliderWorld.GetInstance();
+            int index = source.Handle.index;
+
+            // update collider:
+            var shape = world.colliderShapes[index];
+            shape.is2D = true;
+            shape.type = ColliderShape.ShapeType.Box;
+            shape.filter = source.Filter;
+            shape.SetSign(source.Inverted);
+            shape.isTrigger = box.isTrigger;
+            shape.rigidbodyIndex = source.Rigidbody != null ? source.Rigidbody.Handle.index : -1;
+            shape.materialIndex = source.CollisionMaterial != null ? source.CollisionMaterial.handle.index : -1;
+            shape.forceZoneIndex = source.ForceZone != null ? source.ForceZone.Handle.index : -1;
+            shape.contactOffset = source.Thickness + box.edgeRadius;
+            shape.center = box.offset;
+            shape.size = box.size;
+            world.colliderShapes[index] = shape;
+
+            // update bounds:
+            var aabb = world.colliderAabbs[index];
+            aabb.FromBounds(box.bounds, shape.contactOffset, true);
+            world.colliderAabbs[index] = aabb;
+
+            // update transform:
+            var trfm = world.colliderTransforms[index];
+            trfm.FromTransform2D(box.transform, source.Rigidbody as ObiRigidbody2D);
+            world.colliderTransforms[index] = trfm;
 		}
 
 	}

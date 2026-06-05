@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEditor;
-using System.Collections;
 
 namespace Obi
 {
@@ -19,11 +17,12 @@ namespace Obi
 
         public override Color Get(int index)
         {
-            return editor.Blueprint.colors[index];
+            return editor.blueprint.colors[index];
         }
         public override void Set(int index, Color value)
         {
-            editor.Blueprint.colors[index] = value;
+            editor.blueprint.colors[index] = value;
+            editor.blueprint.edited = true;
         }
         public override bool Masked(int index)
         {

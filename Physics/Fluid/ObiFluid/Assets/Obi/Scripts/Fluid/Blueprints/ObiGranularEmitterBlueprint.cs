@@ -10,6 +10,8 @@ namespace Obi
     [CreateAssetMenu(fileName = "granular blueprint", menuName = "Obi/Granular Blueprint", order = 101)]
     public class ObiGranularEmitterBlueprint : ObiEmitterBlueprintBase
     {
+
+        [Header("Granular parameters")]
         public float randomness = 0;
 
         public void OnValidate()

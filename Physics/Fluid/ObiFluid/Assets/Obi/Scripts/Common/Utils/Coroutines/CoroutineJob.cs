@@ -48,7 +48,7 @@ public class CoroutineJob{
 	private bool stop;
 	private Exception e;
 
-	public int asyncThreshold = 0; //Time in milliseconds that must pass before job switches to async mode. By default, the job is asynchronous from the start.
+	public int asyncThreshold = 250; //Time in milliseconds that must pass before job switches to async mode. By default, the job is asynchronous from the start.
 
 	private void Init(){
 		isDone = false;

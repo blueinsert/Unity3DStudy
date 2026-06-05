@@ -11,80 +11,51 @@ namespace Obi
     [AddComponentMenu("Physics/Obi/Obi Instanced Particle Renderer", 1001)]
     [ExecuteInEditMode]
     [RequireComponent(typeof(ObiActor))]
-    public class ObiInstancedParticleRenderer : MonoBehaviour
+    public class ObiInstancedParticleRenderer : MonoBehaviour, ObiActorRenderer<ObiInstancedParticleRenderer>
     {
-        static ProfilerMarker m_DrawParticlesPerfMarker = new ProfilerMarker("DrawParticles");
-
-        public bool render = true;
         public Mesh mesh;
         public Material material;
-        public Vector3 instanceScale = Vector3.one;
+        public RenderBatchParams renderParameters = new RenderBatchParams(true);
+        public Color instanceColor = Color.white;
+        public float instanceScale = 1;
 
-        private List<Matrix4x4> matrices = new List<Matrix4x4>();
-        private List<Vector4> colors = new List<Vector4>();
-        private MaterialPropertyBlock mpb;
+        public ObiActor actor { get; private set; }
 
-        int meshesPerBatch = 0;
-        int batchCount;
+        void Awake()
+        {
+            actor = GetComponent<ObiActor>();
+        }
 
         public void OnEnable()
         {
-            GetComponent<ObiActor>().OnInterpolate += DrawParticles;
+            ((ObiActorRenderer<ObiInstancedParticleRenderer>)this).EnableRenderer();
         }
 
         public void OnDisable()
         {
-            GetComponent<ObiActor>().OnInterpolate -= DrawParticles;
+            ((ObiActorRenderer<ObiInstancedParticleRenderer>)this).DisableRenderer();
         }
 
-        void DrawParticles(ObiActor actor)
+        public void OnValidate()
         {
-            using (m_DrawParticlesPerfMarker.Auto())
+            ((ObiActorRenderer<ObiInstancedParticleRenderer>)this).SetRendererDirty(Oni.RenderingSystemType.InstancedParticles);
+        }
+
+        RenderSystem<ObiInstancedParticleRenderer> ObiRenderer<ObiInstancedParticleRenderer>.CreateRenderSystem(ObiSolver solver)
+        {
+            switch (solver.backendType)
             {
 
-                if (mesh == null || material == null || !render || !isActiveAndEnabled || !actor.isActiveAndEnabled || actor.solver == null)
-                {
-                    return;
-                }
+#if (OBI_BURST && OBI_MATHEMATICS && OBI_COLLECTIONS)
+                case ObiSolver.BackendType.Burst: return new BurstInstancedParticleRenderSystem(solver);
+#endif
+                case ObiSolver.BackendType.Compute:
+                default:
 
-                ObiSolver solver = actor.solver;
-
-                // figure out the size of our instance batches:
-                meshesPerBatch = Constants.maxInstancesPerBatch;
-                batchCount = actor.particleCount / meshesPerBatch + 1;
-                meshesPerBatch = Mathf.Min(meshesPerBatch, actor.particleCount);
-
-                Vector4 basis1 = new Vector4(1, 0, 0, 0);
-                Vector4 basis2 = new Vector4(0, 1, 0, 0);
-                Vector4 basis3 = new Vector4(0, 0, 1, 0);
-
-                //Convert particle data to mesh instances:
-                for (int i = 0; i < batchCount; i++)
-                {
-
-                    matrices.Clear();
-                    colors.Clear();
-                    mpb = new MaterialPropertyBlock();
-                    int limit = Mathf.Min((i + 1) * meshesPerBatch, actor.activeParticleCount);
-
-                    for (int j = i * meshesPerBatch; j < limit; ++j)
-                    {
-                        int solverIndex = actor.solverIndices[j];
-                        actor.GetParticleAnisotropy(solverIndex, ref basis1, ref basis2, ref basis3);
-                        matrices.Add(Matrix4x4.TRS(actor.GetParticlePosition(solverIndex),
-                                                   actor.GetParticleOrientation(solverIndex),
-                                                   Vector3.Scale(new Vector3(basis1[3], basis2[3], basis3[3]), instanceScale)));
-                        colors.Add(actor.GetParticleColor(solverIndex));
-                    }
-
-                    if (colors.Count > 0)
-                        mpb.SetVectorArray("_Color", colors);
-
-                    // Send the meshes to be drawn:
-                    Graphics.DrawMeshInstanced(mesh, 0, material, matrices, mpb);
-                }
+                    if (SystemInfo.supportsComputeShaders)
+                        return new ComputeInstancedParticleRenderSystem(solver);
+                    return null;
             }
-
         }
 
     }

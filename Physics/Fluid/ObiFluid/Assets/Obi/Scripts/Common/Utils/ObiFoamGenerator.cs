@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Obi
 {
@@ -9,99 +7,95 @@ namespace Obi
 	 * Foam generators create diffuse particles in areas where certain conditions meet (high velocity constrasts, high vorticity, low density, high normal values, etc.). These particles
 	 * are then advected trough the fluid velocity field.
 	 */
-	[RequireComponent(typeof(ObiEmitter))]
-	public class ObiFoamGenerator : MonoBehaviour
-	{
-		ObiEmitter emitter;
-		public float emissionRate = 500;
-		public float randomness = 0.01f;
-		public float vorticityThreshold = 10;
-		public float densityThreshold = 2000;
-		public ParticleAdvector advector;
 
-		private float accumTime = 0;
-		private List<Vector4> emitLocations;
-		private bool subscribed = false;
+    [AddComponentMenu("Physics/Obi/Obi Foam Generator", 1000)]
+    [ExecuteInEditMode]
+    [RequireComponent(typeof(ObiActor))]
+    [DisallowMultipleComponent]
+    public class ObiFoamGenerator : MonoBehaviour, ObiActorRenderer<ObiFoamGenerator>
+    {
+        public ObiActor actor { get; private set; }
 
-		void Awake(){
-			emitter = GetComponent<ObiEmitter>();
-			emitter.OnBlueprintLoaded += delegate{Subscribe();};
-			emitter.OnBlueprintUnloaded += delegate{Unsubscribe();};
-		}
+        [Header("Foam spawning")]
+        public float foamGenerationRate = 100;
+        public float foamPotential = 50;
 
-		private void Subscribe(){
-			if (isActiveAndEnabled && !subscribed && emitter.solver != null){
-				subscribed = true;
-				emitter.solver.OnInterpolate += Emitter_Solver_OnFrameEnd;
-			}
-		}
-	
-		private void Unsubscribe(){
-			if (subscribed && emitter.solver != null){
-				subscribed = false;
-                emitter.solver.OnInterpolate -= Emitter_Solver_OnFrameEnd;
-			}
-		}
+        [Range(0,1)]
+        public float foamPotentialDiffusion = 0.95f;
+        public Vector2 velocityRange = new Vector2(2, 4);
+        public Vector2 vorticityRange = new Vector2(4, 8);
 
-		public void OnEnable(){
-			Subscribe();
-		}
+        [Header("Foam properties")]
+        public Light volumeLight;
+        public Color color = new Color(1,1,1,0.25f);
+        public float size = 0.02f;
+        [Range(0,1)]
+        public float sizeRandom = 0.2f;
+        public float lifetime = 5;
+        [Range(0, 1)]
+        public float lifetimeRandom = 0.2f;
 
-		public void OnDisable(){
-			Unsubscribe();
-		}
+        public float buoyancy = 0.5f;
 
-		void Emitter_Solver_OnFrameEnd (ObiSolver solver)
-		{
-			
-			if (!isActiveAndEnabled || advector == null || advector.solver == null)
-				return;
+        [Range(0, 1)]
+        public float drag = 0.5f;
 
-			if (emitLocations == null)
-				emitLocations = new List<Vector4>(emitter.solverIndices.Length);
+        [Range(0, 1)]
+        public float atmosphericDrag = 0.5f;
 
-			accumTime += Time.deltaTime;
+        [Range(1, 50)]
+        public float airAging = 2;
 
-			// calculate emission budget for this frame:
-			int emitAmount = Mathf.FloorToInt(emissionRate * accumTime);
+        [Range(0, 1)]
+        public float isosurface = 0.02f;
 
-			// remove used emission time from accumulator:
-			accumTime -= emitAmount / emissionRate;
+        [Header("Density Control (Compute only)")]
+        [Range(0, 1)]
+        public float pressure = 1;
+        [Range(0, 1)]
+        public float density = 0.3f;
+        [Range(1, 4)]
+        public float smoothingRadius = 2.5f;
+        [Range(0, 1)]
+        public float viscosity = 0.5f;
+        [Min(0)]
+        public float surfaceTension = 2;
 
-			if (emitAmount == 0) return;
+        public void Awake()
+        {
+            actor = GetComponent<ObiActor>();
+        }
 
-			ParticleSystem.EmitParams param = new ParticleSystem.EmitParams();
+        public void OnEnable()
+        {
+            ((ObiActorRenderer<ObiFoamGenerator>)this).EnableRenderer();
+        }
 
-			emitLocations.Clear();
+        public void OnDisable()
+        {
+            ((ObiActorRenderer<ObiFoamGenerator>)this).DisableRenderer();
+        }
 
-			// loop trough particles and decide where we should emit foam from:
-			for (int i = 0; i < emitter.solverIndices.Length; ++i){
+        public void OnValidate()
+        {
+            ((ObiActorRenderer<ObiFoamGenerator>)this).SetRendererDirty(Oni.RenderingSystemType.FoamParticles);
+        }
 
-				int k = emitter.solverIndices[i];
+        RenderSystem<ObiFoamGenerator> ObiRenderer<ObiFoamGenerator>.CreateRenderSystem(ObiSolver solver)
+        {
+            switch (solver.backendType)
+            {
 
-				float vorticity = solver.vorticities[k].sqrMagnitude;
+#if (OBI_BURST && OBI_MATHEMATICS && OBI_COLLECTIONS)
+                case ObiSolver.BackendType.Burst: return new BurstFoamRenderSystem(solver);
+#endif
+                case ObiSolver.BackendType.Compute:
+                default:
 
-				if (vorticity > vorticityThreshold*vorticityThreshold && solver.fluidData[k][0] < densityThreshold){
-                    emitLocations.Add(solver.renderablePositions[k]);
-				}
-			}
-
-			// calculate how many particles we must skip each iteration to meet the budget:
-			int step = Mathf.Max(1, Mathf.FloorToInt(emitLocations.Count / (float)emitAmount));
-
-			// emit particles:
-			if (advector.solver.parameters.mode == Oni.SolverParameters.Mode.Mode3D){
-				for(int i = UnityEngine.Random.Range(0,step-1); i < emitLocations.Count; i += step){
-					param.position = emitLocations[i] + (Vector4)UnityEngine.Random.insideUnitSphere * randomness;
-					advector.Particles.Emit(param,1);
-				}
-			}else{
-				for(int i = UnityEngine.Random.Range(0,step-1); i < emitLocations.Count; i += step){
-					param.position = emitLocations[i] + (Vector4)UnityEngine.Random.insideUnitCircle * randomness;
-					advector.Particles.Emit(param,1);
-				}
-			}
-		}
-
-	}
+                    if (SystemInfo.supportsComputeShaders)
+                        return new ComputeFoamRenderSystem(solver);
+                    return null;
+            }
+        }
+    }
 }

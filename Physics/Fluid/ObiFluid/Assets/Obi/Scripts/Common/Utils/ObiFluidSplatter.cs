@@ -23,7 +23,7 @@ public class ObiFluidSplatter : MonoBehaviour {
 		solver.OnCollision -= Solver_OnCollision;
 	}
 	
-	void Solver_OnCollision (object sender, Obi.ObiSolver.ObiCollisionEventArgs e)
+	void Solver_OnCollision (object sender, ObiNativeContactList e)
 	{
 		/*for(int i = 0;  i < e.points.Length; ++i){
 			if (e.distances[i] <= 0.05f){

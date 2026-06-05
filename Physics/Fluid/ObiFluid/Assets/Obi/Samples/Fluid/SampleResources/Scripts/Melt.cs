@@ -1,55 +1,63 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Obi;
 
-[RequireComponent(typeof(ObiSolver))]
-public class Melt : MonoBehaviour {
+namespace Obi.Samples
+{
+    [RequireComponent(typeof(ObiSolver))]
+    public class Melt : MonoBehaviour
+    {
 
-	public float heat = 0.1f;
-	public float cooling = 0.1f;
+        public float heat = 0.1f;
+        public float cooling = 0.1f;
 
- 	ObiSolver solver;
-	public Collider hotCollider = null;
-	public Collider coldCollider = null;
+        ObiSolver solver;
+        public ObiCollider hotCollider = null;
+        public ObiCollider coldCollider = null;
 
-	void Awake(){
-		solver = GetComponent<Obi.ObiSolver>();
-	}
+        void Awake()
+        {
+            solver = GetComponent<ObiSolver>();
+        }
 
-	void OnEnable () {
-		solver.OnCollision += Solver_OnCollision;
-	}
+        void OnEnable()
+        {
+            solver.OnCollision += Solver_OnCollision;
+        }
 
-	void OnDisable(){
-		solver.OnCollision -= Solver_OnCollision;
-	}
-	
-	void Solver_OnCollision (object sender, Obi.ObiSolver.ObiCollisionEventArgs e)
-	{
-		for(int i = 0;  i < e.contacts.Count; ++i)
-		{
-			if (e.contacts.Data[i].distance < 0.001f)
-			{
+        void OnDisable()
+        {
+            solver.OnCollision -= Solver_OnCollision;
+        }
 
-				Component collider;
-				if (ObiCollider.idToCollider.TryGetValue(e.contacts.Data[i].other,out collider)){
+        void Solver_OnCollision(object sender, ObiNativeContactList e)
+        {
+            var colliderWorld = ObiColliderWorld.GetInstance();
 
-					int k = e.contacts.Data[i].particle;
+            for (int i = 0; i < e.count; ++i)
+            {
+                if (e[i].distance < 0.001f)
+                {
+                    var col = colliderWorld.colliderHandles[e[i].bodyB].owner;
+                    if (col != null)
+                    {
+                        int k = solver.simplices[e[i].bodyA];
 
-					Vector4 userData = solver.userData[k];
-					if (collider == hotCollider){
-						userData[0] = Mathf.Max(0.05f,userData[0] - heat * Time.fixedDeltaTime);
-						userData[1] = Mathf.Max(0.5f,userData[1] - heat * Time.fixedDeltaTime);
-					}else if (collider == coldCollider){
-						userData[0] = Mathf.Min(10,userData[0] + cooling * Time.fixedDeltaTime);
-						userData[1] = Mathf.Min(2,userData[1] + cooling * Time.fixedDeltaTime);
-					}
-					solver.userData[k] = userData;
-				}
-			}
-		}
+                        Vector4 userData = solver.userData[k];
+                        if (col == hotCollider)
+                        {
+                            userData[0] = Mathf.Max(0.02f, userData[0] - heat * Time.fixedDeltaTime);
+                            userData[1] = Mathf.Max(0.5f, userData[1] - heat * Time.fixedDeltaTime);
+                        }
+                        else if (col == coldCollider)
+                        {
+                            userData[0] = Mathf.Min(1, userData[0] + cooling * Time.fixedDeltaTime);
+                            userData[1] = Mathf.Min(2, userData[1] + cooling * Time.fixedDeltaTime);
+                        }
+                        solver.userData[k] = userData;
+                    }
+                }
+            }
 
-	}
+        }
 
+    }
 }

@@ -6,71 +6,67 @@ namespace Obi{
 
 	public class ObiEdgeShapeTracker2D : ObiShapeTracker
 	{
-		private int pointCount;
-		private GCHandle pointsHandle;
-		private GCHandle indicesHandle;
-		private bool edgeDataHasChanged = false;
+        ObiEdgeMeshHandle handle;
 
-		public ObiEdgeShapeTracker2D(EdgeCollider2D collider){
-
+        public ObiEdgeShapeTracker2D(ObiCollider2D source, EdgeCollider2D collider)
+        {
+            this.source = source;
 			this.collider = collider;
-			adaptor.is2D = true;
-			oniShape = Oni.CreateShape(Oni.ShapeType.EdgeMesh);
-
-			UpdateEdgeData();
 		}		
 
-		public void UpdateEdgeData(){
-
-			EdgeCollider2D edge = collider as EdgeCollider2D;
-
-			if (edge != null){
-
-				Vector3[] vertices = new Vector3[edge.pointCount];
-				int[] indices = new int[edge.edgeCount*2];
+		public void UpdateEdgeData()
+        {
+            ObiColliderWorld.GetInstance().DestroyEdgeMesh(handle);
+        }
 	
-				Vector2[] points = edge.points;
-				for (int i = 0; i < edge.pointCount; ++i){
-					vertices[i] = points[i];
-				}
-	
-				for (int i = 0; i < edge.edgeCount; ++i){
-					indices[i*2] = i;
-					indices[i*2+1] = i+1;
-				}
-				
-				Oni.UnpinMemory(pointsHandle);
-				Oni.UnpinMemory(indicesHandle);
-	
-				pointsHandle = Oni.PinMemory(vertices);
-				indicesHandle = Oni.PinMemory(indices);
+		public override void UpdateIfNeeded (){
 
-				edgeDataHasChanged = true;
-			}
+			EdgeCollider2D edgeCollider = collider as EdgeCollider2D;
+
+            // retrieve collision world and index:
+            var world = ObiColliderWorld.GetInstance();
+            int index = source.Handle.index;
+
+            // get or create the mesh:
+            if (handle == null || !handle.isValid)
+            {
+                handle = world.GetOrCreateEdgeMesh(edgeCollider);
+                handle.Reference();
+            }
+
+            // update collider:
+            var shape = world.colliderShapes[index];
+            shape.is2D = true;
+            shape.type = ColliderShape.ShapeType.EdgeMesh;
+            shape.filter = source.Filter;
+            shape.SetSign(source.Inverted);
+            shape.isTrigger = edgeCollider.isTrigger;
+            shape.rigidbodyIndex = source.Rigidbody != null ? source.Rigidbody.Handle.index : -1;
+            shape.materialIndex = source.CollisionMaterial != null ? source.CollisionMaterial.handle.index : -1;
+            shape.forceZoneIndex = source.ForceZone != null ? source.ForceZone.Handle.index : -1;
+            shape.center = edgeCollider.offset;
+            shape.contactOffset = source.Thickness + edgeCollider.edgeRadius;
+            shape.dataIndex = handle.index;
+            world.colliderShapes[index] = shape;
+
+            // update bounds:
+            var aabb = world.colliderAabbs[index];
+            aabb.FromBounds(edgeCollider.bounds, shape.contactOffset, true);
+            world.colliderAabbs[index] = aabb;
+
+            // update transform:
+            var trfm = world.colliderTransforms[index];
+            trfm.FromTransform2D(edgeCollider.transform, source.Rigidbody as ObiRigidbody2D);
+            world.colliderTransforms[index] = trfm;
 		}
-	
-		public override bool UpdateIfNeeded (){
 
-			EdgeCollider2D edge = collider as EdgeCollider2D;
-	
-			if (edge != null && (edge.pointCount != pointCount || 
-								 edgeDataHasChanged)){
+        public override void Destroy()
+        {
+            base.Destroy();
 
-				pointCount = edge.pointCount;
-				edgeDataHasChanged = false;
-				adaptor.Set(pointsHandle.AddrOfPinnedObject(),indicesHandle.AddrOfPinnedObject(),edge.pointCount,edge.edgeCount*2);
-				Oni.UpdateShape(oniShape,ref adaptor);
-				return true;
-			}			
-			return false;
-		}
-
-		public override void Destroy(){
-			base.Destroy();
-
-			Oni.UnpinMemory(pointsHandle);
-			Oni.UnpinMemory(indicesHandle);
-		}
-	}
+            if (handle != null && handle.Dereference())
+                ObiColliderWorld.GetInstance().DestroyEdgeMesh(handle);
+        }
+    }
 }
 

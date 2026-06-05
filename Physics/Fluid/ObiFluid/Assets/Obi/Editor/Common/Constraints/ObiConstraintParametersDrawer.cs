@@ -14,9 +14,6 @@ namespace Obi
 		{
 			float propHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-			// Remove the "Constraint Parameters" trailing in the label:
-			string shortenedLabel = label.text.Remove(label.text.Length-22);
-
 			EditorGUI.BeginProperty(position, label, property);
 
 			SerializedProperty enabled = property.FindPropertyRelative("enabled");
@@ -27,10 +24,20 @@ namespace Obi
             GUI.Box(position,"",ObiEditorUtils.GetToggleablePropertyGroupStyle());
 			GUI.enabled = true;
 
-			// Draw main constraint toggle:
-            enabled.boolValue = EditorGUI.ToggleLeft(contRect, shortenedLabel, enabled.boolValue, EditorStyles.boldLabel);
+            // Draw main constraint toggle:
+            EditorGUI.BeginProperty(position, label, enabled);
+            EditorGUI.BeginChangeCheck();
+            var newEnabled = EditorGUI.ToggleLeft(contRect, label.text, enabled.boolValue, EditorStyles.boldLabel);
+            // Only assign the value back if it was actually changed by the user.
+            // Otherwise a single value will be assigned to all objects when multi-object editing,
+            // even when the user didn't touch the control.
+            if (EditorGUI.EndChangeCheck())
+            {
+                enabled.boolValue = newEnabled;
+            }
+            EditorGUI.EndProperty();
 
-			if (enabled.boolValue){
+            if (enabled.boolValue){
 	
 				Rect evalRect = new Rect(position.x+padding, position.y+propHeight+padding, position.width-padding*2, propHeight);
 	       		Rect iterRect = new Rect(position.x+padding, position.y+propHeight*2+padding, position.width-padding*2, propHeight);

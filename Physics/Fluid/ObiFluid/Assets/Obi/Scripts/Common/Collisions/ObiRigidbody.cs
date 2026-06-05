@@ -12,38 +12,91 @@ namespace Obi{
 	[RequireComponent(typeof(Rigidbody))]
 	public class ObiRigidbody : ObiRigidbodyBase
 	{
-		private Rigidbody unityRigidbody;
+        public Rigidbody unityRigidbody { get; private set; }
 
-		public override void Awake(){
+        public Vector3 position => unityRigidbody.position;
+        public Quaternion rotation => unityRigidbody.rotation;
+
+        public Vector3 linearVelocity { get; protected set; }
+        public Vector3 angularVelocity { get; protected set; }
+
+        private Quaternion prevRotation;
+        private Vector3 prevPosition;
+
+        protected override void OnEnable()
+        {
 			unityRigidbody = GetComponent<Rigidbody>();
-			base.Awake();
+            ResetPosition();
+            base.OnEnable();
 		}
 
-		public override void UpdateIfNeeded(){
+        public void ResetPosition()
+        {
+            prevPosition = unityRigidbody.position;
+            prevRotation = unityRigidbody.rotation;
+            linearVelocity = unityRigidbody.linearVelocity;
+            angularVelocity = unityRigidbody.angularVelocity;
+        }
 
-			velocity = unityRigidbody.velocity;
-			angularVelocity = unityRigidbody.angularVelocity;
+        private void CacheVelocities(float stepTime)
+        {
+            // differentiate positions/orientations to get our own velocites for kinematic objects.
+            // also useful for animations.
+            if (unityRigidbody.isKinematic && stepTime > 0)
+            {
+                // differentiate positions to obtain linear velocity:
+                linearVelocity = (unityRigidbody.position - prevPosition) / stepTime;
 
-			adaptor.Set(unityRigidbody,kinematicForParticles);
-			Oni.UpdateRigidbody(OniRigidbody,ref adaptor);
+                // differentiate rotations to obtain angular velocity:
+                Quaternion delta = unityRigidbody.rotation * Quaternion.Inverse(prevRotation);
+                angularVelocity = new Vector3(delta.x, delta.y, delta.z) * 2.0f / stepTime;
+            }
+            else
+            {
+                // if the object is non-kinematic, just copy velocities.
+                linearVelocity = unityRigidbody.linearVelocity;
+                angularVelocity = unityRigidbody.angularVelocity;
+            }
 
-		}
+            prevPosition = unityRigidbody.position;
+            prevRotation = unityRigidbody.rotation;
+        }
+
+		public override void UpdateIfNeeded(float stepTime)
+        {
+            // Rigidbody might not exist, as rigidbody deletion is buffered.
+            // This means the unity rigidbody might be deleted before the rigidbody handle is invalidated.
+            // Conversely, rigidbodyHandle might be non-null but invalid.
+            if (unityRigidbody == null || !Handle.isValid) return;
+
+
+            CacheVelocities(stepTime);
+            var world = ObiColliderWorld.GetInstance();
+
+            var rb = world.rigidbodies[Handle.index];
+            rb.FromRigidbody(this);
+            world.rigidbodies[Handle.index] = rb;
+        }
 
 		/**
 		 * Reads velocities back from the solver.
 		 */
-		public override void UpdateVelocities()
+		public override void UpdateVelocities(Vector3 linearDelta, Vector3 angularDelta)
         {
+            // Rigidbody might not exist, as rigidbody deletion is buffered.
+            // This means the unity rigidbody might be deleted before the rigidbody handle is invalidated.
+            if (unityRigidbody == null) return;
 
-			// kinematic rigidbodies are passed to Obi with zero velocity, so we must ignore the new velocities calculated by the solver:
-			if (Application.isPlaying && (unityRigidbody.isKinematic || !kinematicForParticles))
+            // kinematic rigidbodies are passed to Obi with zero velocity, so we must ignore the new velocities calculated by the solver:
+            if (Application.isPlaying && !(unityRigidbody.isKinematic || kinematicForParticles))
             {
-
-                Oni.GetRigidbodyVelocity(OniRigidbody,ref oniVelocities);
-                unityRigidbody.velocity += oniVelocities.linearVelocity - velocity;
-                unityRigidbody.angularVelocity += oniVelocities.angularVelocity - angularVelocity;
-			}
-		}
+                if (Vector3.SqrMagnitude(linearDelta) > 0.00001f || Vector3.SqrMagnitude(angularDelta) > 0.00001f)
+                {
+                    unityRigidbody.linearVelocity += linearDelta;
+                    unityRigidbody.angularVelocity += angularDelta;
+                }
+            }
+        }
 	}
 }
 
