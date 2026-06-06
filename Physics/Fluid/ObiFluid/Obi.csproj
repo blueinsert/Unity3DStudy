@@ -64,8 +64,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeByteList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Rendering\Common\BuildParticleMeshDataJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\ObiIntegration.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ColliderCollision\BurstColliderFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\EnforceLimitsJob.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ColliderCollision\BurstColliderFrictionConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Compute\Collisions\ComputeColliderWorld.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstEdgeMesh.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Compute\Constraints\Skin\ComputeSkinConstraintsBatch.cs" />
@@ -278,8 +278,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Compute\Constraints\ParticleCollision\ComputeParticleCollisionConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ParticleCollision\BurstParticleCollisionConstraintsBatch.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\NativeList\ObiNativeColliderShapeList.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Rendering\Common\BurstFoamRenderSystem.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\Constraints\Groups\ObiSkinConstraintsData.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Rendering\Common\BurstFoamRenderSystem.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Utils\Coroutines\CoroutineJob.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Blueprints\ObiParticleGroup.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ColliderCollision\BurstColliderFrictionConstraints.cs" />
@@ -330,8 +330,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\ConstraintBatcher\FluidInteractionProvider.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Null\NullBackend.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ColliderTrackers\Trackers2D\ObiCapsuleShapeTracker2D.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\MultiPropertyAttribute.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\Volume\BurstVolumeConstraintsBatch.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Utils\Attributes\MultiPropertyAttribute.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\ShapeMatching\BurstShapeMatchingConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Solver\BurstSolverImpl.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Compute\ComputeBackend.cs" />
@@ -357,8 +357,8 @@
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Constraints\StretchShear\BurstStretchShearConstraints.cs" />
     <Compile Include="Assets\Obi\Scripts\Fluid\Blueprints\ObiGranularEmitterBlueprint.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Rendering\Common\BurstInstancedParticleRenderSystem.cs" />
-    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstPrefixSum.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiCollisionMaterial.cs" />
+    <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\DataStructures\BurstPrefixSum.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Backends\Burst\Collisions\BurstColliderWorld.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\DataStructures\ObiList.cs" />
     <Compile Include="Assets\Obi\Scripts\Common\Collisions\ObiDistanceFieldContainer.cs" />
@@ -917,6 +917,10 @@
       <HintPath>Library\PackageCache\com.unity.visualscripting\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>Library\PackageCache\com.unity.ext.nunit\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
@@ -955,10 +959,6 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>Library\PackageCache\com.unity.collections\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

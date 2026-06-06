@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d93d0a0d159da459986967b663da6fd0, type: 3}
   m_Name: FluidPassCompute
   m_EditorClassIdentifier: 
-  voxelSize: 0.06
+  voxelSize: 0.02
   isosurface: 0.07
   descentIterations: 2
   descentIsosurface: 0.242
@@ -30,7 +30,7 @@ MonoBehaviour:
   thickness: 5
   indexOfRefraction: 1
   diffuseMap: {fileID: 0}
-  diffuseColor: {r: 1, g: 1, b: 1, a: 1}
+  diffuseColor: {r: 0, g: 0.5368862, b: 1, a: 1}
   normalMap: {fileID: 0}
   normalMapIntensity: 1
   normalMapVelocityRange: {x: 10, y: 0}

@@ -1,0 +1,5 @@
+1.将模型拖到Equipment节点下
+2.将模型的材质替换为ThreeAAPlaneBSP材质
+3.将模型物体的Layer修改为Equipment
+4.ClipPlane中的ThreeAAPlaneCuttingController确保IsEnabled勾选，点击刷新按钮
+5..拖动Plane_XY,Plane_XZ或者Plane_YZ进行测试
